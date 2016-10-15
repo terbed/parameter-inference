@@ -11,7 +11,7 @@ def sharpness(x, y):
         left_idx = (np.abs(y[:max_x] - value)).argmin()
         right_idx = len(y[:max_x]) + (np.abs(y[max_x:] - value)).argmin()
 
-        full_dev += abs(x[left_idx] - x[right_idx])
+        full_dev += np.abs(x[left_idx] - x[right_idx])
 
     return full_dev
 
