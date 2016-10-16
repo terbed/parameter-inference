@@ -13,7 +13,7 @@ def sharpness(x, y):
 
         full_dev += np.abs(x[left_idx] - x[right_idx])
 
-    return full_dev
+    return full_dev/100
 
 
 if __name__ == "__main__":
