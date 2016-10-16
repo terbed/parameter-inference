@@ -22,7 +22,7 @@ _white_noise_inf3.py_
 _wn3_
 
 ### with colored noise
-4. One compartment passive model parameter (membrane capacitance'cm' and passive conductance 'gpas' ) inference:
+4. One compartment passive model parameter (membrane capacitance'cm' and passive conductance 'gpas' ) inference: 
 **code:**
 _colored_noise_inf1.py_
 **result:**
