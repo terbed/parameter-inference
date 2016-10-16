@@ -2,7 +2,7 @@ import numpy as np
 from math import sqrt, log, cos, pi, exp
 
 
-def white(mu, sigma, v_vec):
+def white(sigma, v_vec, mu=0):
     """Returns the given array with white noise as numpy array"""
     noise_signal = np.random.normal(mu, sigma, len(v_vec))
     exp_v = np.add(v_vec, noise_signal)
