@@ -1,0 +1,26 @@
+# PARAMETER SETS -----------------------
+gpas = 0.0001
+Ra = 100.
+
+gpas_min = 0.00005
+gpas_max = 0.00015
+gpas_num = 80.
+
+Ra_min = 50.
+Ra_max = 150.
+Ra_num = 100.
+
+Ra_sig = 20
+Ra_mean = 110
+gpas_sig = 0.00002
+gpas_mean = 0.0001
+
+NOISE
+D = 30.
+lamb = 0.1
+dt = 0.1
+
+
+The inferred Ra value: 115.656565657
+The sharpness of the prior distribution: 35.9090909091
+The sharpness of the posterior distribution: 31.4949494949
