@@ -1,3 +1,10 @@
+"""
+- Stick and Ball simulation
+- The experimental trace is generated with white noise
+- Axial Resistance (Ra) and passive conductance (gpas) is variable
+- We try to infer the Ra parameter and we are not interested in gpas
+"""
+
 from module.simulation import stick_and_ball
 from module.likelihood import independent_2d as likelihood
 from module.noise import white
@@ -10,12 +17,6 @@ from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm as CM
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
 
-"""
-- Stick and Ball simulation
-- The experimental trace is generated with white noise
-- Axial Resistance (Ra) and passive conductance (gpas) is variable
-- We try to infer the Ra parameter and we are not interested in gpas
-"""
 
 # PARAMETER SETS -----------------------
 gpas = 0.0001

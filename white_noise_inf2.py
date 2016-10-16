@@ -1,3 +1,10 @@
+"""
+- One compartment simulation
+- The experimental trace is generated with white noise
+- Membrane capacitance (cm) and passive conductance (gpas) is variable
+- We try to infer the cm parameter and we are not interested in gpas
+"""
+
 from module.simulation import one_compartment
 from module.likelihood import independent_2d as likelihood
 from module.noise import white
@@ -10,12 +17,6 @@ from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm as CM
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
 
-"""
-- One compartment simulation
-- The experimental trace is generated with white noise
-- Membrane capacitance (cm) and passive conductance (gpas) is variable
-- We try to infer the cm parameter and we are not interested in gpas
-"""
 
 # PARAMETER SETS
 cm = 1.
@@ -83,7 +84,7 @@ surf = ax.plot_surface(x, y, likelihood, rstride=1, cstride=1, cmap=CM.coolwarm,
 ax.zaxis.set_major_locator(LinearLocator(10))
 ax.zaxis.set_major_formatter(FormatStrFormatter('%.02f'))
 fig.colorbar(surf, shrink=0.5, aspect=5)
-plt.savefig("posterior.png")
+plt.savefig("likelihood.png")
 
 
 fig = plt.figure()
@@ -97,7 +98,7 @@ surf = ax.plot_surface(x, y, posterior, rstride=1, cstride=1, cmap=CM.coolwarm, 
 ax.zaxis.set_major_locator(LinearLocator(10))
 ax.zaxis.set_major_formatter(FormatStrFormatter('%.02f'))
 fig.colorbar(surf, shrink=0.5, aspect=5)
-plt.savefig("likelihood.png")
+plt.savefig("posterior.png")
 
 inferred_cm = cm_values[np.argmax(cm_posterior)]
 posterior_sharpness = sharpness(cm_values, cm_posterior)
