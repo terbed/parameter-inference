@@ -27,7 +27,7 @@ if __name__ == "__main__":
     D = float(sys.argv[1])
     lamb = float(sys.argv[2])
     t_dur = float(sys.argv[3])
-    length = float(sys.argv[4])
+    length = int(sys.argv[4])
     dt = float(t_dur/length)
 
     t = np.linspace(0, t_dur, length)
