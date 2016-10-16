@@ -1,0 +1,26 @@
+# PARAMETER SETS
+cm = 1.
+gpas = 0.0001
+
+gpas_start = 0.00005
+gpas_end = 0.00015
+gpas_num = 200.
+
+cm_start = 0.5
+cm_end = 1.5
+cm_num = 200.
+
+gpas_mean = 0.0001
+gpas_sig = 0.00002
+cm_sig = 0.2
+cm_mean = 1
+
+NOISE:
+D = 30.
+lamb = 0.1
+dt = 0.1
+
+RESULT:
+The inferred cm value: 1.09296482412
+The sharpness of the prior distribution: 0.359296482412
+The sharpness of the posterior distribution: 0.210854271357
