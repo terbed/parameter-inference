@@ -19,12 +19,12 @@ def sharpness(x, y):
     right_idx = len(y[:max_x]) + (np.abs(y[max_x:] - value)).argmin()
 
     data_points = len(x[left_idx:right_idx]) + 1
-    print "\nData points on the left side: " + str(len(x[left_idx:max_x])+1)
-    print "Data points on the right side: " + str(len(x[max_x:right_idx]))
-    print "Data points to measure sharpness: " + str(data_points)
 
-    if data_points < 8:
-        print "\nWarning! This trace is too sharp for this sampling frequency!\n" \
+    if data_points < 8 or len(x[left_idx:max_x]) < 3 or len(x[max_x:right_idx]) < 4:
+        print "\nData points on the left side: " + str(len(x[left_idx:max_x]) + 1)
+        print "Data points on the right side: " + str(len(x[max_x:right_idx]))
+        print "Data points to measure sharpness: " + str(data_points)
+        print "\nWARNING! This trace is too sharp for this sampling frequency!\n" \
               "Note that the sharpness value is exactly characteristic for the given trace\n" \
               "if the resolution is high enough so  -data point-  >= 8"
 
