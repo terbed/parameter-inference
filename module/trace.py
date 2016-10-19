@@ -1,43 +1,71 @@
+"""
+This module is to feature the sharpness of the trace.
+It works well with gauss like distributions (quadratic interpolation)
+And with huge enough resolution
+"""
+
 import numpy as np
+from scipy.interpolate import interp1d
 
 
 def sharpness(x, y):
-    res = np.linspace(1.1, 2., 100, dtype=float)
+    # The x value for the maximum y:
     max_x = np.argmax(y)
 
+    # Analysis ---
+    value = y[max_x]/2.
+
+    left_idx = (np.abs(y[:max_x] - value)).argmin()
+    right_idx = len(y[:max_x]) + (np.abs(y[max_x:] - value)).argmin()
+
+    data_points = len(x[left_idx:right_idx]) + 1
+    print "\nData points on the left side: " + str(len(x[left_idx:max_x])+1)
+    print "Data points on the right side: " + str(len(x[max_x:right_idx]))
+    print "Data points to measure sharpness: " + str(data_points)
+
+    if data_points < 8:
+        print "\nWarning! This trace is too sharp for this sampling frequency!\n" \
+              "Note that the sharpness value is exactly characteristic for the given trace\n" \
+              "if the resolution is high enough so  -data point-  >= 8"
+
+    # Sharpness ---
+    f = interp1d(x, y, kind='cubic')
+    x_new = np.linspace(x[0], x[len(x) - 1], 1000)
+    y_new = f(x_new)
+    max_x = np.argmax(y_new)
+
+    res = np.linspace(1.1, 2., 50, dtype=float)
     full_dev = 0.
     for i in res:
-        value = y[max_x] / i
-        left_idx = (np.abs(y[:max_x] - value)).argmin()
-        right_idx = len(y[:max_x]) + (np.abs(y[max_x:] - value)).argmin()
+        value = y_new[max_x] / i
+        left_idx = (np.abs(y_new[:max_x] - value)).argmin()
+        right_idx = len(y_new[:max_x]) + (np.abs(y_new[max_x:] - value)).argmin()
 
-        full_dev += np.abs(x[left_idx] - x[right_idx])
+        full_dev += np.abs(x_new[left_idx] - x_new[right_idx])
 
-    return full_dev/100
+    return full_dev/50
 
 
 if __name__ == "__main__":
     from matplotlib import pyplot
     import prior
-    x = np.linspace(-50, 50, num=100)
 
-    y1 = prior.normal(0, 10, x)
-    y2 = prior.normal(0, 3, x)
-    y3 = prior.normal(0, 2, x)
-    y4 = prior.normal(0, 1, x)
+    sigma = 5
+
+    x = np.linspace(-50, 50, num=50)
+    y = prior.normal(0, sigma, x)
+
+    x_exact = np.linspace(-50, 50, num=1000)  # High enough resolution for reliable sharpness check
+    y_exact = prior.normal(0, sigma, x_exact)
 
     pyplot.figure()
-    pyplot.title(" Test r:10, b:3, g:2, y:1 ")
-    pyplot.plot(x, y1, 'r')
-    pyplot.plot(x, y2, 'b')
-    pyplot.plot(x, y3, 'g')
-    pyplot.plot(x, y4, 'y')
+    pyplot.title(" Low res trace: b, High res trace: r")
+    pyplot.plot(x, y, 'bo')
+    pyplot.plot(x_exact, y_exact, 'r-')
     pyplot.xlabel("x")
     pyplot.ylabel("y")
 
-    print "Sharpness of the red gauss: " + str(sharpness(x, y1))
-    print "Sharpness of the blue gauss: " + str(sharpness(x, y2))
-    print "Sharpness of the green gauss: " + str(sharpness(x, y3))
-    print "Sharpness of the yellow gauss, which is a standard normal distribution: " + str(sharpness(x, y4))
-    pyplot.show()
+    print "\nSharpness of the given trace: " + str(sharpness(x, y))
+    print "Sharpness of the high res trace: " + str(sharpness(x_exact, y_exact))
 
+    pyplot.show()
