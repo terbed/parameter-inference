@@ -13,7 +13,7 @@ def normal(mean, sigma, values):
     for x in values:
         prior.append(normal_val(mean, sigma, x))
 
-    return np.array(prior)
+    return np.subtract(prior, np.sum(prior))
 
 
 def normal2d(x_mean, x_sigma, x_values, y_mean, y_sigma, y_values):
@@ -23,4 +23,4 @@ def normal2d(x_mean, x_sigma, x_values, y_mean, y_sigma, y_values):
         for j, y in enumerate(y_values):
             prior[i, j] = normal_val(x_mean, x_sigma, x) * normal_val(y_mean, y_sigma, y)
 
-    return prior
+    return np.subtract(prior, np.sum(prior))
