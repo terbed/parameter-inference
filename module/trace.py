@@ -34,10 +34,10 @@ def sharpness(x, y):
     y_new = f(x_new)
     max_x = np.argmax(y_new)
 
-    res = np.linspace(1.1, 2., 50, dtype=float)
+    res = np.linspace(0.5, 1., 50, dtype=float, endpoint=False)
     full_dev = 0.
     for i in res:
-        value = y_new[max_x] / i
+        value = y_new[max_x] * i
         left_idx = (np.abs(y_new[:max_x] - value)).argmin()
         right_idx = len(y_new[:max_x]) + (np.abs(y_new[max_x:] - value)).argmin()
 
