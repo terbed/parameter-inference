@@ -42,6 +42,8 @@ def interpolate(x, y):
     t[0] = x
     t[1] = y
 
+    print t
+
     return t
 
 
@@ -77,8 +79,6 @@ def kl_test(posterior, prior):
     """
     kdl = 0
     for i, p in enumerate(posterior):
-        print prior[i]
-        print p * np.log(p / prior[i])
         kdl += p * np.log(p / prior[i])
 
     return kdl
@@ -95,14 +95,14 @@ def stat(posterior, prior, param, true_param):
     :return: feature tuple for the inference
     """
 
-    p = interpolate(param, posterior)[0]
+    x = interpolate(param, posterior)[0]
     posterior = interpolate(param, posterior)[1]
     prior = interpolate(param, prior)[1]
 
-    true_idx = (np.abs(p - true_param)).argmin()
+    true_idx = (np.abs(x - true_param)).argmin()
 
-    sharper = sharpness(p, prior)/sharpness(p, posterior)
-    diff = np.abs(p[np.argmax(posterior)] - p[true_idx])
+    sharper = sharpness(x, prior)/sharpness(x, posterior)
+    diff = np.abs(x[np.argmax(posterior)] - x[true_idx])
     pdiff = np.amax(posterior)/posterior[true_idx]
     kl = kl_test(posterior, prior)
 

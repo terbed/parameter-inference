@@ -13,7 +13,7 @@ def normal(mean, sigma, values):
     for x in values:
         prior.append(normal_val(mean, sigma, x))
 
-    return np.subtract(prior, np.sum(prior))
+    return np.divide(prior, np.sum(prior))
 
 
 def normal2d(x_mean, x_sigma, x_values, y_mean, y_sigma, y_values):
@@ -23,4 +23,14 @@ def normal2d(x_mean, x_sigma, x_values, y_mean, y_sigma, y_values):
         for j, y in enumerate(y_values):
             prior[i, j] = normal_val(x_mean, x_sigma, x) * normal_val(y_mean, y_sigma, y)
 
-    return np.subtract(prior, np.sum(prior))
+    return np.divide(prior, np.sum(prior))
+
+
+if __name__ == "__main__":
+    from matplotlib import pyplot as plt
+
+    x = np.linspace(-50, 50, 1000)
+    y = normal(0, 6, x)
+
+    plt.plot(x,y)
+    plt.show()
