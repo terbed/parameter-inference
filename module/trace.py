@@ -18,7 +18,7 @@ def interpolate(x, y):
     max_idx = np.argmax(y)
 
     # Analysis
-    value = y[max_idx]/2.5
+    value = y[max_idx] / 2.5
 
     left_idx = (np.abs(y[:max_idx] - value)).argmin()
     right_idx = len(y[:max_idx]) + (np.abs(y[max_idx:] - value)).argmin()
@@ -35,14 +35,12 @@ def interpolate(x, y):
 
     # Interpolate
     f = interp1d(x, y, kind='cubic')
-    x = np.linspace(x[0], x[len(x)-1], 1000)
+    x = np.linspace(x[0], x[len(x) - 1], 1000)
     y = f(x)
 
     t = np.ndarray(shape=(2, len(x)))
     t[0] = x
     t[1] = y
-
-    print t
 
     return t
 
@@ -66,17 +64,28 @@ def sharpness(x, y):
 
         full_dev += np.abs(x[right_idx] - x[left_idx])
 
-    return full_dev/50
+    return full_dev / 50
 
 
-def kl_test(posterior, prior):
+def kl_test(posterior, prior, eps=0.0001):
     """
     Kullback-Leiber test for probability distributions.
 
     :param posterior: Posterior distribution codomain vector
     :param prior: Prior distribution codomain vector
+    :param eps: fuzz factor, below this we avoid division with small values
     :return: KL divergence of the two given distribution
     """
+
+    # Clip the too low values
+    i = 0  # count deleted indexes
+    for idx, item in enumerate(prior):
+        if item < eps:
+            prior = np.delete(prior, idx - i, axis=None)
+            posterior = np.delete(posterior, idx - i, axis=None)
+            i += 1
+
+    # KL-divergence
     kdl = 0
     for i, p in enumerate(posterior):
         kdl += p * np.log(p / prior[i])
@@ -101,12 +110,12 @@ def stat(posterior, prior, param, true_param):
 
     true_idx = (np.abs(x - true_param)).argmin()
 
-    sharper = sharpness(x, prior)/sharpness(x, posterior)
+    sharper = sharpness(x, prior) / sharpness(x, posterior)
     diff = np.abs(x[np.argmax(posterior)] - x[true_idx])
-    pdiff = np.amax(posterior)/posterior[true_idx]
+    pdiff = np.amax(posterior) / posterior[true_idx]
     kl = kl_test(posterior, prior)
 
-    return diff, pdiff, sharper, kl
+    return diff, pdiff, sharper
 
 
 if __name__ == "__main__":
@@ -116,17 +125,16 @@ if __name__ == "__main__":
     sigma = 5
 
     x = np.linspace(-50, 50, num=80)
-    y = prior.normal(5, sigma, x)
+    y = prior.normal(1, sigma, x)
 
     y_prior = prior.normal(0, 7, x)
 
     x_true = 0.
 
-    diff, pdiff, sharper, kl = stat(y, y_prior, x, x_true)
+    diff, pdiff, sharper = stat(y, y_prior, x, x_true)
     print "Difference: " + str(diff)
     print "Probability mistake: " + str(pdiff)
     print "Sharper: " + str(sharper)
-    print "kl: " + str(kl)
 
     pyplot.plot(x, y)
     pyplot.plot(x, y_prior)
