@@ -113,7 +113,6 @@ def stat(posterior, prior, param, true_param):
     sharper = sharpness(x, prior) / sharpness(x, posterior)
     diff = np.abs(x[np.argmax(posterior)] - x[true_idx])
     pdiff = np.amax(posterior) / posterior[true_idx]
-    kl = kl_test(posterior, prior)
 
     return diff, pdiff, sharper
 
