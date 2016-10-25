@@ -21,16 +21,14 @@ def generate(D, lamb, t):
 
 
 if __name__ == "__main__":
-    import sys
     import pandas as pd
 
-    D = float(sys.argv[1])
-    lamb = float(sys.argv[2])
-    t_dur = float(sys.argv[3])
-    length = int(sys.argv[4])
-    dt = float(t_dur/length)
+    D = 30
+    lamb = 0.1
+    t_dur = 200
+    dt = 0.1
 
-    t = np.linspace(0, t_dur, length)
+    t = np.linspace(0, t_dur, t_dur/dt)
 
     inv_covmat = generate(D, lamb, t)
     invcovmat = pd.DataFrame(data=inv_covmat.astype(float))
