@@ -53,7 +53,7 @@ dt = 0.1
 t, v = stick_and_ball(Ra, gpas)
 
 
-# Create experimental trace with adding white noise
+# Create experimental trace with adding colored noise
 exp_v = colored(D, lamb, dt, v)
 
 # Create inverse covariant matrix
