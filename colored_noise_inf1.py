@@ -26,11 +26,11 @@ gpas = 0.0001
 
 gpas_start = 0.00005
 gpas_end = 0.00015
-gpas_num = 200.
+gpas_num = 80.
 
 cm_start = 0.5
 cm_end = 1.5
-cm_num = 200.
+cm_num = 100.
 
 gpas_mean = 0.0001
 gpas_sig = 0.00002
@@ -90,7 +90,7 @@ plt.ylabel("probability")
 plt.axvline(cm, color='#34A52F')
 plt.plot(cm_values, cm_posterior, '#A52F34')
 plt.plot(cm_values, cm_prior, color='#2FA5A0')
-plt.savefig("/Users/Dani/TDK/parameter_estim/cn1/cm_posterior"+str(Ra_num)+".png")
+plt.savefig("/Users/Dani/TDK/parameter_estim/cn1/cm_posterior"+str(cm_num)+".png")
 
 
 fig = plt.figure()
@@ -104,7 +104,7 @@ cset = ax.contour(x, y, likelihood, zdir='y', offset=1.6, cmap=CM.coolwarm)
 ax.set_title('Likelihood')
 ax.set_xlabel('gpas [mS/cm2]')
 ax.set_ylabel('cm [microF/cm^2]')
-plt.savefig("/Users/Dani/TDK/parameter_estim/cn1/likelihood"+str(Ra_num)+".png")
+plt.savefig("/Users/Dani/TDK/parameter_estim/cn1/likelihood"+str(cm_num)+".png")
 
 
 fig = plt.figure()
@@ -118,7 +118,7 @@ cset = ax.contour(x, y, posterior, zdir='y', offset=1.6, cmap=CM.coolwarm)
 ax.set_title('Posterior')
 ax.set_xlabel('gpas [mS/cm2]')
 ax.set_ylabel('cm [microF/cm^2]')
-plt.savefig("/Users/Dani/TDK/parameter_estim/cn1/posterior"+str(Ra_num)+".png")
+plt.savefig("/Users/Dani/TDK/parameter_estim/cn1/posterior"+str(cm_num)+".png")
 
 inferred_cm = cm_values[np.argmax(cm_posterior)]
 posterior_sharpness = sharpness(cm_values, cm_posterior)
