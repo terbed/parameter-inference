@@ -70,7 +70,7 @@ plt.ylabel("probability")
 plt.axvline(cm, color='g')
 plt.plot(cm_values, cm_posterior, 'r')
 plt.plot(cm_values, cm_prior, 'b')
-plt.savefig("cm_posterior.png")
+plt.savefig("/Users/Dani/TDK/parameter_estim/wn2/cm_posterior.png")
 
 
 fig = plt.figure()
@@ -84,7 +84,7 @@ surf = ax.plot_surface(x, y, likelihood, rstride=1, cstride=1, cmap=CM.coolwarm,
 ax.zaxis.set_major_locator(LinearLocator(10))
 ax.zaxis.set_major_formatter(FormatStrFormatter('%.02f'))
 fig.colorbar(surf, shrink=0.5, aspect=5)
-plt.savefig("likelihood.png")
+plt.savefig("/Users/Dani/TDK/parameter_estim/wn2/likelihood.png")
 
 
 fig = plt.figure()
@@ -98,7 +98,7 @@ surf = ax.plot_surface(x, y, posterior, rstride=1, cstride=1, cmap=CM.coolwarm, 
 ax.zaxis.set_major_locator(LinearLocator(10))
 ax.zaxis.set_major_formatter(FormatStrFormatter('%.02f'))
 fig.colorbar(surf, shrink=0.5, aspect=5)
-plt.savefig("posterior.png")
+plt.savefig("/Users/Dani/TDK/parameter_estim/wn2/posterior.png")
 
 inferred_cm = cm_values[np.argmax(cm_posterior)]
 posterior_sharpness = sharpness(cm_values, cm_posterior)

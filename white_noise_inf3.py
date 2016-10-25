@@ -73,7 +73,7 @@ plt.ylabel("probability")
 plt.axvline(Ra, color='g')
 plt.plot(Ra_values, Ra_posterior, 'r')
 plt.plot(Ra_values, Ra_prior, 'b')
-plt.savefig("Ra_posterior.png")
+plt.savefig("/Users/Dani/TDK/parameter_estim/wn3/Ra_posterior.png")
 
 plt.figure()
 plt.title("Stick and ball model likelihood (y) distribution for Ra ")
@@ -81,7 +81,7 @@ plt.xlabel("Axial resistance (Ra) [kOhm]")
 plt.ylabel("probability")
 plt.axvline(Ra, color='g')
 plt.plot(Ra_values, Ra_likelihood, color='#A81A28')
-plt.savefig("Ra_likelihood.png")
+plt.savefig("/Users/Dani/TDK/parameter_estim/wn3/Ra_likelihood.png")
 
 
 fig = plt.figure()
@@ -95,7 +95,7 @@ surf = ax.plot_surface(x, y, likelihood, rstride=1, cstride=1, cmap=CM.coolwarm,
 ax.zaxis.set_major_locator(LinearLocator(10))
 ax.zaxis.set_major_formatter(FormatStrFormatter('%.02f'))
 fig.colorbar(surf, shrink=0.5, aspect=5)
-plt.savefig("likelihood.png")
+plt.savefig("/Users/Dani/TDK/parameter_estim/wn3/likelihood.png")
 
 
 fig = plt.figure()
@@ -109,7 +109,7 @@ surf = ax.plot_surface(x, y, posterior, rstride=1, cstride=1, cmap=CM.coolwarm, 
 ax.zaxis.set_major_locator(LinearLocator(10))
 ax.zaxis.set_major_formatter(FormatStrFormatter('%.02f'))
 fig.colorbar(surf, shrink=0.5, aspect=5)
-plt.savefig("posterior.png")
+plt.savefig("/Users/Dani/TDK/parameter_estim/wn3/posterior.png")
 
 inferred_cm = Ra_values[np.argmax(Ra_posterior)]
 posterior_sharpness = sharpness(Ra_values, Ra_posterior)
