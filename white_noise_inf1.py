@@ -55,7 +55,7 @@ plt.xlabel("cm [nF]")
 plt.ylabel("likelihood")
 plt.axvline(cm, color='g')
 plt.plot(cm_values, likelihood)
-plt.savefig("likelihood.png")
+plt.savefig("/Users/Dani/TDK/parameter_estim/wn1/likelihood.png")
 
 plt.figure()
 plt.title("Deterministic (r) and noised trace (b) ")
@@ -63,7 +63,7 @@ plt.xlabel("t [ns]")
 plt.ylabel("V [mV]")
 plt.plot(t, v, 'r')
 plt.plot(t, exp_v, 'b.')
-plt.savefig("noise.png")
+plt.savefig("/Users/Dani/TDK/parameter_estim/wn1/noise.png")
 
 
 plt.figure()
@@ -73,7 +73,7 @@ plt.ylabel("probability")
 plt.axvline(1, color='g')
 plt.plot(cm_values, posterior, 'r')
 plt.plot(cm_values, prior, 'b')
-plt.savefig("probability.png")
+plt.savefig("/Users/Dani/TDK/parameter_estim/wn1/probability.png")
 
 
 inferred_cm = cm_values[np.argmax(posterior)]

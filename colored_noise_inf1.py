@@ -79,7 +79,7 @@ plt.xlabel("t [ns]")
 plt.ylabel("V [mV]")
 plt.plot(t, v, '#A52F34')
 plt.plot(t, exp_v, '#2FA5A0')
-plt.savefig("noise.png")
+plt.savefig("/wn1/noise.png")
 
 
 plt.figure()
