@@ -21,7 +21,7 @@ def one_compartment(cm, g_pas, dt=0.1):
     stim.dur = 100
 
     # Print Information
-    h.psection()
+    # h.psection()
 
     # Set up recording Vectors
     v_vec = h.Vector()                                  # Membrane potential vector
@@ -83,7 +83,7 @@ def stick_and_ball(Ra, gpas, Ra_max=150., dt=0.1):
     stim.dur = 100
 
     # Print information
-    h.psection()
+    # h.psection()
 
     # Set up recording Vectors
     v_vec = h.Vector()

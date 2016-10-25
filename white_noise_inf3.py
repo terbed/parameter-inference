@@ -28,7 +28,7 @@ gpas_num = 80.
 
 Ra_min = 50.
 Ra_max = 150.
-Ra_num = 200.
+Ra_num = 100.
 
 gpas_values = np.linspace(gpas_min, gpas_max, gpas_num)
 Ra_values = np.linspace(Ra_min, Ra_max, Ra_num)
