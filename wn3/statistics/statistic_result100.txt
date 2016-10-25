@@ -1,0 +1,6 @@
+The distance of the most likely parameter from the true one on the average: 7.04704704705
+The standard deviation of the upper distance: 5.40938940417
+The inferred most probable parameter is how many times probable on the average (according to the posterior distribution) then the true one: 1.20301197563
+The standard deviation of the upper stat: 0.372371822933
+The posterior distribution is how many times sharper then the prior distribution on the average: 1.24428628256
+The standard deviation of the upper sharpness: 0.0112653166647
