@@ -6,7 +6,7 @@
 """
 
 from module.simulation import one_compartment
-from module.likelihood import independent_2d as likelihood
+from module.likelihood import independent_2d as likelihood_func
 from module.noise import white
 from module.prior import normal2d
 from module.trace import sharpness
@@ -28,7 +28,7 @@ gpas_num = 80.
 
 cm_start = 0.5
 cm_end = 1.5
-cm_num = 200.
+cm_num = 100.
 
 gpas_mean = 0.0001
 gpas_sig = 0.00002
@@ -50,7 +50,7 @@ sigma_noise = 7
 exp_v = white(sigma_noise, v)
 
 # TRY TO INFER BACK CM PARAMETER
-likelihood = likelihood(one_compartment, cm_values, gpas_values, sigma_noise, exp_v)
+likelihood = likelihood_func(one_compartment, cm_values, gpas_values, sigma_noise, exp_v)
 
 # Create prior distribution for cm
 prior = normal2d(cm_mean, cm_sig, cm_values, gpas_mean, gpas_sig, gpas_values)
