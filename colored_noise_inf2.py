@@ -59,6 +59,7 @@ exp_v = colored(D, lamb, dt, v)
 # Create inverse covariant matrix
 print "Generating inverse covariant matrix..."
 invcovmat = invcovmat.generate(D, lamb, t)
+print "Done!"
 
 # TRY TO INFER BACK Ra PARAMETER
 likelihood = likelihood(stick_and_ball, Ra_values, gpas_values, invcovmat, exp_v)
@@ -82,7 +83,7 @@ plt.ylabel("probability")
 plt.axvline(Ra, color='#34A52F')
 plt.plot(Ra_values, Ra_posterior, '#A52F34')
 plt.plot(Ra_values, Ra_prior, color='#2FA5A0')
-plt.savefig("Ra_posterior.png")
+plt.savefig("/Users/Dani/TDK/parameter_estim/cn2/Ra_posterior"+str(Ra_num)+".png")
 
 
 fig = plt.figure()
@@ -97,7 +98,7 @@ cset = ax.contour(x, y, likelihood, zdir='y', offset=160, cmap=CM.coolwarm)
 ax.set_title('Likelihood')
 ax.set_xlabel('gpas [mS/cm2]')
 ax.set_ylabel('Ra [kOhm]')
-plt.savefig("likelihood.png")
+plt.savefig("/Users/Dani/TDK/parameter_estim/cn2/likelihood"+str(Ra_num)+".png")
 
 
 fig = plt.figure()
@@ -111,7 +112,7 @@ cset = ax.contour(x, y, posterior, zdir='y', offset=160, cmap=CM.coolwarm)
 ax.set_title('Posterior')
 ax.set_xlabel('gpas [mS/cm2]')
 ax.set_ylabel('Ra [kOhm]')
-plt.savefig("posterior.png")
+plt.savefig("/Users/Dani/TDK/parameter_estim/cn2/posterior"+str(Ra_num)+".png")
 
 inferred_Ra = Ra_values[np.argmax(Ra_posterior)]
 posterior_sharpness = sharpness(Ra_values, Ra_posterior)

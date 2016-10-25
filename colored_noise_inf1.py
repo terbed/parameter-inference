@@ -58,6 +58,7 @@ exp_v = colored(D, lamb, dt, v)
 # Create inverse covariant matrix
 print "Generating inverse covariant matrix..."
 invcovmat = invcovmat.generate(D, lamb, t)
+print "Done!"
 
 # TRY TO INFER BACK CM PARAMETER
 likelihood = likelihood(one_compartment, cm_values, gpas_values, invcovmat, exp_v)
@@ -79,7 +80,7 @@ plt.xlabel("t [ns]")
 plt.ylabel("V [mV]")
 plt.plot(t, v, '#A52F34')
 plt.plot(t, exp_v, '#2FA5A0')
-plt.savefig("/wn1/noise.png")
+plt.savefig("/Users/Dani/TDK/parameter_estim/cn1/noise.png")
 
 
 plt.figure()
@@ -89,7 +90,7 @@ plt.ylabel("probability")
 plt.axvline(cm, color='#34A52F')
 plt.plot(cm_values, cm_posterior, '#A52F34')
 plt.plot(cm_values, cm_prior, color='#2FA5A0')
-plt.savefig("cm_posterior.png")
+plt.savefig("/Users/Dani/TDK/parameter_estim/cn1/cm_posterior"+str(Ra_num)+".png")
 
 
 fig = plt.figure()
@@ -103,7 +104,7 @@ cset = ax.contour(x, y, likelihood, zdir='y', offset=1.6, cmap=CM.coolwarm)
 ax.set_title('Likelihood')
 ax.set_xlabel('gpas [mS/cm2]')
 ax.set_ylabel('cm [microF/cm^2]')
-plt.savefig("likelihood.png")
+plt.savefig("/Users/Dani/TDK/parameter_estim/cn1/likelihood"+str(Ra_num)+".png")
 
 
 fig = plt.figure()
@@ -117,7 +118,7 @@ cset = ax.contour(x, y, posterior, zdir='y', offset=1.6, cmap=CM.coolwarm)
 ax.set_title('Posterior')
 ax.set_xlabel('gpas [mS/cm2]')
 ax.set_ylabel('cm [microF/cm^2]')
-plt.savefig("posterior.png")
+plt.savefig("/Users/Dani/TDK/parameter_estim/cn1/posterior"+str(Ra_num)+".png")
 
 inferred_cm = cm_values[np.argmax(cm_posterior)]
 posterior_sharpness = sharpness(cm_values, cm_posterior)
