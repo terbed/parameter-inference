@@ -1,0 +1,77 @@
+\documentclass[12pt]{article}
+\usepackage{amsmath}
+\usepackage{gensymb}
+\usepackage[magyar]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[a4paper]{geometry}
+\usepackage{graphicx}
+\usepackage{siunitx}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{booktabs}
+\usepackage{textcomp}
+\usepackage{color}   
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=black,
+    citecolor=black,
+    filecolor=black,
+    linkcolor=black,
+    urlcolor=black
+    linktoc=all,     
+}
+
+\author{Terbe Dániel}
+\title{Idegsejtmodellek paraméterbecslése valószínűségi keretben}
+%\date{}
+\frenchspacing
+
+\begin{document}
+\maketitle
+
+\newpage
+\tableofcontents
+\newpage
+\listoffigures
+\newpage
+
+\renewcommand{\abstractname}{Absztrakt}
+\begin{abstract}
+\
+
+Az idegsejtek viselkedését számos paraméter határozza meg, melyek közül kísérletileg nem mérhető mind közvetlenül. Az ilyen típusú paraméterekre a kísérletben megfigyeltek csupán közvetett módon hatnak és a köztük levő összefüggés általában bonyolult. Ezért modelleket alkalmazunk bizonyos paraméterek kísérleti eredményekből való meghatározására.\
+
+
+A munkánk célja az, hogy valószínűségszámítás módszereivel, illetve a modellek szimulációjával meghatározzuk, hogy adott kísérleti eredmények alapján mennyire vagyunk képesek a paraméterek megbecslésére. A Bayesiánus valószínűségszámítás alapvető módszereit és a modellek szimulációs eredményeit felhasználva kiszámíthatjuk, hogy adott kísérleti eredményeket milyen paraméterek mekkora valószínűséggel adják.
+\
+
+Ezeket a módszereket először egyszerű esetekben teszteltük. Megállapítottuk, hogy egy egykompartmentumos passzív idegsejt membránparamétereit fehér zaj jelenlétében becsülni tudjuk az idegsejtmodell áramlépcső bemenetre adott válasza alapján. Kezdetben az egykompartmentumos modell membrán kapacitását választottuk valószínűségi változónak. Majd ugyanezt azzal kiegészítve, hogy a passzív konduktanciát is változónak vettük. A következő lépésben térbelileg kiterjedt modellek axiális ellenállását és passzív membrán konduktanciáját választottuk a becsülendő paramétereknek. Végül mindezeket az eseteket általánosítottuk exponenciálisan korreláló színes zajra, mert ez egy jó modellje a kísérleti zajoknak. Ezen kívül vizsgáltuk a zaj és a paraméterek mintavételezési módszerének hatását az inferencia pontosságára.\
+
+Végeredményként arra jutottunk, hogy a becslés pontossága függ a becsülni kívánt paraméterek számától és azok összeállításától is. Tehát bizonyos paramétereket együtt mérve az egyes paraméterek értékéről kevesebb információt szerzünk, mint amennyit esetleges más összeállításokból kinyerhetnénk. A gyakorlatban fontos speciális esetként megfigyeltük, hogy a kiterjedt modell dendritre jellemző paraméterei (pl. az axiális ellenállás) kevésbé pontosan mérhetők tisztán a sejttesten végzett mérések alapján.\
+
+Összességében megállapíthatjuk, hogy az általunk kidolgozott paraméterbecslési módszerek alkalmasak arra, hogy a kísérleti adatok alapján megbecsüljük ne csak önmagában a legvalószínűbb paraméterértékeket, hanem maga az inferencia várható pontosságát és akár a paraméterek korrelációját is.\
+
+A probléma jövőbeli általános kiterjesztése, hogy sok különböző paraméterösszeállítást használva szintetikus adatokat állítunk elő, melyekre aztán alkalmazzuk a paraméterbecslést. Ennek segítségével képesek leszünk előre megmondani, hogy az adott kísérletet elvégezve mennyire pontos eredményt kapnánk, mekkora lenne a mérés információtartalma.
+\end{abstract}
+
+% Bevezetés
+\input{./sections/intro.tex}
+
+% Elmélet
+\input{./sections/method.tex}
+
+% Eredmények
+\input{./sections/results.tex}
+
+% Konklúziós
+\input{./sections/conclusion.tex}
+
+\appendix
+\input{./sections/appindex.tex}
+
+% Bibliográfia
+\newpage
+\bibliographystyle{plain}
+\bibliography{references.bib}
+\end{document}
+
