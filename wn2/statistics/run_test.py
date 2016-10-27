@@ -41,7 +41,7 @@ cm_step = (cm_end - cm_start)/cm_num
 
 # Create deterministic trace
 t, v = one_compartment(cm, gpas)
-sigma_noise = 7
+sigma_noise = 5
 
 statmat = np.zeros((3, 100), dtype=np.float)
 
@@ -75,9 +75,9 @@ for i in range(100):
         plt.ylabel("Probability")
         plt.axvline(cm, color='g')
         plt.plot(cm_values, posterior)
-        plt.savefig("./statistics/outstanding" + str(cm_num) + "_" + str(i) + ".png")
+        plt.savefig("./statistics/lower_noise/outstanding" + str(cm_num) + "_" + str(i) + ".png")
 
-sys.stdout = open('./statistics/statistic_result' + str(cm_num) + '.txt', 'w')
+sys.stdout = open('./statistics/lower_noise/statistic_result' + str(cm_num) + '.txt', 'w')
 print "The distance of the most likely parameter from the true one on the average: " + str(np.average(statmat[0]))
 print "The standard deviation of the upper distance: " + str(np.std(statmat[0]))
 print "The inferred most probable parameter is how many times probable on the average " \
@@ -92,18 +92,18 @@ plt.title("The distance of the most likely parameter from the true one")
 plt.xlabel("Simulation number")
 plt.ylabel("Distance")
 plt.plot(range(100), statmat[0], 'bo')
-plt.savefig("./statistics/dist" + str(cm_num) + ".png")
+plt.savefig("./statistics/lower_noise/dist" + str(cm_num) + ".png")
 
 plt.figure()
 plt.title("The inferred most probable parameter is how many times probable")
 plt.xlabel("Simulation number")
 plt.ylabel("times true probability -> max inferred probability")
 plt.plot(range(100), statmat[1], 'ro')
-plt.savefig("./statistics/p_times" + str(cm_num) + ".png")
+plt.savefig("./statistics/lower_noise/p_times" + str(cm_num) + ".png")
 
 plt.figure()
 plt.title("TThe posterior distribution is how many times sharper then the prior distribution")
 plt.xlabel("Simulation number")
 plt.ylabel("times prior -> posterior sharpness")
 plt.plot(range(100), statmat[2], 'go')
-plt.savefig("./statistics/sharp_times" + str(cm_num) + ".png")
+plt.savefig("./statistics/lower_noise/sharp_times" + str(cm_num) + ".png")

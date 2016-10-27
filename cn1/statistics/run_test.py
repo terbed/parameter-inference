@@ -26,7 +26,7 @@ gpas_num = 80
 
 cm_start = 0.5
 cm_end = 1.5
-cm_num = 100
+cm_num = 50
 
 gpas_mean = 0.0001
 gpas_sig = 0.00002
