@@ -3,7 +3,6 @@ Inference on true experimental data
 """
 
 from module.likelihood import dependent_2d as likelihood_func
-from module.noise import colored
 from module.prior import normal2d
 from module.trace import sharpness
 

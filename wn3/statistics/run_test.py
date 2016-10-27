@@ -34,9 +34,9 @@ gpas_step = (gpas_max - gpas_min) / gpas_num
 Ra_step = (Ra_max - Ra_min) / Ra_num
 
 Ra_sig = 20
-Ra_mean = 100
+Ra_mean = 80
 gpas_sig = 0.00002
-gpas_mean = 0.0001
+gpas_mean = 0.00008
 
 noise_sigma = 7
 
@@ -45,6 +45,8 @@ noise_sigma = 7
 t, v = stick_and_ball(Ra, gpas, Ra_max)
 
 statmat = np.zeros((3, 100), dtype=np.float)
+left = 0
+right = 0
 
 for i in range(100):
     print i
@@ -66,7 +68,14 @@ for i in range(100):
     Ra_posterior = np.sum(posterior, axis=1) * gpas_step
     Ra_prior = np.sum(prior, axis=1) * gpas_step
 
-    statmat[0][i], statmat[1][i], statmat[2][i] = stat(Ra_posterior, Ra_prior, Ra_values, Ra)
+    if stat(Ra_posterior, Ra_prior, Ra_values, Ra) is str:
+        np.delete(statmat, -1, axis=1)
+        if stat(Ra_posterior, Ra_prior, Ra_values, Ra) == "left":
+            left += 1
+        else:
+            right += 1
+    else:
+        statmat[0][i], statmat[1][i], statmat[2][i] = stat(Ra_posterior, Ra_prior, Ra_values, Ra)
 
 sys.stdout = open('/Users/Dani/TDK/parameter_estim/wn3/statistics/statistic_result' + str(Ra_num) + '.txt', 'w')
 print "The distance of the most likely parameter from the true one on the average: " + str(np.average(statmat[0]))
@@ -77,6 +86,7 @@ print "The standard deviation of the upper stat: " + str(np.std(statmat[1]))
 print "The posterior distribution is how many times sharper then the prior distribution on the average: " \
       + str(np.average(statmat[2]))
 print "The standard deviation of the upper sharpness: " + str(np.std(statmat[2]))
+print "The distribution is out of range: left: " + str(left) + " right: " + str(right)
 
 plt.figure()
 plt.title("The distance of the most likely parameter from the true one")
