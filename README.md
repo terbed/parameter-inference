@@ -1,6 +1,6 @@
 # parameter inference
 
-## Generated experimental trace
+## Generated experimental trace (synthetic simulation)
 
 ### with white noise
 1. One compartment passive model parameter (membrane capacitance 'cm') inference: <br>
@@ -45,3 +45,4 @@ Inference on true experimental data<br>
 **code:**<br>
 _expference.py_<br>
 **result:**<br>
+_exp_

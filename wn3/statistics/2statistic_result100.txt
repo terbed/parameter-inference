@@ -1,0 +1,30 @@
+gpas = 0.0001
+Ra = 100.
+
+gpas_min = 0.00005
+gpas_max = 0.00015
+gpas_num = 80
+
+Ra_min = 50.
+Ra_max = 150.
+Ra_num = 100
+
+gpas_values = np.linspace(gpas_min, gpas_max, gpas_num)
+Ra_values = np.linspace(Ra_min, Ra_max, Ra_num)
+
+gpas_step = (gpas_max - gpas_min) / gpas_num
+Ra_step = (Ra_max - Ra_min) / Ra_num
+
+Ra_sig = 20
+Ra_mean = 100
+gpas_sig = 0.00002
+gpas_mean = 0.0001
+
+noise_sigma = 7
+
+The distance of the most likely parameter from the true one on the average: 7.62662662663
+The standard deviation of the upper distance: 6.03502656745
+The inferred most probable parameter is how many times probable on the average (according to the posterior distribution) then the true one: 1.25228905295
+The standard deviation of the upper stat: 0.461980686248
+The posterior distribution is how many times sharper then the prior distribution on the average: 1.24418975334
+The standard deviation of the upper sharpness: 0.0115247962324

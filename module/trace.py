@@ -13,15 +13,21 @@ def interpolate(x, y):
 
     :param x: x codomain value vector
     :param y: y domain value vector
-    :return: matrix with two row (x,y)
+    :return: matrix with two row (x,y) or str on which direction out of range
     """
     max_idx = np.argmax(y)
 
     # Analysis
     value = y[max_idx] / 2.5
 
-    left_idx = (np.abs(y[:max_idx] - value)).argmin()
-    right_idx = len(y[:max_idx]) + (np.abs(y[max_idx:] - value)).argmin()
+    try:
+        left_idx = (np.abs(y[:max_idx] - value)).argmin()
+    except ValueError:
+        return "left"
+    try:
+        right_idx = len(y[:max_idx]) + (np.abs(y[max_idx:] - value)).argmin()
+    except ValueError:
+        return "right"
 
     data_points = len(x[left_idx:right_idx])
 
@@ -101,20 +107,23 @@ def stat(posterior, prior, param, true_param):
     :param prior: prior distribution codomain vector
     :param param: parameters domain vector
     :param true_idx: the exact parameter to infer
-    :return: feature tuple for the inference
+    :return: feature tuple for the inference or str if out of range
     """
 
-    x = interpolate(param, posterior)[0]
-    posterior = interpolate(param, posterior)[1]
-    prior = interpolate(param, prior)[1]
+    if interpolate(param, posterior) is str:
+        return interpolate(param, posterior)
+    else:
+        x = interpolate(param, posterior)[0]
+        posterior = interpolate(param, posterior)[1]
+        prior = interpolate(param, prior)[1]
 
-    true_idx = (np.abs(x - true_param)).argmin()
+        true_idx = (np.abs(x - true_param)).argmin()
 
-    sharper = sharpness(x, prior) / sharpness(x, posterior)
-    diff = np.abs(x[np.argmax(posterior)] - x[true_idx])
-    pdiff = np.amax(posterior) / posterior[true_idx]
+        sharper = sharpness(x, prior) / sharpness(x, posterior)
+        diff = np.abs(x[np.argmax(posterior)] - x[true_idx])
+        pdiff = np.amax(posterior) / posterior[true_idx]
 
-    return diff, pdiff, sharper
+        return diff, pdiff, sharper
 
 
 if __name__ == "__main__":

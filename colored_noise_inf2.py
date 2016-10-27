@@ -6,7 +6,7 @@
 """
 
 from module.simulation import stick_and_ball
-from module.likelihood import dependent_2d as likelihood
+from module.likelihood import dependent_2d as likelihood_func
 from module.noise import colored
 from module.prior import normal2d
 from module.trace import sharpness
@@ -62,7 +62,7 @@ invcovmat = invcovmat.generate(D, lamb, t)
 print "Done!"
 
 # TRY TO INFER BACK Ra PARAMETER
-likelihood = likelihood(stick_and_ball, Ra_values, gpas_values, invcovmat, exp_v)
+likelihood = likelihood_func(stick_and_ball, Ra_values, gpas_values, invcovmat, exp_v)
 
 # Create prior distribution for cm
 prior = normal2d(Ra_mean, Ra_sig, Ra_values, gpas_mean, gpas_sig, gpas_values)
