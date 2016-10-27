@@ -75,7 +75,7 @@ for i in range(100):
         plt.ylabel("Probability")
         plt.axvline(cm, color='g')
         plt.plot(cm_values, posterior)
-        plt.savefig("/Users/Dani/TDK/param_estim/statistics/wn2/lower_noise/outstanding" + str(cm_num) + "_" + str(i) + ".png")
+        plt.savefig("/Users/Dani/TDK/param_estim/wn2/statistics/lower_noise/outstanding" + str(cm_num) + "_" + str(i) + ".png")
 
 sys.stdout = open('/Users/Dani/TDK/param_estim/wn2/statistics/lower_noise/statistic_result' + str(cm_num) + '.txt', 'w')
 print "The distance of the most likely parameter from the true one on the average: " + str(np.average(statmat[0]))
