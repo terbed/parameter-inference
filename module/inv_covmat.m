@@ -13,3 +13,7 @@ end
 S = sparse(covmat);
 C = inv(S);
 inv_covmat = full(C);
+
+% Run function with these settings:
+% t = linspace(0,1500,30000)
+% invcovmat = inv_covmat(30, 0.1, t)
