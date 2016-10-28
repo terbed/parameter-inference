@@ -14,6 +14,8 @@ from module.trace import stat
 import numpy as np
 import sys
 from matplotlib import pyplot as plt
+import time
+startTime = time.time()
 
 # PARAMETER SETS -----------------------
 gpas = 0.0001
@@ -84,6 +86,8 @@ print "The standard deviation of the upper stat: " + str(np.std(statmat[1]))
 print "The posterior distribution is how many times sharper then the prior distribution on the average: " \
       + str(np.average(statmat[2]))
 print "The standard deviation of the upper sharpness: " + str(np.std(statmat[2]))
+runningTime = (time.time() - startTime) / 60
+print "Running time: " + str(runningTime) + " min"
 
 plt.figure()
 plt.title("The distance of the most likely parameter from the true one")
