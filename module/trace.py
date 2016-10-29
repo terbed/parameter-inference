@@ -126,6 +126,22 @@ def stat(posterior, prior, param, true_param):
         return diff, pdiff, sharper
 
 
+def re_sampling(old_res_trace, new_res):
+    """
+    Resampling trace
+    :param old_res_trace: (2, old_resolution) dimension np.ndarray()
+    :param new_res: new resolution array
+    :return: The interpolated new resolution (2, new_resolution) dimension np.ndarray()
+    """
+
+    low_res_trace = np.ndarray((len(new_res), 2))
+    f = interp1d(old_res_trace[:, 0], old_res_trace[:, 1])
+
+    low_res_trace[:, 0] = new_res
+    low_res_trace[:, 1] = f(new_res)
+
+    return low_res_trace
+
 if __name__ == "__main__":
     from matplotlib import pyplot
     import prior
