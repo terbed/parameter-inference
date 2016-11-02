@@ -4,7 +4,8 @@ Inference on true experimental data
 
 from module.likelihood import dependent_2d as likelihood_func
 from module.prior import normal2d
-from module.trace import sharpness
+from module.trace import sharpness, interpolate
+from module.noise import colored
 
 from neuron import h, gui
 from matplotlib import pyplot as plt
@@ -15,8 +16,7 @@ from matplotlib import cm as CM
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
 
 
-# - [Fix simulation!]
-def experiment_sim(Ra, gpas, Ra_max=150, dt=0.05):
+def experiment_sim(Ra, gpas, Ra_max=150, dt=0.1):
 
     # Load morphology
     h('load_file("/Users/Dani/TDK/parameter_estim/exp/morphology_131117-C2.hoc")')
@@ -43,15 +43,13 @@ def experiment_sim(Ra, gpas, Ra_max=150, dt=0.05):
     # Print information
     h.psection()
 
-    soma = h.Section(name='soma')
-
     # Stimulus
-    stim1 = h.IClamp(soma(0.01))
+    stim1 = h.IClamp(h.soma(0.01))
     stim1.delay = 200
     stim1.amp = 0.5
     stim1.dur = 203
 
-    stim2 = h.IClamp(soma(0.01))
+    stim2 = h.IClamp(h.soma(0.01))
     stim2.delay = 503
     stim2.amp = 0.01
     stim2.dur = 605
@@ -59,11 +57,11 @@ def experiment_sim(Ra, gpas, Ra_max=150, dt=0.05):
     # Set up recording Vectors
     v_vec = h.Vector()  # Membrane potential vector
     t_vec = h.Vector()  # Time stamp vector
-    v_vec.record(soma(0.5)._ref_v)
+    v_vec.record(h.soma(0.5)._ref_v)
     t_vec.record(h._ref_t)
 
     # Simulation duration and RUN
-    h.tstop = 1500  # Simulation end
+    h.tstop = 1200  # Simulation end
     h.dt = dt  # Time step (iteration)
     h.steps_per_ms = 1 / dt
     h.v_init = 0
@@ -82,20 +80,20 @@ def experiment_sim(Ra, gpas, Ra_max=150, dt=0.05):
 # Colored noise parameters
 D = 30.
 lamb = 0.1
-dt = 0.05
+dt = 0.1
 
 Ra = 100.           # to infer
 g_pas = 0.0001      # to infer
 
-gpas_min = 0.00005
-gpas_max = 0.00015
+gpas_min = 0.00004
+gpas_max = 0.00016
 gpas_num = 80.
 gpas_values = np.linspace(gpas_min, gpas_max, gpas_num)
 gpas_range = gpas_max - gpas_min
 gpas_step = gpas_range / gpas_num
 
-Ra_min = 40.
-Ra_max = 160.
+Ra_min = 35.
+Ra_max = 165.
 Ra_num = 80.
 Ra_values = np.linspace(Ra_min, Ra_max, Ra_num)
 Ra_range = Ra_max - Ra_min
@@ -106,9 +104,22 @@ Ra_mean = 110
 gpas_sig = 0.00002
 gpas_mean = 0.0001
 
-experimental_trace = genfromtxt("/Users/Dani/TDK/parameter_estim/exp/131117-C2_short.dat")
+
+# Load experimental trace
+experimental_trace = genfromtxt("/Users/Dani/TDK/parameter_estim/exp/resampled_experimental_trace")
 plt.figure()
 plt.title("Experimental trace")
+plt.xlabel("Time [ns]")
+plt.ylabel("Voltage [mV]")
+plt.plot(experimental_trace[:, 0], experimental_trace[:, 1])
+# pyplot.savefig("/Users/Dani/TDK/parameter_estim/exp/experimental_trace.png")
+
+
+# Check simulation trace
+t_sim, v_sim = experiment_sim(Ra, g_pas)
+v_sim = colored(30, 0.1, 0.1, v_sim)
+plt.figure()
+plt.title("Simulation trace")
 plt.xlabel("Time [ns]")
 plt.ylabel("Voltage [mV]")
 plt.plot(experimental_trace[:, 0], experimental_trace[:, 1])
@@ -119,7 +130,7 @@ t = experimental_trace[:, 0]
 exp_v = experimental_trace[:, 1]
 
 # Load inverse covariant matrix - [Generate inverse covariant matrix]
-invcovmat = genfromtxt()
+invcovmat = genfromtxt('/Users/Dani/TDK/parameter_estim/exp/inv_covmat_30_0.1.txt')
 
 # TRY TO INFER BACK Ra PARAMETER
 likelihood = likelihood_func(experiment_sim, Ra_values, gpas_values, invcovmat, exp_v)
@@ -174,13 +185,16 @@ ax.set_xlabel('gpas [mS/cm2]')
 ax.set_ylabel('Ra [kOhm]')
 plt.savefig("/Users/Dani/TDK/parameter_estim/exp/posterior"+str(Ra_num)+".png")
 
-inferred_Ra = Ra_values[np.argmax(Ra_posterior)]
-posterior_sharpness = sharpness(Ra_values, Ra_posterior)
-prior_sharpness = sharpness(Ra_values, Ra_prior)
 
-
-print "The inferred Ra value: " + str(inferred_Ra)
-print "The sharpness of the prior distribution: " + str(prior_sharpness)
-print "The sharpness of the posterior distribution: " + str(posterior_sharpness)
+Ra_posterior = interpolate(Ra_values, Ra_posterior)
+if Ra_posterior is str:
+    print "The posterior distribution is out of range in the direction: " + Ra_posterior
+else:
+    inferred_Ra = Ra_values[np.argmax(Ra_posterior)]
+    posterior_sharpness = sharpness(Ra_values, Ra_posterior)
+    prior_sharpness = sharpness(Ra_values, Ra_prior)
+    print "The inferred maximum probable Ra value: " + str(inferred_Ra)
+    print "The sharpness of the prior distribution: " + str(prior_sharpness)
+    print "The sharpness of the posterior distribution: " + str(posterior_sharpness)
 
 plt.show()

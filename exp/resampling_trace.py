@@ -16,7 +16,7 @@ plt.title("Old high res")
 plt.plot(trace[:, 0], trace[:, 1])
 
 
-t = np.linspace(0, 1200, 12000)
+t = np.linspace(0, 1200, 12001)
 new_trace = re_sampling(trace, t)
 
 
