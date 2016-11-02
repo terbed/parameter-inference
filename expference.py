@@ -187,7 +187,7 @@ plt.savefig("/Users/Dani/TDK/parameter_estim/exp/posterior"+str(Ra_num)+".png")
 
 
 Ra_posterior = interpolate(Ra_values, Ra_posterior)
-if Ra_posterior is str:
+if type(Ra_posterior) is str:
     print "The posterior distribution is out of range in the direction: " + Ra_posterior
 else:
     inferred_Ra = Ra_values[np.argmax(Ra_posterior)]
