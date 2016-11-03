@@ -109,10 +109,10 @@ gpas_mean = 0.000403860792541     # parameter optimisation algorithm found this
 experimental_trace = genfromtxt("/Users/Dani/TDK/parameter_estim/exp/resampled_experimental_trace")
 plt.figure()
 plt.title("Experimental trace")
-plt.xlabel("Time [ns]")
+plt.xlabel("Time [ms]")
 plt.ylabel("Voltage [mV]")
 plt.plot(experimental_trace[:, 0], experimental_trace[:, 1])
-# plt.savefig("/Users/Dani/TDK/parameter_estim/exp/experimental_trace.png")
+plt.savefig("/Users/Dani/TDK/parameter_estim/exp/experimental_trace.png")
 
 
 # Check simulation trace
@@ -120,16 +120,16 @@ t_sim, v_sim = experiment_sim(Ra, g_pas)
 v_sim = colored(0.0001, 0.1, 0.1, v_sim)
 plt.figure()
 plt.title("Simulation trace")
-plt.xlabel("Time [ns]")
+plt.xlabel("Time [ms]")
 plt.ylabel("Voltage [mV]")
 plt.plot(t_sim, v_sim)
-# plt.savefig("/Users/Dani/TDK/parameter_estim/exp/simulated_trace" + str(Ra) + "_gpas" + str(g_pas) + ".png")
+plt.savefig("/Users/Dani/TDK/parameter_estim/exp/simulated_trace" + str(Ra) + "_gpas" + str(g_pas) + ".png")
 
 plt.figure()
 plt.title("Together")
 plt.plot(experimental_trace[:, 0], experimental_trace[:, 1], 'r')
 plt.plot(t_sim, v_sim, 'g')
-# plt.savefig("/Users/Dani/TDK/parameter_estim/exp/exp_and_sim_trace_Ra" + str(Ra) + "_gpas" + str(g_pas) + ".png")
+plt.savefig("/Users/Dani/TDK/parameter_estim/exp/exp_and_sim_trace_Ra" + str(Ra) + "_gpas" + str(g_pas) + ".png")
 plt.show()
 
 t = experimental_trace[:, 0]
@@ -154,12 +154,12 @@ Ra_prior = np.sum(prior, axis=1) * gpas_step
 Ra_likelihood = np.sum(likelihood, axis=1) * gpas_step
 
 plt.figure()
-plt.title("One compartment model posterior (r) and prior (b) distribution for cm ")
-plt.xlabel("membrane conductance (cm) [microF/cm^2]")
+plt.title("Ra posterior (g), likelihood (r), prior (b)")
+plt.xlabel("Axial resistance (Ra) [ohm cm]")
 plt.ylabel("probability")
-plt.axvline(Ra, color='#34A52F')
-plt.plot(Ra_values, Ra_posterior, '#A52F34')
+plt.plot(Ra_values, Ra_posterior, '#34A52F')
 plt.plot(Ra_values, Ra_prior, color='#2FA5A0')
+plt.plot(Ra_values, Ra_likelihood, color='#A52F34')
 plt.savefig("/Users/Dani/TDK/parameter_estim/exp/Ra_posterior"+str(Ra_num)+".png")
 
 
@@ -170,11 +170,9 @@ ax.plot_surface(x, y, likelihood, rstride=8, cstride=8, alpha=0.3)
 cset = ax.contour(x, y, likelihood, zdir='z', offset=0, cmap=CM.coolwarm)
 cset = ax.contour(x, y, likelihood, zdir='x', offset=0.00004, cmap=CM.coolwarm)
 cset = ax.contour(x, y, likelihood, zdir='y', offset=160, cmap=CM.coolwarm)
-
-
 ax.set_title('Likelihood')
-ax.set_xlabel('gpas [mS/cm2]')
-ax.set_ylabel('Ra [kOhm]')
+ax.set_xlabel('gpas [uS] ')
+ax.set_ylabel('Ra [ohm cm]')
 plt.savefig("/Users/Dani/TDK/parameter_estim/exp/likelihood"+str(Ra_num)+".png")
 
 
@@ -185,10 +183,9 @@ ax.plot_surface(x, y, posterior, rstride=8, cstride=8, alpha=0.3)
 cset = ax.contour(x, y, posterior, zdir='z',  offset=-0, cmap=CM.coolwarm)
 cset = ax.contour(x, y, posterior, zdir='x', offset=0.00004, cmap=CM.coolwarm)
 cset = ax.contour(x, y, posterior, zdir='y', offset=160, cmap=CM.coolwarm)
-
 ax.set_title('Posterior')
-ax.set_xlabel('gpas [mS/cm2]')
-ax.set_ylabel('Ra [kOhm]')
+ax.set_xlabel('gpas [uS]')
+ax.set_ylabel('Ra [ohm cm]')
 plt.savefig("/Users/Dani/TDK/parameter_estim/exp/posterior"+str(Ra_num)+".png")
 
 
