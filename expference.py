@@ -33,7 +33,7 @@ def experiment_sim(Ra, gpas, Ra_max=150, dt=0.1):
     # Sec parameters and conductance
     for sec in h.allsec():
         sec.Ra = Ra  # Ra is a parameter to infer
-        sec.cm = 1
+        sec.cm = 7.84948013251   # parameter optimisation algorithm found this
         sec.v = 0
 
         sec.insert('pas')
@@ -47,12 +47,12 @@ def experiment_sim(Ra, gpas, Ra_max=150, dt=0.1):
     stim1 = h.IClamp(h.soma(0.01))
     stim1.delay = 200
     stim1.amp = 0.5
-    stim1.dur = 203
+    stim1.dur = 2.9
 
     stim2 = h.IClamp(h.soma(0.01))
     stim2.delay = 503
     stim2.amp = 0.01
-    stim2.dur = 605
+    stim2.dur = 599.9
 
     # Set up recording Vectors
     v_vec = h.Vector()  # Membrane potential vector
@@ -78,31 +78,31 @@ def experiment_sim(Ra, gpas, Ra_max=150, dt=0.1):
 
 # GLOBAL PARAMETERS
 # Colored noise parameters
-D = 30.
+D = 0.0001
 lamb = 0.1
 dt = 0.1
 
-Ra = 100.           # to infer
-g_pas = 0.0001      # to infer
+Ra = 157.362128223           # parameter optimisation algorithm found this
+g_pas = 0.000403860792541     # parameter optimisation algorithm found this
 
-gpas_min = 0.00004
-gpas_max = 0.00016
-gpas_num = 80.
+gpas_min = 0.0003
+gpas_max = 0.0005
+gpas_num = 100.
 gpas_values = np.linspace(gpas_min, gpas_max, gpas_num)
 gpas_range = gpas_max - gpas_min
 gpas_step = gpas_range / gpas_num
 
-Ra_min = 35.
-Ra_max = 165.
-Ra_num = 80.
+Ra_min = 57.
+Ra_max = 257.
+Ra_num = 100.
 Ra_values = np.linspace(Ra_min, Ra_max, Ra_num)
 Ra_range = Ra_max - Ra_min
 Ra_step = Ra_range / Ra_num
 
 Ra_sig = 20
-Ra_mean = 110
+Ra_mean = 157.362128223      # parameter optimisation algorithm found this
 gpas_sig = 0.00002
-gpas_mean = 0.0001
+gpas_mean = 0.000403860792541     # parameter optimisation algorithm found this
 
 
 # Load experimental trace
@@ -112,25 +112,31 @@ plt.title("Experimental trace")
 plt.xlabel("Time [ns]")
 plt.ylabel("Voltage [mV]")
 plt.plot(experimental_trace[:, 0], experimental_trace[:, 1])
-# pyplot.savefig("/Users/Dani/TDK/parameter_estim/exp/experimental_trace.png")
+# plt.savefig("/Users/Dani/TDK/parameter_estim/exp/experimental_trace.png")
 
 
 # Check simulation trace
 t_sim, v_sim = experiment_sim(Ra, g_pas)
-v_sim = colored(30, 0.1, 0.1, v_sim)
+v_sim = colored(0.0001, 0.1, 0.1, v_sim)
 plt.figure()
 plt.title("Simulation trace")
 plt.xlabel("Time [ns]")
 plt.ylabel("Voltage [mV]")
-plt.plot(experimental_trace[:, 0], experimental_trace[:, 1])
-# pyplot.savefig("/Users/Dani/TDK/parameter_estim/exp/experimental_trace.png")
+plt.plot(t_sim, v_sim)
+# plt.savefig("/Users/Dani/TDK/parameter_estim/exp/simulated_trace" + str(Ra) + "_gpas" + str(g_pas) + ".png")
+
+plt.figure()
+plt.title("Together")
+plt.plot(experimental_trace[:, 0], experimental_trace[:, 1], 'r')
+plt.plot(t_sim, v_sim, 'g')
+# plt.savefig("/Users/Dani/TDK/parameter_estim/exp/exp_and_sim_trace_Ra" + str(Ra) + "_gpas" + str(g_pas) + ".png")
 plt.show()
 
 t = experimental_trace[:, 0]
 exp_v = experimental_trace[:, 1]
 
 # Load inverse covariant matrix - [Generate inverse covariant matrix]
-invcovmat = genfromtxt('/Users/Dani/TDK/parameter_estim/exp/inv_covmat_30_0.1.txt')
+invcovmat = genfromtxt('/Users/Dani/TDK/parameter_estim/exp/inv_covmat_0.0001_0.1.txt')
 
 # TRY TO INFER BACK Ra PARAMETER
 likelihood = likelihood_func(experiment_sim, Ra_values, gpas_values, invcovmat, exp_v)
