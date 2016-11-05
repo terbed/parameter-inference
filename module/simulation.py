@@ -106,3 +106,51 @@ def stick_and_ball(Ra, gpas, Ra_max=150., dt=0.1):
     v = v_vec.to_python()
 
     return t, v
+
+
+def run_loaded_exp(Ra, gpas, dt=0.1):
+    # -- Biophysics --
+    # Sec parameters and conductance
+    for sec in h.allsec():
+        sec.Ra = Ra  # Ra is a parameter to infer
+        sec.cm = 7.84948013251   # parameter optimisation algorithm found this
+        sec.v = 0
+
+        sec.insert('pas')
+        sec.g_pas = gpas  # gpas is a parameter to infer
+        sec.e_pas = 0
+
+    # Print information
+    h.psection()
+
+    # Stimulus
+    stim1 = h.IClamp(h.soma(0.01))
+    stim1.delay = 200
+    stim1.amp = 0.5
+    stim1.dur = 2.9
+
+    stim2 = h.IClamp(h.soma(0.01))
+    stim2.delay = 503
+    stim2.amp = 0.01
+    stim2.dur = 599.9
+
+    # Set up recording Vectors
+    v_vec = h.Vector()  # Membrane potential vector
+    t_vec = h.Vector()  # Time stamp vector
+    v_vec.record(h.soma(0.5)._ref_v)
+    t_vec.record(h._ref_t)
+
+    # Simulation duration and RUN
+    h.tstop = 1200  # Simulation end
+    h.dt = dt  # Time step (iteration)
+    h.steps_per_ms = 1 / dt
+    h.v_init = 0
+    h.finitialize(h.v_init)
+
+    h.init()
+    h.run()
+
+    t = t_vec.to_python()
+    v = v_vec.to_python()
+
+    return t, v
