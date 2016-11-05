@@ -26,24 +26,59 @@ def normal2d(x_mean, x_sigma, x_values, y_mean, y_sigma, y_values):
     return prior
 
 
+def normal_nd(*priors):
+    # Trivial case
+    if len(priors) == 1:
+        return priors
+
+    # General case
+    shape = []
+    for item in priors:
+        shape.append(len(item))
+
+    n = np.ones(shape)
+    for idx, _ in np.ndenumerate(n):
+        for ax, element in enumerate(idx):
+            n[idx] *= priors[ax][element]
+
+    return n
+
 if __name__ == "__main__":
     from matplotlib import pyplot as plt
+    from mpl_toolkits.mplot3d import Axes3D
+    from matplotlib import cm as CM
+    from matplotlib.ticker import LinearLocator, FormatStrFormatter
 
-    x = np.linspace(-50, 50, 1000)
-    y = normal(0, 6, x)
+    x1 = np.linspace(-100, 100, 20)
+    y1 = normal(0, 18, x1)
+
+    x2 = np.linspace(-50, 50, 30)
+    y2 = normal(0, 3, x2)
+
+    x3 = np.linspace(-30, 30, 40)
+    y3 = normal(0, 6, x3)
+
+    x4 = np.linspace(-10, 10, 50)
+    y4 = normal(0, 2, x4)
+
+    y1y2y3 = normal_nd(y1, y2, y3, y4)
+
+    y11 = y1y2y3.sum(axis=(1, 2, 3)) * abs(x2[1]-x2[0]) * abs(x3[1]-x3[0]) * abs(x4[1]-x4[0])
 
     plt.figure()
-    plt.plot(x, y)
+    plt.plot(x1, y1, 'r')
+    plt.plot(x1, y11)
     plt.show()
-    print np.sum(y)*np.abs(x[0]-x[1])
 
-    x1 = np.linspace(-50, 50, 1000)
-    x2 = np.linspace(-50, 50, 1000)
-
-    y = normal2d(0, 5, x1, 2, 6, x2)
-    print np.sum(y)*np.abs(x1[1]-x1[0])*np.abs(x2[1]-x2[0])
-
-    plt.figure()
-    plt.plot(x1, np.sum(y, axis=1), 'r')
-    plt.plot(x2, np.sum(y, axis=0), "b")
+    y1y2 = np.sum(y1y2y3, axis=(2, 3))
+    fig = plt.figure()
+    ax = fig.gca(projection='3d')
+    x, y = np.meshgrid(x2, x1)
+    ax.plot_surface(x, y, y1y2, rstride=8, cstride=8, alpha=0.3)
+    cset = ax.contour(x, y, y1y2, zdir='z', offset=-0, cmap=CM.coolwarm)
+    cset = ax.contour(x, y, y1y2, zdir='x', offset=0.00004, cmap=CM.coolwarm)
+    cset = ax.contour(x, y, y1y2, zdir='y', offset=160, cmap=CM.coolwarm)
+    ax.set_title('Posterior')
+    ax.set_xlabel('x1')
+    ax.set_ylabel('x2')
     plt.show()
