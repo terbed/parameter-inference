@@ -27,6 +27,12 @@ def normal2d(x_mean, x_sigma, x_values, y_mean, y_sigma, y_values):
 
 
 def normal_nd(*priors):
+    """
+    General normal distribution
+
+    :param priors: sequence of 1d normal distributions
+    :return: n dimensional normal distribution
+    """
     # Trivial case
     if len(priors) == 1:
         return priors
