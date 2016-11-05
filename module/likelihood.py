@@ -29,17 +29,13 @@ def independent_2d(simulation_func, x_values, y_values, sigma, target_trace):
     y_values: sampled variable array
     target_trace: the experimental (noisy) trace array
     """
-
     log_likelihood = np.zeros((len(x_values), len(y_values)))
 
     for i, x in enumerate(x_values):
         for j, y in enumerate(y_values):
-
             (_, v) = simulation_func(x, y)
             v_dev = np.subtract(target_trace, v)
-            loglival = - np.sum(np.square(v_dev)) / (2 * sigma ** 2)
-
-            log_likelihood[i, j] = loglival
+            log_likelihood[i, j] = - np.sum(np.square(v_dev)) / (2 * sigma ** 2)
 
     log_likelihood = np.subtract(log_likelihood, np.amax(log_likelihood))
 
@@ -59,11 +55,9 @@ def dependent_2d(simulation_func, x_values, y_values, inv_covmat, target_trace):
 
     for i, x in enumerate(x_values):
         for j, y in enumerate(y_values):
-
             (_, v) = simulation_func(x, y)
             v_dev = np.array(np.subtract(target_trace, v))
-            exponent = - 1 / 2 * np.dot(v_dev, np.array(inv_covmat).dot(v_dev))
-            log_likelihood[i, j] = exponent
+            log_likelihood[i, j] = - 1 / 2 * np.dot(v_dev, np.array(inv_covmat).dot(v_dev))
 
     log_likelihood = np.subtract(log_likelihood, np.amax(log_likelihood))
 
