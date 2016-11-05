@@ -1,7 +1,7 @@
 from neuron import h, gui
 
 
-def one_compartment(cm, g_pas, dt=0.1):
+def one_compartment(cm=1., g_pas=0.0001, dt=0.1):
     """ One compartment simulation, variables: membrane capacitance and passive conductance """
     # Creating one compartment passive  model (interacting with neuron)
     soma = h.Section(name='soma')
@@ -46,7 +46,7 @@ def one_compartment(cm, g_pas, dt=0.1):
     return t, v
 
 
-def stick_and_ball(Ra, gpas, Ra_max=150., dt=0.1):
+def stick_and_ball(Ra=100, gpas=0.0001, cm=1., Ra_max=150., dt=0.1):
     """ Stick and Ball model variables: Passive conductance and axial resistance """
     # Create Sections
     soma = h.Section(name='soma')
@@ -69,7 +69,7 @@ def stick_and_ball(Ra, gpas, Ra_max=150., dt=0.1):
     # Sec parameters and conductance
     for sec in h.allsec():
         sec.Ra = Ra                                                 # Ra is a parameter to infer
-        sec.cm = 1
+        sec.cm = cm
         sec.v = -70
 
         sec.insert('pas')
@@ -108,12 +108,12 @@ def stick_and_ball(Ra, gpas, Ra_max=150., dt=0.1):
     return t, v
 
 
-def run_loaded_exp(Ra, gpas, dt=0.1):
+def exp_model(Ra=157, gpas=0.0004, cm=7.84948013251, dt=0.1):
     # -- Biophysics --
     # Sec parameters and conductance
     for sec in h.allsec():
         sec.Ra = Ra  # Ra is a parameter to infer
-        sec.cm = 7.84948013251   # parameter optimisation algorithm found this
+        sec.cm = cm   # parameter optimisation algorithm found this
         sec.v = 0
 
         sec.insert('pas')

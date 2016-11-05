@@ -1,9 +1,24 @@
 \section{Bevezetés}
-\
 
-Elektrofiziológiai kísérletek során az idegsejtet jellemző bizonyos paramétereket nehézkesen, csak közvetett módon lehet mérni. Ezért az a bevett módszer, hogy egy idegsejt bizonyos áramstimulusra adott válaszát kísérleti úton rögzítjük és azt replikálni próbáljuk a sejtről készített kompartmentumos modell ugyanazon (programozott) áramimpulzusra adott szimulációs válaszával. 
+\subsection{Motiváció}
+Elektrofiziológiai kísérletek során, az idegsejtet jellemző bizonyos paramétereket nehézkesen, csak közvetett módon lehet mérni. Ezért az a bevett módszer, hogy egy idegsejt bizonyos áramstimulusra adott válaszát kísérleti úton rögzítjük és azt replikálni próbáljuk a sejtről készített kompartmentumos modell ugyanazon (programozott) áramimpulzusra adott szimulációs válaszával. Kezdetben az intuíció erejével kézzel állítgatták a paramétereket. Ma is vannak erre kifejlesztett kreatív technikák \cite{eichner2011hands}. A módszer azon alapszik, hogy adott paraméterbeállítással kiértékeljük a modell eredményét és összehasonlítjuk annak kísérleti adatokkal vett hasonlóságát. Ezt addig ismételgetjük, míg elfogadható hasonlóságot nem mutat a kettő. Viszont ahogy a számítógépek egyre hatékonyabbá és gyorsabbá váltak, lehetőség nyílott a fentebbi folyamat automatizálására, ahol már a modellünk adott paraméterek melletti teljesítményét, \textit{"jóságát"} egy algoritmus értékeli ki. Minden összehasonlítási módszer a modell és kísérleti eredmény között három alapvető elemből áll:
+A cél adatsor (és a stimulus ami generálta), az idegsejtmodell a szabad paraméterekkel (és azok tartományával) és a paraméterteret bejáró kereső algoritmus. Az illesztési procedúra eredménye egy megoldás a keresett paraméterekre, kiegészítve az így kapott modell hibájával. Ezeknek a megvalósítására rengeteg módszer van és széles körben elterjedtek, sok cikk foglalkozik velük \cite{druckmann2007novel}\cite{van2007neurofitter}\cite{van2008automated}.
 
-\subsection{NEURON}
+ Ennek a megközelítésnek viszont sok hátulütője lehet, ugyanis a zaj miatt a sejtválasz ugyanarra az áramstimulusra kísérletről-kísérletre változhat. Valamint bizonyos neurális hálózatok modelljeinek a kísérleti adatokhoz legjobban illeszkedő paraméterei nem mindig tükrözik a valóságot. Ilyenek például az elektromosan csatolt neurális hálózatok \cite{amsalem2016neuron}\cite{szoboszlay2016functional}, mert ez a csatoltság kihatással van a sejtet leíró passzív paraméterekre és megváltoztatja azok tényleges értékét. Ennek következtében az a megoldás, miszerint megkeressük a paramétereket melyekkel a sejtmodellünk tökéletesen visszaadja a kísérleti eredményeket, félrevezető lehet.
+
+A fentebbi probléma orvoslására egy valószínűségi modellt hoztunk létre a Bayesiánus formalizmust használva, ami eredményül egy poszterior eloszlást társít a keresett paraméterekhez (valószínűségi változókhoz), az adott kísérleti adatok függvényében. Ezzel ellenben az optimalizációs algoritmusok csupán egyetlen értéket adnak egy hibaértékkel társítva megoldásként. Ez a módszer lehetőséget ad arra, hogy a kísérletből származó bizonytalanságot is figyelembe tudjuk venni, ami egy kiterjedtebb, részletesebb jellemzése az egész problémakörnek. Több különböző területen már sikeresen alkalmazták ezt a megközelítést, például a szinaptikus paraméterek megbecslésére \cite{costa2013probabilistic}. Sikeresen alkalmazták a módszert arra, hogy a kísérleti protokollt javítsák a nagyobb információtartalmú paraméterbecslés érdekében. Emellett kiderült, hogy a különböző szélességű eloszlások jellemzik a különböző szinaptikus dinamikákat, így ennek segítségével azok csoportosíthatók. 
+
+
+Tehát elektrofiziológiai mérések idegsejtmodellekkel való kiegészítése nem újkeletű, de statisztikai vizsgálódás a paraméter optimalizációs algoritmusokkal szemben kevésbé elterjedt. Tehát a mi általunk tárgyalt megközelítés célja nem csupán az, hogy találjunk egy olyan paraméterkombinációt a modellhez, ami legjobban illeszkedik a kísérleti adatsorra, hanem valamilyen módon jellemezzük az adott kísérleti összeállítás információtartalmát. Ez azért fontos mivel a paraméterek különböző megválasztásával azok becslése is különböző hatékonysággal történik, mert köztük bonyolult összefüggések, korrelációk lehetnek, így az eredmény pontosságának szempontjából nem mindegy milyen beállításokkal végezzük a kísérletet. Mi szeretnénk megmondani (szintetikus adatok előállításával) mielőtt az adott kísérleti protokollal elvégeznénk a mérést, hogy az mennyi információt képes szolgáltatni a keresett biofizikai paraméterekről. Ez egy nagyon hasznos, sok helyen felhasználható, általános eredmény lenne a kísérletek megtervezése szempontjából.
+
+
+A munkánk során egyszerű statisztikai modellt állítunk fel, amit különböző komplexitású modellek passzív paramétereinek eloszlásának becslésére alkalmazunk. Végeredményként a paraméterekre mint valószínűségi változókra egy eloszlást fogunk kapni, ami képes jellemezni a mérés bizonytalanságát. Végül arra jutunk, hogy a módszer jól működik és kiterjeszthető a fő problémára: adott kísérleti protokoll információtartalmának előrejelzésére.
+
+
+A következőkben röviden áttekintjük a NEURON idegsejt modellező programot, amit a munkánk során alkalmaztunk. Majd arról lesz szó hogyan is modellezzük az idegsejtek működését. Ezután rátérünk a konkrétumokra: fentebb leírt feladat megvalósítása, eredmények.
+
+
+\subsection{NEURON idegsejt szimulációs program}
 
 \subsection{Egykompartmentumos modell}
 

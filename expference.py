@@ -112,15 +112,16 @@ plt.show()
 t = experimental_trace[:, 0]
 exp_v = experimental_trace[:, 1]
 
-
-for i, x in enumerate(Ra.values):
-    for j, y in enumerate(gpas.values):
-        if i%10 == 0 and j%10 == 0:
-            _, v_sim = experiment_sim(x, y)
-            plt.figure()
-            plt.plot(t, exp_v, 'r')
-            plt.plot(t, v_sim, 'g')
-            plt.savefig('/Users/Dani/TDK/parameter_estim/exp/out/trace_Ra' + str(x) + "_gpas" + str(y) + ".png")
+run = False
+if run:
+    for i, x in enumerate(Ra.values):
+        for j, y in enumerate(gpas.values):
+            if i%10 == 0 and j%10 == 0:
+                _, v_sim = experiment_sim(x, y)
+                plt.figure()
+                plt.plot(t, exp_v, 'r')
+                plt.plot(t, v_sim, 'g')
+                plt.savefig('/Users/Dani/TDK/parameter_estim/exp/out/trace_Ra' + str(x) + "_gpas" + str(y) + ".png")
 
 
 # Load inverse covariant matrix - [Generate inverse covariant matrix]
