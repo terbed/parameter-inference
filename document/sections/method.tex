@@ -1,6 +1,40 @@
 \section{Módszerek és megvalósítás}
 
-\subsection{Bayesiánus formalizmus}
+\subsection{Eloszlásbecslés Bayesiánus formalizmussal}
+Célunk az idegsejt modellezés eszközeivel adott mérési eredmények alapján különböző paraméterek poszterior eloszlását meghatározni a kiválasztott sejttípuson belül, mivel ez sok lényeges információt hordozhat (paraméterek várható értéke, közöttük levő korreláció, becslés információtartalma...). Erre a problémakörre jól alkalmazható a Baysiánus inferencia módszere, amit a következőkben tárgyalunk.
+
+\paragraph{valószínűségi változók}
+A modell paramétereire úgy tekintünk, mint valószínűségi változókra $(\xi)$, melyekhez eloszlásfüggvényt szeretnénk rendelni.
+
+\paragraph{poszterior eloszlás}
+Paraméterek poszterior eloszlása szeretnénk meghatározni adott kísérleti eredmények mellett.
+Elsődleges szempont tehát, hogy legyenek kísérleti eredményeink (például a mi esetünkben passzív idegsejtek válasza áramimpulzus hatására). Valamint jellemezni kell valamilyen módon, hogy az adatok mennyire támasztják alá a modellünk adott paraméterek melletti helyességét. Ezeken felül hasznos, ha vannak előzetes ismereteink a becsülendő paraméterekről. Ezen összetevőkből egy poszterior eloszlás készíthető a következő módon:
+
+\begin{equation}\label{eq:bayes}
+P_i(\xi|D) = \dfrac{P_i(D|\xi)P(\xi)}{\int P_i(D|\xi)P(\xi)d\xi}
+\end{equation}
+ahol $D$ a kísérleti adat, $i$ az áramimpulzusra adott választ jelöli és $\xi$ pedig a modellparamétereinket.
+\begin{itemize}
+	\item $P_i(\xi|D)$: Ez a poszterior eloszlás, a keresett paraméterek valószínűségi eloszlása a mérési adatok figyelembevétele után.
+	\item $P_i(D|\xi)$: Ez a likelihood eloszlás, azt jellemzi mennyire valószínű ezeknek az adatoknak a mérése, ha az adott paraméterbeállítással vett modellünket vesszük igaznak. A következő pontban ezt részletesen tárgyaljuk.
+	\item $P(\xi)$: Ez a prior eloszlás, előzetes ismereteink a paraméterekről. Úgy is felfoghatjuk, hogy ezt az eloszlást frissítjük az új adatok függvényében, így keletkezik a poszterior eloszlás. Új méréseket végezve ez a folyamat tovább iterálható.
+	\item $\int P_i(D|\xi)P(\xi)d\xi$: Ez csupán a normálási faktor. Annak a következménye, hogy a valószínűségi eloszlásoknak normáltnak kell lenniük, így teljes tartományra vett integráljuknak egy. A normálási faktor ezzel a tulajdonsággal ruházza fel a poszterior értékünket, aminek következtében teljes értékű valószínűségi eloszlás lesz.
+\end{itemize}
+
+\paragraph{marginalizálás}
+Előfordulhat, hogy néhány paraméterre nem vagyunk kíváncsiak (például csak azért vettük be a modellünkbe, hogy lássuk mennyire torzítja el a többi paraméter eloszlását). Tegyük fel, hogy $\xi$ a cél paramétereink, de a modellt kiterjesztettük további $\theta$ változóval, aminek viszont az eloszlása nem érdekel. Továbbra is $P_i(\xi|D)$ meghatározása a feladat.  A likelihood viszont ekkor ilyen formában írható fel:
+\[
+P_i(D|\xi, \theta)
+\]
+A "felesleges" változókat egyszerűen kiintegrálva (a priorjaival együtt) visszakapjuk a~\ref{eq:bayes}-es egyenletben szereplő likelihood formát:
+
+\begin{eqnarray}\label{eq:marginalize}
+P_i(D|\xi) = \int P_i(\xi, \theta)P(\theta)d\theta
+\end{eqnarray}
+Viszont ez nem feltétlen fogja ugyan azt az eredményt szolgáltatni, ugyanis a paraméterek között komplex összefüggések lehetnek.
+
+\paragraph{numerikus implementálás}
+Numerikusan nem lehetséges egzaktul folytonos függvények kezelése. Mégis diszkrét eloszlások bevezetése helyett, \textit{kvázi-folytonosnak} tekintjük őket és alkalmazzuk rá a numerikus eljárásokat, mintha folytonosak lennének.
 
 \subsection{Maximum likelihood módszer}
 
