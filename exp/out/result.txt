@@ -1,11 +1,7 @@
-White noise sigma: 7
-resolution: 100
-The inferred maximum probable Ra value: 149.299299299
-The sharpness of the prior distribution: 29.6576576577
-The sharpness of the posterior distribution: 30.9189189189
-
 White noise sigma: 2
 resolution 50
-The inferred maximum probable Ra value: 139.97997998
+The inferred maximum probable Ra value: 184.904904905
 The sharpness of the prior distribution: 44.4888888889
-The sharpness of the posterior distribution: 48.4748748749
+The sharpness of the posterior distribution: 30.1173173173
+
+

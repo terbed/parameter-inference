@@ -62,3 +62,4 @@ def dependent_2d(simulation_func, x_values, y_values, inv_covmat, target_trace):
     log_likelihood = np.subtract(log_likelihood, np.amax(log_likelihood))
 
     return np.exp(log_likelihood)
+

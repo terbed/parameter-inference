@@ -17,6 +17,7 @@ from matplotlib import cm as CM
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
 import multiprocessing
 from multiprocessing import Pool
+from functools import partial
 
 def experiment_sim(Ra, gpas, dt=0.1):
     # -- Biophysics --
@@ -130,10 +131,10 @@ if run:
 shape = (len(Ra.values), len(gpas.values))
 
 
-def work(param_set):
-    (_, v) = experiment_sim(param_set[0], param_set[1])
-    v_dev = np.subtract(exp_v, v)
-    return - np.sum(np.square(v_dev)) / (2 * noise_sigma ** 2)
+def work(param_set, simulation_func, target_trace):
+    (_, v) = simulation_func(param_set[0], param_set[1])
+    v_dev = np.subtract(target_trace, v)
+    return np.exp(- np.sum(np.square(v_dev)) / (2 * noise_sigma ** 2))
 
 
 param_seq = []
@@ -145,7 +146,7 @@ likelihood = []
 # Multi processing
 if __name__ == '__main__':
     pool = Pool(multiprocessing.cpu_count())
-    likelihood = pool.map(work, param_seq)
+    likelihood = pool.map(partial(work, simulation_func=experiment_sim, target_trace=exp_v), param_seq)
     pool.close()
     pool.join()
 
