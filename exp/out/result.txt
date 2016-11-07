@@ -20,3 +20,8 @@ Colored noise: 0.1 0.1 0.1
 The inferred maximum probable Ra value: 235.095095095
 The sharpness of the prior distribution: 44.4804804805
 The sharpness of the posterior distribution: 23.7117117117
+
+Colored noise: 0.1 0.1 0.1
+The inferred maximum probable Ra value: 235.095095095
+The sharpness of the prior distribution: 44.4804804805
+The sharpness of the posterior distribution: 23.7117117117

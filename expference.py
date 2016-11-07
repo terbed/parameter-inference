@@ -19,6 +19,7 @@ import multiprocessing
 from multiprocessing import Pool
 from functools import partial
 
+
 def experiment_sim(Ra, gpas, dt=0.1):
     # -- Biophysics --
     # Sec parameters and conductance
@@ -86,8 +87,8 @@ h('forall {nseg = int((L/(0.1*lambda_f(100))+.9)/2)*2 + 1}')  # If Ra_max = 105 
 
 noise_sigma = 1
 
-Ra = RandomVariable(range_min=100., range_max=380., resolution=100, mean=157.362128223, sigma=30, is_target=True)
-gpas = RandomVariable(range_min=0.00030, range_max=0.0005, resolution=100, mean=0.000403860792541, sigma=0.00003)
+Ra = RandomVariable(range_min=100., range_max=380., resolution=200, mean=157.362128223, sigma=30, is_target=True)
+gpas = RandomVariable(range_min=0.00030, range_max=0.0005, resolution=200, mean=0.000403860792541, sigma=0.00003)
 
 # Load experimental trace
 experimental_trace = genfromtxt("/Users/Dani/TDK/parameter_estim/exp/resampled_experimental_trace")
