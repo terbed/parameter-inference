@@ -27,8 +27,12 @@ class RandomVariable:
             self.value = self.mean
 
 
-class ParameterSet:
+class Inference:
 
-    def __init__(self, *params):
-        self.num_of_var = len(params)
-        self.set = params
+    def __init__(self, *parameter_set):
+        self.parameters = parameter_set
+        self.idx_seq = None
+
+    shape = []
+    for item in priors:
+        shape.append(len(item))

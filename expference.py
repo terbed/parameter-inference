@@ -86,7 +86,7 @@ h('forall {nseg = int((L/(0.1*lambda_f(100))+.9)/2)*2 + 1}')  # If Ra_max = 105 
 
 noise_sigma = 1
 
-Ra = RandomVariable(range_min=40., range_max=260., resolution=50, mean=157.362128223, sigma=30, is_target=True)
+Ra = RandomVariable(range_min=100., range_max=380., resolution=50, mean=157.362128223, sigma=30, is_target=True)
 gpas = RandomVariable(range_min=0.00030, range_max=0.0005, resolution=50, mean=0.000403860792541, sigma=0.00003)
 
 # Load experimental trace
@@ -107,7 +107,7 @@ plt.xlabel("Time [ms]")
 plt.ylabel("Voltage [mV]")
 plt.plot(t_sim, v_sim)
 #plt.savefig("/Users/Dani/TDK/parameter_estim/exp/out/simulated_trace" + str(Ra.value) + "_gpas" + str(gpas.value) + ".png")
-plt.show()
+#plt.show()
 
 
 t = experimental_trace[:, 0]
@@ -126,7 +126,10 @@ if run:
 
 
 # Load inverse covariant matrix - [Generate inverse covariant matrix]
-# invcovmat = genfromtxt('/Users/Dani/TDK/parameter_estim/exp/inv_covmat_0.0001_0.1.txt')
+print "Loading inverse covariance matrix..."
+invcovmat = genfromtxt('/Users/Dani/TDK/parameter_estim/exp/inv_covmat_1_0.1.txt')
+print "Done..."
+
 
 shape = (len(Ra.values), len(gpas.values))
 
@@ -134,7 +137,17 @@ shape = (len(Ra.values), len(gpas.values))
 def work(param_set, simulation_func, target_trace):
     (_, v) = simulation_func(param_set[0], param_set[1])
     v_dev = np.subtract(target_trace, v)
-    return np.exp(- np.sum(np.square(v_dev)) / (2 * noise_sigma ** 2))
+    return - np.sum(np.square(v_dev)) / (2 * noise_sigma ** 2)
+
+
+def work1(param_set, simulation_func, target_trace):
+    (_, v) = simulation_func(param_set[0], param_set[1])
+    v_dev = np.array(np.subtract(target_trace, v))
+    return v_dev
+
+
+def work2(devitation, inv_covmat):
+    return - 1 / 2 * np.dot(devitation, inv_covmat.dot(devitation))
 
 
 param_seq = []
@@ -142,17 +155,26 @@ for x in Ra.values:
     for y in gpas.values:
         param_seq.append((x, y))
 
-likelihood = []
+log_likelihood = []
 # Multi processing
 if __name__ == '__main__':
     pool = Pool(multiprocessing.cpu_count())
-    likelihood = pool.map(partial(work, simulation_func=experiment_sim, target_trace=exp_v), param_seq)
+    log_likelihood = pool.map(partial(work1, simulation_func=experiment_sim, target_trace=exp_v), param_seq)
     pool.close()
     pool.join()
 
-print type(likelihood)
-print likelihood
-likelihood = np.reshape(likelihood, shape)
+
+log_likelihood = map(partial(work2, inv_covmat=invcovmat), log_likelihood)
+
+
+print "work2 done\n\n\n\n"
+
+log_likelihood = np.reshape(log_likelihood, shape)
+log_likelihood = np.subtract(log_likelihood, np.amax(log_likelihood))
+likelihood = np.exp(log_likelihood)
+
+
+#likelihood = l.dependent_2d(experiment_sim, Ra.values, gpas.values, invcovmat, exp_v)
 
 # Create prior distribution for cm
 prior = normal2d(Ra.mean, Ra.sigma, Ra.values, gpas.mean, gpas.sigma, gpas.values)
@@ -172,7 +194,7 @@ plt.ylabel("probability")
 plt.plot(Ra.values, Ra.posterior, '#34A52F')
 plt.plot(Ra.values, Ra.prior, color='#2FA5A0')
 plt.plot(Ra.values, Ra_likelihood, color='#A52F34')
-plt.savefig("/Users/Dani/TDK/parameter_estim/exp/out/Ra_posterior"+str(Ra.resolution)+".png")
+plt.savefig("/Users/Dani/TDK/parameter_estim/exp/out/Ra_posterior_c"+str(Ra.resolution)+".png")
 
 
 fig = plt.figure()
@@ -180,12 +202,12 @@ ax = fig.gca(projection='3d')
 x, y = np.meshgrid(gpas.values, Ra.values)
 ax.plot_surface(x, y, likelihood, rstride=8, cstride=8, alpha=0.3)
 cset = ax.contour(x, y, likelihood, zdir='z', offset=0, cmap=CM.coolwarm)
-cset = ax.contour(x, y, likelihood, zdir='x', offset=0.00004, cmap=CM.coolwarm)
-cset = ax.contour(x, y, likelihood, zdir='y', offset=160, cmap=CM.coolwarm)
+cset = ax.contour(x, y, likelihood, zdir='x', offset=gpas.range_min, cmap=CM.coolwarm)
+cset = ax.contour(x, y, likelihood, zdir='y', offset=Ra.range_max, cmap=CM.coolwarm)
 ax.set_title('Likelihood')
 ax.set_xlabel('gpas [uS] ')
 ax.set_ylabel('Ra [ohm cm]')
-plt.savefig("/Users/Dani/TDK/parameter_estim/exp/out/likelihood"+str(Ra.resolution)+".png")
+plt.savefig("/Users/Dani/TDK/parameter_estim/exp/out/likelihood_c"+str(Ra.resolution)+".png")
 
 
 fig = plt.figure()
@@ -193,12 +215,12 @@ ax = fig.gca(projection='3d')
 x, y = np.meshgrid(gpas.values, Ra.values)
 ax.plot_surface(x, y, posterior, rstride=8, cstride=8, alpha=0.3)
 cset = ax.contour(x, y, posterior, zdir='z',  offset=-0, cmap=CM.coolwarm)
-cset = ax.contour(x, y, posterior, zdir='x', offset=0.00004, cmap=CM.coolwarm)
-cset = ax.contour(x, y, posterior, zdir='y', offset=160, cmap=CM.coolwarm)
+cset = ax.contour(x, y, posterior, zdir='x', offset=gpas.range_min, cmap=CM.coolwarm)
+cset = ax.contour(x, y, posterior, zdir='y', offset=Ra.range_max, cmap=CM.coolwarm)
 ax.set_title('Posterior')
 ax.set_xlabel('gpas [uS]')
 ax.set_ylabel('Ra [ohm cm]')
-plt.savefig("/Users/Dani/TDK/parameter_estim/exp/out/posterior"+str(Ra.resolution)+".png")
+plt.savefig("/Users/Dani/TDK/parameter_estim/exp/out/posterior_c"+str(Ra.resolution)+".png")
 
 
 Ra_posterior = interpolate(Ra.values, Ra.posterior)

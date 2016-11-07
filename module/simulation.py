@@ -23,6 +23,7 @@ def one_compartment(cm=1., g_pas=0.0001, dt=0.1):
     # Print Information
     # h.psection()
 
+    # Run simulation ->
     # Set up recording Vectors
     v_vec = h.Vector()                                  # Membrane potential vector
     t_vec = h.Vector()                                  # Time stamp vector
@@ -82,6 +83,7 @@ def stick_and_ball(Ra=100, gpas=0.0001, cm=1., Ra_max=150., dt=0.1):
     stim.amp = 0.1
     stim.dur = 100
 
+    # Run simulation ->
     # Print information
     # h.psection()
 
@@ -108,7 +110,7 @@ def stick_and_ball(Ra=100, gpas=0.0001, cm=1., Ra_max=150., dt=0.1):
     return t, v
 
 
-def exp_model(Ra=157, gpas=0.0004, cm=7.84948013251, dt=0.1):
+def exp_model(Ra=157.3621, gpas=0.000403860792, cm=7.849480, dt=0.1):
     # -- Biophysics --
     # Sec parameters and conductance
     for sec in h.allsec():
@@ -134,6 +136,7 @@ def exp_model(Ra=157, gpas=0.0004, cm=7.84948013251, dt=0.1):
     stim2.amp = 0.01
     stim2.dur = 599.9
 
+    # Run simulation ->
     # Set up recording Vectors
     v_vec = h.Vector()  # Membrane potential vector
     t_vec = h.Vector()  # Time stamp vector
