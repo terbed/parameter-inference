@@ -1,4 +1,82 @@
 \section{Függelék}
-\subsection{Mintavételezés}
+\subsection{Kullback-Leiber divergencia}\label{app:KL}
+Két valószínűségi eloszlás összehasonlítására használható. Az \ref{app:sampling} és \ref{app:timestep} függelékekben ezt a módszert alkalmaztuk az eloszlásfüggvények vizsgálatára. Azt mutatja meg, hogy a poszterior eloszlásnak mennyivel több az információtartalma, mint a prior eloszlásnak. A következő módon számolható Kullback-Leiber divergencia együttható diszkrét esetben:
 
-\subsection{Időlépések}
+\begin{equation}\label{eq:kl}
+D_{KL}(P||Q) = \sum_i P_ilog\left(\frac{P_i}{Q_i}\right)
+\end{equation}
+"numerikusan folytonos" esetben ez a tag még szorzódik a lépésközökkel. $P$ jelöli a "frissített" eloszlást, amit össze szeretnénk mérni a "régi" $Q$-val, mekkora mértékben változott, mennyivel lett nagyobb az információtartalma. Ennek az együtthatónak az értéke annál kisebb minél kevesebb új információt tartalmaz a $P$ eloszlás és értelemszerűen annál nagyobb minél többet. A~\ref{fig:KL} ábrán ennek egy jó szemléltetése látható.
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[width=0.7\textwidth]{./fig/KL-Gauss-Example.png}
+	\caption[Kullback-Leiber divergencia]{Szépen látszik az alsó ábrán, hogy a kiintegrálandó terület annál nagyobb, minél jobban el vannak csúszva a függvények. \\
+	\textit{forrás: www.wikipedia.org} }
+	\label{fig:KL}
+\end{figure}
+
+
+
+\FloatBarrier
+\subsection{Mintavételezés}\label{app:sampling}
+Érdemes megvizsgálni, hogy az egyik rögzített felbontású paraméterre vett inferencia pontossága mennyire függ a többi paraméterhez választott tartományok felbontásától és azok mintavételezési módjától. Ennek a vizsgálatának érdekében rögzítettünk egy paramétert nagy felbontás mellett (mi esetünkben ez a $cm$) és vizsgáltuk ennek a poszterior eloszlását különböző módon mintavételezett másik paraméter mellett $(gpas)$. Az inferenciát fehér zajjal ellátott szintetikus adatokon végeztük (egykompartmentumos modell áramimpulzusra adott feszültségválasza).
+
+\paragraph{referencia eloszlás}
+Először megkerestük a paraméter tartomány azon felbontását, ami után már nem nyertünk ki lényegesen több mennyiségű információt a kísérleti adatokból. Az (\ref{fig:ref}) ábra szerint -melyen összefoglaltuk az eredményeket- 40-ről 80-ra emelve a $gpas$ paraméter tartományának a felbontását, már nem adott hozzá lényegesen sokat a $cm$ paraméter poszerior eloszlásának az információtartalmához. Ez azt jelenti, ha (fehér zaj mellett passzív egykompartmentumos modellnél) csak az egyik változó eloszlására vagyunk kíváncsiak, akkor nem érdemes a másik paraméter tartományát 40-nél nagyobb felbontásra választani. Referenciaként a 160-as $gpas$ felbontású eloszlást választjuk és ehhez mérjük a többi mintavételezési technikát.
+
+\begin{figure}
+	\hfill
+	\subfloat[10 -> 20]{{\includegraphics[width=0.49\textwidth]{./fig/20-10.png} }}%
+	\hfill
+	\subfloat[20 -> 40]{{\includegraphics[width=0.49\textwidth]{./fig/40-20.png} }}%
+	\hfill
+	\vfill
+	\subfloat[40 -> 80]{{\includegraphics[width=0.5\textwidth]{./fig/80-40.png} }}%
+	\hfill
+	\subfloat[80 -> 160]{{\includegraphics[width=0.5\textwidth]{./fig/160-80.png} }}%
+	\caption[Referencia felbontás]{(a) ábrán azt mutatja, hogy $gpas$ felbontását 10-ről 20-ra változtatva, mennyivel nőtt $cm$ poszterior eloszlásának az információtartalma, amit a KDL érték jelöl. A többi (b)(c)(d) ábrán pedig hasonlóan.}%
+	\label{fig:ref}
+\end{figure}
+
+\paragraph{priorból való mintavételezés}
+Eddig lineáris mintavételezéssel dolgoztunk, tehát a tartományt egyenletes részekre bontottuk. Azonban azt is megtehetjük, hogy a változó prior eloszlásából mintavételezünk. Most azt vizsgáljuk, hogy ez a fajta mintavételezés hogyan befolyásolja a másik paraméter poszterior eloszlását (~\ref{fig:prior_samp} ábra). Végeredményként megállapíthatjuk, ha a másik paraméternek ismert egy megbízható prior eloszlása, akkor alacsony felbontás mellett (a számításigény csökkentése érdekében) érdemes lehet abból mintavételezni azért, hogy a másik paraméterre pontosabb becslést adjunk. Nagy felbontás mellett viszont elhanyagolható az eltérés a két módszer között.
+
+\begin{figure}
+	\hfill
+	\subfloat[lineáris 10 felbontású]{{\includegraphics[width=0.49\textwidth]{./fig/20l.png} }}%
+	\hfill
+	\subfloat[priorból 10 felbontású]{{\includegraphics[width=0.49\textwidth]{./fig/10p.png} }}%
+	\hfill
+	\vfill
+	\subfloat[lineáris 20 felbontású]{{\includegraphics[width=0.5\textwidth]{./fig/10l.png} }}%
+	\hfill
+	\subfloat[priorból 20 felbontású]{{\includegraphics[width=0.5\textwidth]{./fig/20p.png} }}%
+	\vfill
+	\centering
+	\subfloat[priorból 160 felbontású]{{\includegraphics[width=0.5\textwidth]{./fig/160p.png} }}%
+	\caption[Prior mintavételezés]{(a) és (b) ábrán látható 10-es felbontás mellett a két mintavételezési technika teljesítménye. Ugyan így (c) és (d) ábrán pedig 20-as felbontás mellett. (e) ábrán láthatjuk, hogy elhanyagolható eltérés van a két módszer között}%
+	\label{fig:prior_samp}
+\end{figure}
+
+\FloatBarrier
+\subsection{Időlépések}\label{app:timestep}
+Amikor a NEURON programban futtatunk egy szimulációt be lehet állítani az időlépéseket, ami meghatározza a kapott szimulációs eredményünk felbontását. Láttuk (\ref{par:tau}) hogy az idegsejtek működésének időskálája a 1-10 ms tartományba esik. Fontos egy ideális időfelbontás meghatározása, amivel még kielégítő eredményeket lehet kinyerni, de számításigénye minél kisebb. Ezt végezzük el a következőkben. 
+
+Színes zajjal generált szintetikus adatokon végeztük a paraméterbecslést egykompartmentumos modell rögzített felbontású $cm$ és $gpas$ paramétereire. Referenciaként a $\Delta t = 0.0025 [ms]$ felbontású adatokat vettük, majd ezeket mintavételeztük az adott felbontások elérése érdekében. A rögzített felbontású paraméterek melletti és adott időfelbontású inferencia során nyert poszterior eloszlásokat hasonlítottuk a referencia eloszláshoz Kullback-Leiber divergenciával (\ref{app:KL}).
+
+Legyen a referencia eloszlás a $\Delta t = 0.0025 [ms]$ időlépések mellett végzett paraméterbecslésből nyert poszterior eloszlás. És ezt mérjük össze az $\Delta t = 0.1 $; $\Delta t = 0.3 $; $\Delta t = 0.3 $ esetekben kapott eredményekkel. A (\ref{fig:timestep}) ábráról látszik (ahol az eredményeket összefoglaltuk), hogy a $\Delta t = 0.1 $ választás egészen ideális.
+
+\begin{figure}
+	\hfill
+	\subfloat[$\Delta t = 1$]{{\includegraphics[width=0.49\textwidth]{./fig/dt1.png} }}%
+	\hfill
+	\subfloat[$\Delta t = 0.3$]{{\includegraphics[width=0.49\textwidth]{./fig/dt03.png} }}%
+	\hfill
+	\vfill
+	\centering
+	\subfloat[$\Delta t = 0.1$]{{\includegraphics[width=0.5\textwidth]{./fig/dt01.png} }}%
+	\caption[Időlépések megválasztása]{Az ábrákon sorban látni a különböző mintavételezések során nyert eloszlást a referencia eloszláshoz mérve, valamint a KDL értéket, ami a Kullback-Leiber együtthatója az eloszlásoknak a referenciához viszonyítva.}%
+	\label{fig:timestep}
+\end{figure}
+
+\FloatBarrier

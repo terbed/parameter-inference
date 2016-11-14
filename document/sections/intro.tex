@@ -1,6 +1,5 @@
 \section{Bevezetés}
 
-\subsection{Motiváció}
 Elektrofiziológiai kísérletek során, az idegsejtet jellemző bizonyos paramétereket nehézkesen, csak közvetett módon lehet mérni. Ezért az a bevett módszer, hogy egy idegsejt bizonyos áramstimulusra adott válaszát kísérleti úton rögzítjük és azt replikálni próbáljuk a sejtről készített kompartmentumos modell ugyanazon (programozott) áramimpulzusra adott szimulációs válaszával. Kezdetben az intuíció erejével kézzel állítgatták a paramétereket. Ma is vannak erre kifejlesztett kreatív technikák \cite{eichner2011hands}. A módszer azon alapszik, hogy adott paraméterbeállítással kiértékeljük a modell eredményét és összehasonlítjuk annak kísérleti adatokkal vett hasonlóságát. Ezt addig ismételgetjük, míg elfogadható hasonlóságot nem mutat a kettő. Viszont ahogy a számítógépek egyre hatékonyabbá és gyorsabbá váltak, lehetőség nyílott a fentebbi folyamat automatizálására, ahol már a modellünk adott paraméterek melletti teljesítményét, \textit{"jóságát"} egy algoritmus értékeli ki. Minden összehasonlítási módszer a modell és kísérleti eredmény között három alapvető elemből áll:
 A cél adatsor (és a stimulus ami generálta), az idegsejtmodell a szabad paraméterekkel (és azok tartományával) és a paraméterteret bejáró kereső algoritmus. Az illesztési procedúra eredménye egy megoldás a keresett paraméterekre, kiegészítve az így kapott modell hibájával. Ezeknek a megvalósítására rengeteg módszer van és széles körben elterjedtek, sok cikk foglalkozik velük \cite{druckmann2007novel}\cite{van2007neurofitter}\cite{van2008automated}.
 
@@ -18,8 +17,4 @@ A munkánk során egyszerű statisztikai modellt állítunk fel, amit különbö
 A következőkben röviden áttekintjük a NEURON idegsejt modellező programot, amit a munkánk során alkalmaztunk. Majd arról lesz szó hogyan is modellezzük az idegsejtek működését. Ezután rátérünk a konkrétumokra: fentebb leírt feladat megvalósítása, eredmények.
 
 
-\subsection{NEURON idegsejt szimulációs program}
 
-\subsection{Egykompartmentumos modell}
-
-\subsection{Térbelileg kiterjedt modellek}

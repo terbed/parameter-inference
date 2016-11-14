@@ -1,11 +1,13 @@
 \documentclass[hidelinks, 12pt]{article}
 \usepackage{amsmath}
 \usepackage{pygmentex}
+\usepackage{listings}
 \usepackage{gensymb}
 \usepackage[magyar]{babel}
 \usepackage[utf8]{inputenc}
 \usepackage[a4paper]{geometry}
 \usepackage{graphicx}
+\usepackage{subfig}
 \usepackage{siunitx}
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
@@ -21,8 +23,11 @@
     urlcolor=black
     linktoc=all,     
 }
-\renewcommand{\baselinestretch}{1.15}
-\numberwithin{equation}{section}
+\usepackage{placeins}
+\renewcommand{\baselinestretch}{1.13}
+\numberwithin{equation}{subsection}
+\numberwithin{figure}{subsection}
+\numberwithin{table}{subsection}
 
 \author{Terbe Dániel}
 \title{Idegsejtmodellek paraméterbecslése valószínűségi keretben}
@@ -62,15 +67,19 @@ A probléma jövőbeli általános kiterjesztése, hogy sok különböző param�
 % Bevezetés
 \input{./sections/intro.tex}
 
+\newpage
 % Elmélet
 \input{./sections/method.tex}
 
+\newpage
 % Eredmények
 \input{./sections/results.tex}
 
+\newpage
 % Konklúziós
 \input{./sections/conclusion.tex}
 
+\newpage
 \appendix
 \input{./sections/appindex.tex}
 
