@@ -73,9 +73,9 @@ def sharpness(x, y):
     return full_dev / 50
 
 
-def kl_test(posterior, prior, eps=0.0001):
+def kl_test(posterior, prior, step, eps=0.0001):
     """
-    Kullback-Leiber test for probability distributions.
+    Kullback-Leiber test for (numerically continuous) probability distributions.
 
     :param posterior: Posterior distribution codomain vector
     :param prior: Prior distribution codomain vector
@@ -94,7 +94,7 @@ def kl_test(posterior, prior, eps=0.0001):
     # KL-divergence
     kdl = 0
     for i, p in enumerate(posterior):
-        kdl += p * np.log(p / prior[i])
+        kdl += p * np.log(p / prior[i])*step
 
     return kdl
 

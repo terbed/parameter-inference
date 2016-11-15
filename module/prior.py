@@ -30,7 +30,7 @@ def normal_nd(*priors):
     """
     General normal distribution
 
-    :param priors: sequence of 1d normal distributions
+    :param priors: RandomVariable objects
     :return: n dimensional normal distribution
     """
     # Trivial case
@@ -40,12 +40,12 @@ def normal_nd(*priors):
     # General case
     shape = []
     for item in priors:
-        shape.append(len(item))
+        shape.append(len(item.values))
 
     n = np.ones(shape)
     for idx, _ in np.ndenumerate(n):
         for ax, element in enumerate(idx):
-            n[idx] *= priors[ax][element]
+            n[idx] *= priors[ax].values[element]
 
     return n
 

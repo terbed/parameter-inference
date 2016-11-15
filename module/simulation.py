@@ -1,7 +1,7 @@
 from neuron import h, gui
 
 
-def one_compartment(cm=1., g_pas=0.0001, dt=0.1):
+def one_compartment(cm=1., gpas=0.0001, dt=0.1):
     """ One compartment simulation, variables: membrane capacitance and passive conductance """
     # Creating one compartment passive  model (interacting with neuron)
     soma = h.Section(name='soma')
@@ -11,7 +11,7 @@ def one_compartment(cm=1., g_pas=0.0001, dt=0.1):
 
     # Insert passive conductance
     soma.insert('pas')
-    soma.g_pas = g_pas                                  # parameter to infer
+    soma.g_pas = gpas                                  # parameter to infer
     soma.e_pas = -70
 
     # Creating stimulus
@@ -123,7 +123,7 @@ def exp_model(Ra=157.3621, gpas=0.000403860792, cm=7.849480, dt=0.1):
         sec.e_pas = 0
 
     # Print information
-    h.psection()
+    #h.psection()
 
     # Stimulus
     stim1 = h.IClamp(h.soma(0.01))

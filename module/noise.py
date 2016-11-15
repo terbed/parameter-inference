@@ -25,4 +25,4 @@ def colored(D, lamb, dt, v_vec):
         noise.append(e_next)
         e_0 = e_next
 
-    return np.add(v_vec, np.array(noise))
+    return np.add(v_vec, noise)
