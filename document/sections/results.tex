@@ -32,19 +32,6 @@ Végeredményként ezek a statisztikák adódtak:
 \end{verbatim}
 A (C) és (D) pont érdekes, azt mutatja, hogy nagy kiugrások lehetségesek. A statisztikák szemléltetése a \ref{fig:wn1-stat} ábrán látható. 
 
-\begin{table}
-	\caption{Membrán kapacitás ($cm$) beállításai}\label{tab:1}
-	\centering
-			\begin{tabular}{l|c}	
-			\\
-			eredeti érték& 1 \\
-			mintavétel kezdőpont & 0.4 \\
-			mintavétel végpont & 1.6 \\
-			tartomány felbontása & 200 \\
-			prior átlag & 1.2 \\
-			prior szórása & 0.2 \\
-		   \end{tabular}
-\end{table}
 
 \begin{figure}[!htb]
 	\centering
@@ -201,7 +188,7 @@ hányszorosa az igazi értékhez tartozó valószínűségnek átlagban: 1.25
 (F) A felső érték szórása: 0.03
 \end{verbatim}
 
-A zárójelben levő értékek le vannak osztva a paraméter nagyságrendjével, így összehasonlítható a $cm$ paraméterhez kapott eredményekkel. Az eredmények egybevágnak: a poszterior eloszlásom kevésbé éles, ennek következtében viszont ritkábban történhet rossz becslés, amikor a haranggörbe alakú eloszlásom elhagyja az eredeti értéket.
+A zárójelben levő értékek le vannak osztva a paraméter nagyságrendjével, így összehasonlítható a $cm$ paraméterhez kapott eredményekkel. Az eredmények egybevágnak: a poszterior eloszlásom kevésbé éles, ennek következtében viszont ritkábban történhet rossz becslés, amikor a haranggörbe alakú eloszlásom elhagyja az eredeti értéket. 
 
 \begin{figure}
 	\hfill
@@ -234,9 +221,21 @@ A zárójelben levő értékek le vannak osztva a paraméter nagyságrendjével,
 
 
 
-
-
-
-
 \FloatBarrier
 \subsection{Valós kísérleti adatsor}
+Valós idegsejt áramimpulzus és áramlépcsőlépcső bemenetre adott feszültségválaszát vizsgálták. A kísérleti eredmény ábrázolása a \ref{fig:compare}-ábrán látható. Ezután a sejtről egy részletes három dimenziós rekonstrukciót készítettek. Ezt a modellt betöltve a Neuron programba és elkészítve hozzá a protokollt (sejtbe injektált áramok a megfelelő időpontokban) majdnem minden megvan a paraméterbecsléses módszerünkhöz. Egyedül a kísérleti zaj autokorrelációs függvénye hiányzik, amiből aztán a kovariancia mátrix megalkotható. Mi jelen esetben sima fehér zajjal közelítve végeztük a becslést. Az eredmények a~\ref{fig:exp} ábrán láthatók.
+Előre lefuttatott paraméteroptimalizációs algoritmusok révén már előre tudtuk, hogy milyen tartományokon kell keresni, így ennek megfelelően állítottuk be a paraméterek tartományait. Most is az $Ra$ és $gpas$ paramétereket vettük változóknak. Fontos kiemelni ismét, hogy míg optimalizációval csupán a legjobban illeszkedő paramétereket határoztuk meg (de annak megbízhatóságáról nem nyertünk információt), addig a mi inferenciánk egy teljes poszterior eloszlást biztosít (a kísérleti adatokon alapulva) a paramétertér fölött. Láthatóan a módszer ilyen nagy (valós sejteken alapuló) modellek esetén is megállja a helyét. (A \ref{fig:morph} ábra a modell vetületi képe.)
+
+\begin{figure}
+	\hfill
+	\subfloat[együttes likelihood]{{\includegraphics[width=0.49\textwidth]{./fig/exp/likelihood100.png} }}%
+	\hfill
+	\subfloat[együttes poszterior]{{\includegraphics[width=0.49\textwidth]{./fig/exp/posterior100.png} }}%
+	\hfill
+	\vfill
+	\subfloat[$Ra$ poszterior]{{\includegraphics[width=0.5\textwidth]{./fig/exp/Ra_posterior100.png} }}%
+	\caption[Kísérleti adatok fehér zajjal közelítve]{Az első két képen az együttes eloszlások, végül pedig a kimarginalizált $gpas$-al kapott $Ra$ poszterior eloszlás láthatóak. Az együttes likelihood eloszlás alakjából kivehető, hogy a két paraméter között korreláció van.}%
+	\label{fig:exp}
+\end{figure}
+
+
