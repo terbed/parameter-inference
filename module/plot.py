@@ -8,12 +8,7 @@ import numpy as np
 import os
 
 
-def return_unit(name):
-    database = {'Ra': '[ohm cm]', 'cm': '[uF/cm^2]', 'gpas': '[uS/cm^2]'}
-    return database[name]
-
-
-def plot3d(param1, param2, z, title=''):
+def plot3d(param1, param2, z, title='', path=''):
     fig = plt.figure()
     ax = fig.gca(projection='3d')
     x, y = np.meshgrid(param2.values, param1.values)
@@ -24,7 +19,7 @@ def plot3d(param1, param2, z, title=''):
     ax.set_title(title)
     ax.set_xlabel(param2.name + ' ' + param2.unit)
     ax.set_ylabel(param1.name + ' ' + param1.unit)
-    filename = "/Users/Dani/TDK/parameter_estim/exp/out/" + title + '_' + param1.name + str(param1.resolution) + '_' + \
+    filename = path + title + '_' + param1.name + str(param1.resolution) + '_' + \
                param2.name + str(param2.resolution) + '_'
     i = 0
     while os.path.exists('{}{:d}.png'.format(filename, i)):

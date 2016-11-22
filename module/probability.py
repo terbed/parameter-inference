@@ -16,7 +16,7 @@ class RandomVariable:
 
     def __init__(self, name, range_min, range_max, resolution, mean, sigma,  value=None):
         self.name = name
-        self.unit = module.plot.return_unit(name)
+        self.unit = self.get_unit()
         self.value = value
         self.range_min = range_min
         self.range_max = range_max
@@ -33,6 +33,10 @@ class RandomVariable:
 
         if self.value is None:
             self.value = self.mean
+
+    def get_unit(self):
+        database = {'Ra': '[ohm cm]', 'cm': '[uF/cm^2]', 'gpas': '[uS/cm^2]'}
+        return database[self.name]
 
 
 class ParameterSet:
@@ -166,7 +170,7 @@ class Inference:
             plt.plot(item.values, item.posterior, '#34A52F')
             plt.plot(item.values, item.prior, color='#2FA5A0')
 
-            filename = "/Users/Dani/TDK/parameter_estim/exp/out/" + \
+            filename = "/Users/Dani/TDK/parameter_estim/exp/out2/" + \
                        self.parameter_set.name + '-'+ item.name + "-posterior_" + str(item.resolution) + "_"
             i = 0
             while os.path.exists('{}{:d}.png'.format(filename, i)):
@@ -182,7 +186,7 @@ class Inference:
             plt.plot(item.values, item.likelihood, color='#A52F34')
             plt.plot(item.values, item.prior, color='#2FA5A0')
 
-            filename = "/Users/Dani/TDK/parameter_estim/exp/out/" +\
+            filename = "/Users/Dani/TDK/parameter_estim/exp/out2/" +\
                        self.parameter_set.name + '-' +item.name + "-likelihood_" + str(item.resolution) + "_"
             i = 0
             while os.path.exists('{}{:d}.png'.format(filename, i)):
