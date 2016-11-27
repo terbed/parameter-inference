@@ -1,19 +1,19 @@
 import numpy as np
+from functools import partial
 
 
-def normal_val(mean, sigma, x):
+def normal_val(x, mean, sigma):
     """Returns a value for the given x"""
     normal_distribution_value = 1 / np.sqrt(2 * np.pi * sigma ** 2) * np.exp(-(x - mean) ** 2 / (2 * sigma ** 2))
     return normal_distribution_value
 
 
-def normal(mean, sigma, values):
-    """Returns a normal distribution as a numpy array"""
-    prior = []
-    for x in values:
-        prior.append(normal_val(mean, sigma, x))
+def normal(vec, mean, sigma):
+    """Returns a normal distribution as a numpy array
+        equal to map(partial(normal_val, mean=mean, sigma=sigma), vec)
+    """
 
-    return prior
+    return [partial(normal_val, mean=mean, sigma=sigma)(x) for x in vec]
 
 
 def normal2d(x_mean, x_sigma, x_values, y_mean, y_sigma, y_values):
@@ -48,6 +48,7 @@ def normal_nd(*priors):
             n[idx] *= priors[ax].values[element]
 
     return n
+
 
 if __name__ == "__main__":
     from matplotlib import pyplot as plt
