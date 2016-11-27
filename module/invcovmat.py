@@ -14,7 +14,8 @@ def generate(D, lamb, t):
     lamb: characteristic time constant (1/tau)
     t: the time sample values of the experiment
     """
-    covmat = [[partial(E, D=D, lamb=lamb)(abs(t1 - t2)) for t2 in t] for t1 in t]
+    Exp = partial(E, D=D, lamb=lamb)
+    covmat = [[Exp(abs(t1 - t2)) for t2 in t] for t1 in t]
     inv_covmat = inv(covmat)
 
     return np.array(inv_covmat)
