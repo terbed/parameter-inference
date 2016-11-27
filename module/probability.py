@@ -4,6 +4,7 @@ import multiprocessing
 from multiprocessing import Pool
 from functools import partial
 import likelihood
+import plot
 from matplotlib import pyplot as plt
 import module.plot
 import os
@@ -26,7 +27,7 @@ class RandomVariable:
 
         self.step = np.abs(range_max-range_min)/resolution
         self.values = np.linspace(range_min, range_max, resolution)
-        self.prior = prior.normal(mean, sigma, self.values)
+        self.prior = prior.normal(self.values, mean, sigma)
 
         self.posterior = []
         self.likelihood = []
@@ -45,7 +46,7 @@ class ParameterSet:
     """
     def __init__(self, *params):
         self.params = params
-        self.name = self.set_name()
+        self.name = self.get_name()
         self.parameter_set_seq, self.shape = self.parameter_seq_for_mapping()
         self.joint_prior = prior.normal_nd()
         self.joint_step = self.joint_step()
@@ -58,7 +59,7 @@ class ParameterSet:
             self.parameter_set_batch_list = []
             self.create_batch()
 
-    def set_name(self):
+    def get_name(self):
         name = ''
         for item in self.params:
             name += item.name
@@ -89,7 +90,7 @@ class ParameterSet:
         return param_seq, shape
 
     def create_batch(self):
-        """Create batches with 50 elements for flawless multiprocessing"""
+        """Create batches with self.batch_len elements for flawless multiprocessing"""
         batch_num = len(self.parameter_set_seq)/self.batch_len  # This stores an int
         for times in range(batch_num):
             self.parameter_set_batch_list.append(self.parameter_set_seq[times*self.batch_len: (times+1)*self.batch_len])
@@ -136,6 +137,7 @@ class Inference:
         self.likelihood = []
         self.posterior = []
 
+    # Method to override
     def run_sim(self, sim_protocol_func, covmat):
         pass
 
@@ -152,7 +154,6 @@ class Inference:
         self.posterior = np.multiply(self.likelihood, self.parameter_set.joint_prior)
         self.posterior = self.posterior / (np.sum(self.posterior) * self.parameter_set.joint_step)
 
-    def __str__(self):
         # Marginalize likelihood and posterior
         for idx, item in enumerate(self.parameter_set.margin_ax):
             self.parameter_set.params[idx].likelihood = \
@@ -161,39 +162,10 @@ class Inference:
             self.parameter_set.params[idx].posterior = \
                 np.sum(self.posterior, axis=tuple(item)) * self.parameter_set.margin_step[idx]
 
+    def __str__(self):
         for item in self.parameter_set.params:
-            # Plot posterior
-            plt.figure()
-            plt.title(item.name + " posterior (g) and prior (b) distribution")
-            plt.xlabel(item.name + ' ' + item.unit)
-            plt.ylabel("probability")
-            plt.plot(item.values, item.posterior, '#34A52F')
-            plt.plot(item.values, item.prior, color='#2FA5A0')
-
-            filename = "/Users/Dani/TDK/parameter_estim/exp/out2/" + \
-                       self.parameter_set.name + '-'+ item.name + "-posterior_" + str(item.resolution) + "_"
-            i = 0
-            while os.path.exists('{}{:d}.png'.format(filename, i)):
-                i += 1
-            plt.savefig('{}{:d}.png'.format(filename, i))
-            print "Plot done! File path: " + filename
-
-            # Plot likelihood
-            plt.figure()
-            plt.title(item.name + " likelihood (r) and prior (b) distribution")
-            plt.xlabel(item.name + ' ' + item.unit)
-            plt.ylabel("probability")
-            plt.plot(item.values, item.likelihood, color='#A52F34')
-            plt.plot(item.values, item.prior, color='#2FA5A0')
-
-            filename = "/Users/Dani/TDK/parameter_estim/exp/out2/" +\
-                       self.parameter_set.name + '-' +item.name + "-likelihood_" + str(item.resolution) + "_"
-            i = 0
-            while os.path.exists('{}{:d}.png'.format(filename, i)):
-                i += 1
-            plt.savefig('{}{:d}.png'.format(filename, i))
-            print "Plot done! File path: " + filename
-
+            plot.marginal_plot(item.name, item.unit, self.parameter_set.name, item.resolution, item.values, item.prior,
+                               item.likelihood, item.posterior)
         return "Plot Done!"
 
 

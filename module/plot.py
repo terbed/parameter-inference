@@ -26,3 +26,36 @@ def plot3d(param1, param2, z, title='', path=''):
         i += 1
     plt.savefig('{}{:d}.png'.format(filename, i))
 
+
+def marginal_plot(resolution, values, prior, likelihood, posterior, name='', unit='', paramset_name=''):
+    # Plot posterior
+    plt.figure()
+    plt.title(name + " posterior (g) and prior (b) distribution")
+    plt.xlabel(name + ' ' + unit)
+    plt.ylabel("probability")
+    plt.plot(values, posterior, '#34A52F')
+    plt.plot(values, prior, color='#2FA5A0')
+
+    filename = "/Users/Dani/TDK/parameter_estim/exp/out2/" + \
+               paramset_name + '-' + name + "-posterior_" + str(resolution) + "_"
+    i = 0
+    while os.path.exists('{}{:d}.png'.format(filename, i)):
+        i += 1
+    plt.savefig('{}{:d}.png'.format(filename, i))
+    print "Plot done! File path: " + filename
+
+    # Plot likelihood
+    plt.figure()
+    plt.title(name + " likelihood (r) and prior (b) distribution")
+    plt.xlabel(name + ' ' + unit)
+    plt.ylabel("probability")
+    plt.plot(values, likelihood, color='#A52F34')
+    plt.plot(values, prior, color='#2FA5A0')
+
+    filename = "/Users/Dani/TDK/parameter_estim/exp/out2/" + \
+               paramset_name + '-' + name + "-likelihood_" + str(resolution) + "_"
+    i = 0
+    while os.path.exists('{}{:d}.png'.format(filename, i)):
+        i += 1
+    plt.savefig('{}{:d}.png'.format(filename, i))
+    print "Plot done! File path: " + filename
