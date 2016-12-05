@@ -10,4 +10,4 @@ for i = 1:len
     end
 end
 
-inv_covmat2 = inv(covmat);
+inv_covmat2 = covmat;
