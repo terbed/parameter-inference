@@ -30,7 +30,7 @@ Az idegsejtek magas ion és molekulatartalmú közegben működnek. Legtöbbszö
 A sejtmembrán egy 3-4 $nm$ vastag kettős lipid réteg, ami lényegében átjárhatatlan a legtöbb töltött molekulára nézve. A sejtmembrán ezen tulajdonsága okozza, hogy tulajdonképpen egy kondenzátorként viselkedik, mivel elkülöníti a belsejében levő és a külső töltéseket.
 
 \paragraph{ion csatornák}
-Számos típusú ion-áteresztő csatorna van beleágyazva a sejtmembránba változó sűrűséggel. Ezek bizonyos ionokat átengednek, másokat pedig nem. Részletesebben ezekre nem térünk ki, mert mi csak passzív modellekkel foglalkoztunk vizsgálataink során, aminek az a lényege, hogy ezeket a csatornákat blokkoljuk és az idegsejt (passzív) viselkedését így vizsgáljuk.
+Számos típusú feszültségfüggő ion-áteresztő csatorna van beleágyazva a sejtmembránba változó sűrűséggel. Ezek bizonyos ionokat átengednek, másokat pedig nem. Részletesebben ezekre nem térünk ki, mert mi csak passzív modellekkel foglalkoztunk vizsgálataink során, aminek az a lényege, hogy a feszültségfüggő csatornákat blokkoljuk és az idegsejt (passzív) viselkedését így vizsgáljuk.
 
 \paragraph{ion pumpák}
 Az ion-pumpák tartják fenn hosszútávon a koncentrációgradienst a membrán két oldala között, energiát használva fel. Munkánkhoz ez sem kapcsolódik közvetlen.
@@ -46,6 +46,31 @@ Ez fontos fogalom az idegsejt leírására, mert annak épp az áramimpulzusra a
 \subsubsection{Elektromos tulajdonságok}
 Ebben az alfejezetben összefoglaljuk az idegsejtek alapvető elektromos tulajdonságainak a matematikai leírását.
 
+\paragraph{axiális ellenállás}\label{par:Ra}
+A kiterjedt idegsejt membránpotenciálja térben általában nem homogén. Ez ion-áramot indít meg a sejt belsejében, ami igyekszik ezt a különbséget kiegyenlíteni. A sejt intracelluláris közege ellenállásként funkcionál erre az áramra nézve (ezért is szokták még intracelluláris ellenállásnak nevezni). Értéke annál nagyobb minél hosszabb és vékonyabb a sejttest (axonok és dendritek esetén például). Két pont között átfolyt áram nagysága könnyen megadható ennek a mennyiségnek és az Ohm törvény segítségével:
+
+\begin{equation}
+	I_L = \dfrac{\Delta U}{R_L}
+\end{equation}
+ahol $\Delta U$ a két pont közötti feszültségkülönbség és $R_L$ pedig a szakasz ellenállása.
+$R_L$ arányos a szakasz hosszával és fordítottan arányos a keresztmetszettel. Egy hengeres kábelmodell esetén felírható a következőképpen:
+\begin{equation}\label{eq:r_L}
+	R_L = \dfrac{R_a L}{\pi a^2}
+\end{equation}
+ahol $R_a [Ohm\cdot cm]$ a sejtet jellemző axiális ellenállás (vagy más néven intracelluláris ellenállás az itteni ábrákon $r_L$ jelöléssel), $a$ pedig a keresztmetszet sugara. A szemléltetés megtalálható a \ref{fig:Ra}-ábrán.
+
+Munkánk során a sejtmodell ezen paraméterét is sokszor becsültük, mivel ez az érték egy jellemzője az idegsejt passzív viselkedésének: beinjektált áram esetén az milyen gyorsan oszlik szét a sejttestben.
+
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[width=0.7\textwidth]{./fig/Ra.png}
+	\caption[Axiális ellenállás]{\cite{dayan2001theoretical} Az axiális ellenállás szemléltetése egy L hosszúságú kábelszakasz esetén.}
+	\label{fig:Ra}
+\end{figure}
+
+
+\FloatBarrier
 \paragraph{membrán kapacitás}
 Fentebb szó volt arról, hogy a membrán úgy viselkedik mint egy kondenzátor. Ebben az esetben az azon felhalmozódó töltést $(Q)$ a következőképp számolhatjuk ki:
 
@@ -71,7 +96,7 @@ Ahhoz is áram szükséges, hogy a membránpotenciált egy nem egyensúlyi szint
 	\Delta V = R_m I_e
 \end{equation}
 Ez a képlet csak kis $I_e$ áramok és $\Delta V$ feszültséges esetén érvényes, mivel a membrán ellenállás a feszültség függvénye egyébként.
-Ennek az értéknek a variabilitása sokkal nagyobb a membránkapacitásénál. A membrán ellenállás az a membrán konduktancia (áteresztőképesség) ellentéte, ez pedig hasonlóan a membrán kapacitáshoz arányos a membrán felületével. A passzív membrán konduktancia tehát így írható fel:
+Ennek az értéknek a variabilitása sokkal nagyobb a membránkapacitásénál. A membrán ellenállás az a membrán konduktancia (áteresztőképesség) reciproka, ez pedig hasonlóan a membrán kapacitáshoz arányos a membrán felületével. A passzív membrán konduktancia tehát így írható fel:
 \begin{equation}\label{eq:gpas}
 	g_{pas} = \dfrac{1}{R_m A} = \dfrac{1}{r_m}
 \end{equation}
@@ -83,12 +108,12 @@ Ha a membránkapacitást és membránellenállást összeszorozzuk akkor egy id�
 	\tau_m = C_m R_m \approx 10-100 \left[ ms \right]
 \end{equation}
 
-\paragraph{megfordítási potenciál}
+\paragraph{megfordulási potenciál}
 Az ionokra ható erő két fő komponensből tevődik össze, az elektromos és a kémiai potenciálból. Míg az elektromos potenciál a molekulák töltéséből fakad, addig a kémiai potenciál a koncentrációjukból. Ez a két erő tart ellen egymásnak. Egy ion-csatornát jellemző potenciál az a feszültségérték, mely meghaladása esetén az ionok ellenkező irányba kezdenek folyni rajta. Ezt nevezzük az adott csatorna megfordítási potenciáljának. Ezt úgy lehet elképzelni, hogy az adott csatorna mindig a saját megfordítási potenciálja felé próbálja terelni a feszültséget.
-Annak ellenére, hogy mi a csatornákkal nem foglalkozunk ez mégis elengedhetetlen, mert a passzív konduktanciát is így modellezzük. Ennek a megfordítási potenciálja értelemszerűen a neuron nyugalmi potenciálja.
+A passzív, úgynevezett "leakage" csatorna megfordítási potenciálja értelemszerűen a neuron nyugalmi feszültsége.
 
 \paragraph{membrán áram}
-A membrán összes csatornáján (és passzívan) átáramló áramot leosztjuk a membrán felületével, akkor megkapjuk az egységnyi felületre eső membrán áramot $(i_m)$. Mi esetünkben ez nem ion-csatornákból származik hanem csak a membránon "átszökő" töltésekből. Ezt a jelenséget a membrán passzív konduktanciájával jellemezzük és az ebből fakadó egységnyi felületre eső membránáramot a következőképpen írhatjuk le:
+A membrán összes csatornáján átáramló áramot leosztjuk a membrán felületével, akkor megkapjuk az egységnyi felületre eső membrán áramot $(i_m)$. Mi esetünkben ez a nem feszültségfüggő (passzív) ion-csatornákból származik. Ezt a jelenséget a membrán passzív konduktanciájával jellemezzük és az ebből fakadó egységnyi felületre eső membránáramot a következőképpen írhatjuk le:
 
 \begin{equation}\label{eq:im}
 	i_m = g_{pas}\left( V-E_{pas}\right)
@@ -104,7 +129,7 @@ A passzív egykompartmentumos modell leírásához a~\ref{eq:dV} és a \ref{eq:i
 \begin{equation}\label{eq:one_comp}
 	c_m \dfrac{dV}{dt} = -g_{pas} \left( V-E_{pas} \right) + \dfrac{I_e}{A}
 \end{equation}
-ahol $I_e$ a kísérleti úton sejtbe juttatott áram. A \ref{fig:single_comp} ábrán egy általános kapcsolási rajza látható az egykompartmentumos modelleknek. Vizsgálataink során ennek a modellnek mind a $c_m$ és a $g_{pas}$ paramétereinek az inferenciájával foglalkoztunk.
+ahol $I_e$ a kísérleti úton sejtbe juttatott áram. A \ref{fig:single_comp} ábrán egy általános kapcsolási rajza látható az egykompartmentumos modelleknek. Vizsgálataink során ennek a modellnek mind a $c_m$ és a $g_{pas}$ (gyakran $g_L$-lel jelölik, mint például az itt fellelhető ábrákon is) paramétereinek az inferenciájával foglalkoztunk.
 
 \begin{figure}[!htb]
 	\centering
@@ -117,7 +142,7 @@ ahol $I_e$ a kísérleti úton sejtbe juttatott áram. A \ref{fig:single_comp} �
 
 \FloatBarrier
 \subsubsection{Térbelileg kiterjedt modellek}\label{sec:multi-comp}
-A térbelileg kiterjedt modelleknél már nem tehetjük fel, hogy a membrán mentén a potenciál konstans. Ez úgy orvosolhatjuk, hogy több elemből építjük fel az idegsejtet, melynek az egyes kompartmentumjaiban rögzítjük a potenciált. Minél több részre osztjuk a sejtet, annál részletesebben tudjuk leírni a viselkedését. Ezt a folyamatot, vagyis a modellezés különböző szintjeit mutatja be szemléletesen a \ref{fig:multi_comp} ábra. Ez matematikailag összekapcsolt egykompartmentumos modellekkel írható le a következő módon (passzív idegsejt esetén):
+A térbelileg kiterjedt modelleknél már nem tehetjük fel, hogy a membrán mentén a potenciál konstans. Ezt úgy orvosolhatjuk, hogy több elemből építjük fel az idegsejtet, melynek az egyes kompartmentumjaiban rögzítjük a potenciált. Minél több részre osztjuk a sejtet, annál részletesebben tudjuk leírni a viselkedését. Ezt a folyamatot, vagyis a modellezés különböző szintjeit mutatja be szemléletesen a \ref{fig:multi_comp} ábra. Ez matematikailag összekapcsolt egykompartmentumos modellekkel írható le a következő módon (passzív idegsejt esetén):
 
 \begin{equation}\label{eq:multi_comp}
 	c_m\dfrac{dV_\mu}{dt} = -g_{pas}\left(V - E_{pas}\right) + \dfrac{I_e^\mu}{A_\mu} + g_{\mu,\mu+1}\left(V_{\mu+1}-V_\mu \right) + g_{\mu,\mu-1}\left(V_{\mu-1}-V_\mu \right)
@@ -125,13 +150,13 @@ A térbelileg kiterjedt modelleknél már nem tehetjük fel, hogy a membrán men
 ahol $I_e^\mu$ az adott $\mu$-edik kompartmentumba befecskendezett áram, $V_\mu$ a $\mu$-edik kompartmentum membrán potenciálja, $A_\mu$ a $\mu$-edik kompartmentum felülete. Ennek megfelelően $V_{\mu+1}$ és $V_{\mu-1}$ a jelenlegi komparmentumhoz csatlakozó másik kompartmentumok feszültségei. $g_{\mu,\mu+1}$ és $g_{\mu,\mu-1}$ a csatolási tényező, áteresztőképesség a kompartmentumok között. Ez felírható a következőképp is:
 
 \begin{equation}\label{eq:Ra}
-	g_{\mu,\mu+1} = \dfrac{1}{R_a^{\mu,\mu+1} A_\mu}
+	g_{\mu,\mu+1} = \dfrac{a}{R_a^{\mu,\mu+1} L^2}
 \end{equation}
-ahol $R_a$ az axiális ellenállás. Inferencia során ezt a paramétert is becsültük, a kompartmentumok között állandónak tekintve ezt az értéket: 
+ahol $R_a$ a \ref{par:Ra}-paragrafusban említett axiális ellenállás, $a$ a kábel keresztmetszetének sugara és $L$ a kábel középpontjait összekötő szakasz hossza ami ugyanakkora kábeldarabok esetén maga a kábel hossza (a képlet erre az esetre érvényes). Inferencia során ezt a paramétert is becsültük, a kompartmentumok között állandónak tekintve ezt az értéket: 
 \[ R_a^{\mu,\mu-1} = R_a^{\mu,\mu+1} = ... = R_a \]
 Egy ilyen modellnek az általános kapcsolási rajza a \ref{fig:multi_comp_model} ábrán látható. 
 
-Mi egy úgynevezett \textit{Ball and Stick} modellt építettünk vizsgálataink során, ami egy szómához kapcsolódó dentrit esetét reprezentálja. Ezen kívül vizsgáltunk egy kísérletből származó bonyolult három dimenziós morfológiát is. Erről a NEURON program segítségével előállított rajz a~\ref{fig:morph} ábrán látható.
+Mi egy úgynevezett \textit{Ball and Stick} modellt építettünk vizsgálataink során, ami egy szómához kapcsolódó dendrit esetét reprezentálja. Ezen kívül vizsgáltunk egy kísérletből származó bonyolult három dimenziós morfológiát is. Erről a NEURON program segítségével előállított rajz a~\ref{fig:morph} ábrán látható.
 
 
 \begin{figure}[!htb]
@@ -182,11 +207,11 @@ ahol $D$ a kísérleti adat, $i$ az áramimpulzusra adott választ jelöli és $
 \end{itemize}
 
 \paragraph{marginalizálás}
-Előfordulhat, hogy néhány paraméterre nem vagyunk kíváncsiak (például csak azért vettük be a modellünkbe, hogy lássuk mennyire torzítja el a többi paraméter eloszlását). Tegyük fel, hogy $\xi$ a cél paramétereink, de a modellt kiterjesztettük további $\theta$ változóval, aminek viszont az eloszlása nem érdekel. Továbbra is $P_i(\xi|D)$ meghatározása a feladat.  A likelihood viszont ekkor ilyen formában írható fel:
+Előfordulhat, hogy néhány paraméterre ki szeretnénk marginalizálni az eloszlást, ezzel azt vizsgálva ezek hogyan hatnak a többi paraméterre. Tegyük fel, hogy $\xi$ a cél paramétereink, de a modellt kiterjesztettük további $\theta$ változóval, aminek viszont az eloszlása nem érdekel. Továbbra is $P_i(\xi|D)$ meghatározása a feladat.  A likelihood viszont ekkor ilyen formában írható fel:
 \[
 P_i(D|\xi, \theta)
 \]
-A "felesleges" változókat egyszerűen kiintegrálva (a priorjaival együtt) visszakapjuk a~\ref{eq:bayes}-es egyenletben szereplő likelihood formát:
+A megcélzott változókat egyszerűen kiintegrálva (a priorjaival együtt) visszakapjuk a~\ref{eq:bayes}-es egyenletben szereplő likelihood formát:
 
 \begin{eqnarray}\label{eq:marginalize}
 P_i(D|\xi) = \int P_i(\xi, \theta)P(\theta)d\theta
@@ -199,88 +224,12 @@ Numerikusan nem lehetséges egzaktul folytonos függvények kezelése. Mégis di
 
 
 
-
-\subsection{Likelihood függvény}\label{sec:likelihood}
-Előző fejezetben már volt szó a likelihood függvény szerepéről. Most arról lesz szó, hogy mi ezt milyen módszerrel konstruáltuk meg.
-
-Azt szeretnénk elérni, hogy a kísérleti adatokat összemérjük a modellünk eredményeivel. Ehhez megvan a modellünk a Neuron programban és tegyük fel, hogy kísérleti adataink is vannak. Össze kell hasonlítanunk a kísérleti eredményünket a modellünkből kinyert eredménnyel. Az eltérést szemlélteti a \ref{fig:compare} ábra, ahol a zöld függvény az adott paraméterek melletti modellünk eredménye.
-\begin{figure}[!htb]
-	\centering
-	\includegraphics[width=0.7\textwidth]{./fig/compare.png}
-	\caption[Kísérletből és szimulációvól származó adatok]{A kísérleti adatokat jelöljük pirossal, a szimulációból eredőt pedig zölddel. Az idő függvényében $(ms)$ van kirajzolva az idegsejt áramimpulzusokra adott feszültségválasza $(mV)$.}
-	\label{fig:compare}
-\end{figure}
-Ezekhez a paraméterekhez (amik a \ref{fig:compare} ábrán a zöld függvénymenetet eredményezték) szeretnénk egy valószínűségi értéket társítani, ami jellemzi a kísérleti adatokkal való egybevágóságot. Egy jó megközelítés ennek a megvalósítására, hogy a adatpontok eltérésének a nagyságát egy exponenciálisan lecsengő függvénybe rakjuk. Ez ugyanis nagy eltérések mellett kis értékeket fog adni, közel megegyező pontok esetén (ahol nincs eltérés) pedig nagyobb értéket. Következő pontokban ezt öntjük matematikai formába:
-
-
-\subsubsection{Normál eloszlás}
-A függvény alakjának célszerű a normál (gauss) eloszlást választani, amely egy változó esetén a következő módon néz ki:
-
-\begin{equation}\label{eq:gauss}
-	N\left(x|\mu=0, \sigma^2\right) = \dfrac{1}{\sqrt{2\pi \sigma^2}}e^{-\dfrac{\left(x-\mu\right)^2}{2\sigma^2}}
-\end{equation}
-mivel $\mu$ értékétől független a szolgáltatott eredmény, ezért azt tetszőlegesen megválaszthatom, jelen esetben az egyszerűség kedvéért nullának. 
-
-\paragraph{általános alak}
-Mivel a függvényalakunk (\ref{fig:compare}) sok pontból áll, érdemes az általános $D$ dimenziós alakot bevezetni:
-\begin{equation}\label{eq:gaussD}
-	N\left(\vec{x}|\vec{\mu}=\vec{0}, \underline{\underline{ \Sigma }}\right) = \dfrac{1}{\left(2\pi\right)^{D/2} \sqrt{\det \underline{\underline{ \Sigma }}}}\exp\left[-\dfrac{1}{2}\left(\vec{x}-\vec{\mu}\right)^T \underline{\underline{ \Sigma }}^{-1}\left(\vec{x}-\vec{\mu}\right)\right]
-\end{equation}
-ahol $\underline{\underline{ \Sigma }}$ a valószínűségi változók kovariancia mátrixa. Ennek a főátlójában a szórás négyzetek helyezkednek el, a többi helyen pedig a megfelelő kereszt tagok. Ennek következében ez egy szimmetrikus mátrix. 
-
-\paragraph{független eset}
-Speciális eset ha a mátrixnak csak a főátlójában helyezkednek el tagok, ami azt jelenti, hogy a pontok függetlenek, így szétválik a valószínűségi eloszlásfüggvény az egydimenziós esetek (\ref{eq:gauss}) szorzat alakjára (legyen a szórás is ugyan az):
-\begin{equation}\label{eq:gauss_independent}
-		N\left(\vec{x}|\vec{\mu}=\vec{0}, \underline{\underline{ \Sigma }}\right) = N\left(x_1, x_2, \ldots, x_n| \sigma^2\right) = N\left(x_1| \sigma^2\right)\cdot N\left( x_2| \sigma^2\right) \cdot \ldots \cdot N\left( x_n| \sigma^2\right) = 
-\end{equation}
-
-\begin{equation}
-		= \dfrac{1}{\sqrt{2\pi \sigma^2}}\exp \left[-\dfrac{x_1^2}{2\sigma^2}\right] \cdot \dfrac{1}{\sqrt{2\pi \sigma^2}}\exp\left[-\dfrac{x_2^2}{2\sigma^2}\right] \cdot \ldots \cdot \dfrac{1}{\sqrt{2\pi \sigma^2}}\exp \left[-\dfrac{x_n^2}{2\sigma^2}\right] =
-\end{equation}
-
-\begin{equation}
-	=  \left(\dfrac{1}{\sqrt{2\pi \sigma^2}}\right)^n \exp \left[-\dfrac{x_1^2 + x_2^2 + \ldots + x_n^2}{2\sigma^2}\right]
-\end{equation}
-
-
-\subsubsection{Likelihood megkonstruálása}
-Most pedig tekintsük át, hogyan is alkalmazható a gyakorlatban ez az elmélet. A \ref{eq:gaussD} képletnek kell szolgáltatni egy $\vec{x}$ vektort és egy $\underline{\underline{\Sigma}}$ mátrixot, eredményül pedig egy skalárt ad, ami az adott paraméterkombináció jóságát jellemzi. Az előbbi a pontbeli eltérésekből (\ref{fig:compare}) gyártott vektor, az utóbbi pedig a kísérletből fakadó zaj autokorrelációs függvénye által meghatározott kovariancia mátrix, amiről később lesz szó.
-Ha az adatpontokat függetleneknek, vagy függőknek tekintjük, különböző módon kell eljárnunk:
- 
- \paragraph{független eset}
-Azt már említettük is fentebb, hogy független pontok esetében szorzat alakra bomlik a megoldás. Ekkor a likelihood értékek konstruálását a következő lépések írják le:
-\begin{enumerate}\label{meth:independet}
-	\item Adott paraméterkombinációval lefuttatjuk a szimulációt a NEURON program segítségével.
-	\item Megnézzük a kísérleti és a szimulációs adatok négyzetes eltérését minden pontban és összegzünk is erre.
-	\item Az összegzett értéket megszorozzuk $-1/(2 \sigma^2)$ -tel, ahol $\sigma$ a független zaj szórása.
-	\item Ezt elvégezzük az összes lehetséges paraméterkombinációra és tároljuk az eredményt. Numerikus okokból érdemes a legnagyobb értéket kivonni az összesből.
-	\item Végül ezt exponencializálva megkapjuk az összes paraméterbeállítás likelihood értéket $\Rightarrow P_i(D|\vec{\xi})$.
-\end{enumerate}
-Tulajdonképpen nem csinálunk mást, mint a \ref{eq:gauss_independent} képlet exponensébe a négyzetes eltéréseket helyettesítjük (a normálási faktorral elegendő csak a legvégén, a poszterior eloszlás megalkotásánál foglalkozni). Ezzel egy gauss jellegű likelihood függvényt kapunk a vizsgált paramétereink tartományai fölött, ami egy kísérletből származó valószínűséget rendel az egyes paraméterértékekhez.
-
-\paragraph{átalános eset}
-Általános nem független esetben az előző lépések így módosulnak:
-\begin{enumerate}\label{meth:dependet}
-	\item Adott paraméterkombinációval lefuttatjuk a szimulációt a NEURON program segítségével.
-	\item Megnézzük a kísérleti és a szimulációs adatok négyzetes eltérését minden pontban és ezeket egy vektorban tároljuk.
-	\item A zaj inverz kovariancia mátrixát megszorozzuk balról és jobbról is az előbbi különbségvektorral és ezt egy további $-1/2$ faktorral.
-	\item Ezt elvégezzük az összes lehetséges paraméterkombinációra és tároljuk az eredményt. Numerikus okokból érdemes a legnagyobb értéket kivonni az összesből.
-	\item Végül ezt exponencializálva megkapjuk az összes paramétermegválasztás likelihood értéket $\Rightarrow P_i(D|\vec{\xi})$.
-\end{enumerate}
-Tulajdonképpen nem csinálunk mást, mint a \ref{eq:gaussD} képlet exponensébe a négyzetes eltérésvektorokat és a zaj inverz kovariancia mátrixát helyettesítjük (numerikusan itt sem kell törődni a normálással). Ezzel egy gauss jellegű likelihood függvényt kapunk a vizsgált paramétereink tartományai fölött, ami egy kísérletből származó valószínűséget rendel a paraméterértékekhez.
-
-Azt hogy az adatpontok milyen módon függnek és ekkor mi lesz a \ref{eq:gaussD} normál eloszlásban szereplő kovariancia mátrix, a kísérleti zaj határozza meg, ha a kísérletből nem származna zaj és a kinyert adatok determinisztikusak lennének, akkor ezzel nem kellene foglalkoznunk (függetlenek lennének nulla szórással). A problémakörnek ez is egy fontos része, a következőkben erről lesz szó részletesebben.
-
-
-
-
-\FloatBarrier
 \subsection{Zajmodellek}\label{sec:noise}
 A \ref{sec:bayes} fejezetben bevezettünk egy valószínűségi leírást, aminek fontos alkotóeleme a kísérleti adatsor $D$ (mi esetünkben ez a passzív idegsejt áramimpulzusra adott feszültségválasza). Minden kísérletnél elkerülhetetlen tényező a zajok megjelenése. Tegyük fel, hogy van egy determinisztikus eredmény $(D^*)$, amire kísérleti zajt rakva $(z)$ kapjuk meg a valódi mért adatokat $(D)$. 
 \[
 D = D^* + z
 \]
-Ez azt jelenti, ha jól ismerjük a kísérletből fakadó zajt, akkor egyrészt szintetikus kísérleti adatokat tudunk előállítani, másrészt pontosabban elvégezhető az inferencia, mivel a likelihood függvényben megjelenő kovarianciamátrixot épp a zaj $(z)$ autokorrelációs függvénye határozza meg, így paraméterbecslésnél a zajt is figyelembe vesszük.
+Ez azt jelenti, ha jól ismerjük a kísérletből fakadó zajt, akkor egyrészt szintetikus kísérleti adatokat tudunk előállítani, másrészt a zaj az inferencia lelke, mivel ez az egyik tényezője a paraméterbecslés pontosságának, amire kíváncsiak vagyunk. A likelihood függvényben megjelenő kovarianciamátrixot épp a zaj $(z)$ autokorrelációs függvénye határozza meg, így paraméterbecslésnél a zajt is figyelembe vesszük.
 
 Szintetikus adatok előállításával mi is foglalkoztunk, mivel a statisztikus modellünket kezdetben ily módon gyártott "kísérleti" adatokra alkalmaztuk.
 
@@ -289,16 +238,16 @@ Kétfajta zajmodellel dolgoztunk: egy igen primitív független zajjal, a fehér
 \subsubsection{Kovariancia mátrix}
 Két valószínűségi változó kovarianciája:
 \begin{equation}\label{eq:cov}
-	cov(\xi,\chi) = E\left[(\xi-E[\xi])(\chi-E[\chi])\right] = E[\xi\chi] - E[\xi]E[\chi]
+cov(\xi,\chi) = E\left[(\xi-E[\xi])(\chi-E[\chi])\right] = E[\xi\chi] - E[\xi]E[\chi]
 \end{equation}
 Ahol $E$ (expected value, szokás jelölés még: $<x>$, $\overline{x}$) a várható értéket jelöli. (Kiszámítani úgy kell, hogy a valószínűségi változót integrálom a sűrűségfüggvényével az egész téren.) Tulajdonképpen azt jellemzi, hogy a két valószínűségi változó mennyire mozog együtt. Érdemes még tovább elemezni a $\chi=\xi$ esetet:
 \begin{equation}\label{eq:cov_var}
-	cov(\xi,\xi) = <\xi^2> - <\xi>^2 = \sigma_\xi^2 = var_\xi
+cov(\xi,\xi) = <\xi^2> - <\xi>^2 = \sigma_\xi^2 = var_\xi
 \end{equation}
 ez épp a $\xi$ valószínűségi változó szórás négyzete, azaz varianciája. 
 Legyen $n$ darab valószínűségi változónk: $x_1, x_2, \ldots , x_n$. Ekkor ezeknek a kovariancia mátrixát a következőképp definiáljuk:
 \begin{equation}\label{eq:covmat}
-	\Sigma_{ij} = cov(x_i, x_j)
+\Sigma_{ij} = cov(x_i, x_j)
 \end{equation}
 Ez a mátrix szimmetrikus, mivel a \ref{eq:cov} kifejezés invariáns a változócserére, valamint a főátlójában a változók szórás négyzetei szerepelnek \ref{eq:cov_var} kifejezés értelmében. Tehát ez a mátrix tartalmazza a valószínűségi változók szórás négyzeteit és minden egyes tag minden másikkal vett kovarianciáját.
 
@@ -308,18 +257,18 @@ A mi esetünkben a valószínűségi változók az összes időpillanatban vett 
 \paragraph{tulajdonságai}
 Tegyük fel hogy a kísérleti zajunk Gauss fehér zaj $(z = g_w)$. Ennek a következő tulajdonságai vannak:
 \begin{equation}
-	<g_w(t)> = 0
+<g_w(t)> = 0
 \end{equation}
 vagyis várható értéke nulla és
 \begin{equation}
-	<g_w(t)g_w(s)> = 2\sigma^2\delta(t-s)
+<g_w(t)g_w(s)> = 2\sigma^2\delta(t-s)
 \end{equation}
 időben független, nem korrelál önmagával a zajfüggvény, mivel az autokorrelációs függvénye egy Dirac-delta függvény (a képletben $\delta(x)$ jelöli a Dirac-delta függvényt, ami mindenhol nulla csak $x=0$ ban végtelen ). Ez azt jelenti, hogy ilyen zajmodellek esetén elég a független esetekben érvényes likelihood függvény előállítás módszert bevetni (\ref{meth:independet}), ami sokkal kevésbé számításigényes (egy teljes kovariancia mátrix helyett elegendő csupán a zaj szórásával számolni).
 
 \paragraph{kovariancia mátrixa}
 A fehér zaj tulajdonságait visszahelyettesítve a \ref{eq:cov} képletbe, a kovarianciamátrix elemei így alakulnak:
 \begin{equation}
-	\Sigma_{ij} = 2\sigma^2 \delta_{ij}
+\Sigma_{ij} = 2\sigma^2 \delta_{ij}
 \end{equation}
 ahol $\delta_{ij}$ a Kronkecker-delta kifejezés, $\sigma$ pedig a zaj szórása. Ez azt jelenti, hogy a mátrix diagonálisában szerepelnek a szórások és visszakaptuk a független esetet.
 
@@ -347,14 +296,14 @@ vagyis várható értéke nulla és
 \begin{equation}
 <\epsilon(t)\epsilon(s)> = D\lambda \exp(-\lambda|t-s|)
 \end{equation}
-önmagával exponenciálisan korrelál, mivel az autokorrelációs függvénye exponenciálisan lecsengő. Ebben a képletben $D$ az amplitúdó és $\lambda$ pedig a karakterisztikus idő, azt mondja meg milyen gyorsan cseng le a korreláció a vizsgált pontok távolodása esetén. 
+önmagával exponenciálisan korrelál, mivel az autokorrelációs függvénye exponenciálisan lecsengő. Ebben a képletben $D$ az amplitúdó és $\lambda$ pedig a karakterisztikus idő reciproka ($1/\tau$), azt mondja meg milyen gyorsan cseng le a korreláció a vizsgált pontok távolodása esetén. 
 
 Korreláló adatpontok esetén a \ref{meth:dependet} metódust kell követni. Az ehhez szükséges kovarianciamátrixot a zaj autokorrelációs függvénye határozza meg.
 
 \paragraph{kovariancia mátrixa}
 A színes zaj tulajdonságait visszahelyettesítve a \ref{eq:cov} képletbe, a kovarianciamátrix elemei így alakulnak:
 \begin{equation}\label{eq:covmat_col}
-	\Sigma_{ij} = D\lambda e^{\lambda |t_i - t_j|}
+\Sigma_{ij} = D\lambda e^{- \lambda |t_i - t_j|}
 \end{equation}
 ahol $t_i$ az $i$-edik időpillanat.
 
@@ -375,5 +324,81 @@ A \ref{fig:colored} ábrán látható két determinisztikus függvény, amire sz
 	\caption[Színes zaj]{2 ábra a (nagy amplitúdójú) színes zajról, ami rárakódott a determinisztikus (piros) függvényre. Passzív idegsejt áramimpulzusra adott feszültségválasza látható a képen (az idő függvényében a feszültség).}%
 	\label{fig:colored}
 \end{figure}
+
+\FloatBarrier
+
+
+\subsection{Likelihood függvény}\label{sec:likelihood}
+A  \ref{sec:bayes} fejezetben már volt szó a likelihood függvény szerepéről. Most arról lesz szó, hogy mi ezt milyen módszerrel konstruáltuk meg.
+
+Azt szeretnénk elérni, hogy a kísérleti adatokat összemérjük a modellünk eredményeivel a zaj figyelembevétele mellett. Ehhez megvan a modellünk a Neuron programban és tegyük fel, hogy kísérleti adataink is vannak. Össze kell hasonlítanunk a kísérleti eredményünket a modellünkből kinyert eredménnyel. Az eltérést szemlélteti a \ref{fig:compare} ábra, ahol a zöld függvény az adott paraméterek melletti modellünk eredménye.
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[width=0.7\textwidth]{./fig/compare.png}
+	\caption[Kísérletből és szimulációvól származó adatok]{A kísérleti adatokat jelöljük pirossal, a szimulációból eredőt pedig zölddel. Az idő függvényében $(ms)$ van kirajzolva az idegsejt áramimpulzusokra adott feszültségválasza $(mV)$.}
+	\label{fig:compare}
+\end{figure}
+Ezekhez a paraméterekhez (amik a \ref{fig:compare} ábrán a zöld függvénymenetet eredményezték) szeretnénk egy valószínűségi értéket társítani, ami jellemzi a kísérleti adatokkal való egybevágóságot. Egy jó megközelítés ennek a megvalósítására, hogy a adatpontok eltérésének a nagyságát egy normál eloszlásba rakjuk. Ez ugyanis nagy eltérések mellett kis értékeket fog adni, közel megegyező pontok esetén (ahol nincs eltérés) pedig nagyobb értéket. Következő pontokban ezt öntjük matematikai formába:
+
+
+\subsubsection{Normál eloszlás}
+A függvény alakjának célszerű a normál (gauss) eloszlást választani, amely egy változó esetén a következő módon néz ki:
+
+\begin{equation}\label{eq:gauss}
+	N\left(x|\mu=0, \sigma^2\right) = \dfrac{1}{\sqrt{2\pi \sigma^2}}e^{-\dfrac{\left(x-\mu\right)^2}{2\sigma^2}}
+\end{equation}
+mivel $\mu$ értékétől független a szolgáltatott eredmény, ezért azt tetszőlegesen megválaszthatom, jelen esetben az egyszerűség kedvéért nullának. 
+
+\paragraph{általános alak}
+Mivel a függvényalakunk (\ref{fig:compare}) sok pontból áll, érdemes az általános $D$ dimenziós alakot bevezetni:
+\begin{equation}\label{eq:gaussD}
+	N\left(\vec{x}|\vec{\mu}=\vec{0}, \underline{\underline{ \Sigma }}\right) = \dfrac{1}{\left(2\pi\right)^{D/2} \sqrt{\det \underline{\underline{ \Sigma }}}}\exp\left[-\dfrac{1}{2}\left(\vec{x}-\vec{\mu}\right)^T \underline{\underline{ \Sigma }}^{-1}\left(\vec{x}-\vec{\mu}\right)\right]
+\end{equation}
+ahol $\underline{\underline{ \Sigma }}$ a zaj (időbeli) kovariancia mátrixa. Ennek a főátlójában a szórás négyzetek helyezkednek el, a többi helyen pedig a megfelelő keresztkorrelációs tagok. Ennek következében ez egy szimmetrikus mátrix. 
+
+\paragraph{független eset}
+Speciális eset ha a mátrixnak csak a főátlójában helyezkednek el tagok, ami azt jelenti, hogy a pontok függetlenek (a zaj időben független), így szétválik a valószínűségi eloszlásfüggvény az egydimenziós esetek (\ref{eq:gauss}) szorzat alakjára (legyen a szórás is ugyan az):
+\begin{equation}\label{eq:gauss_independent}
+		N\left(\vec{x}|\vec{\mu}=\vec{0}, \underline{\underline{ \Sigma }}\right) = N\left(x_1, x_2, \ldots, x_n| \sigma^2\right) = N\left(x_1| \sigma^2\right)\cdot N\left( x_2| \sigma^2\right) \cdot \ldots \cdot N\left( x_n| \sigma^2\right) = 
+\end{equation}
+
+\begin{equation}
+		= \dfrac{1}{\sqrt{2\pi \sigma^2}}\exp \left[-\dfrac{x_1^2}{2\sigma^2}\right] \cdot \dfrac{1}{\sqrt{2\pi \sigma^2}}\exp\left[-\dfrac{x_2^2}{2\sigma^2}\right] \cdot \ldots \cdot \dfrac{1}{\sqrt{2\pi \sigma^2}}\exp \left[-\dfrac{x_n^2}{2\sigma^2}\right] =
+\end{equation}
+
+\begin{equation}
+	=  \left(\dfrac{1}{\sqrt{2\pi \sigma^2}}\right)^n \exp \left[-\dfrac{x_1^2 + x_2^2 + \ldots + x_n^2}{2\sigma^2}\right]
+\end{equation}
+
+
+\subsubsection{Likelihood megkonstruálása}
+Most pedig tekintsük át, hogyan is alkalmazható a gyakorlatban ez az elmélet. A \ref{eq:gaussD} képletnek kell szolgáltatni egy $\vec{x}$ vektort és egy $\underline{\underline{\Sigma}}$ mátrixot, eredményül pedig egy skalárt ad, ami az adott paraméterkombináció jóságát jellemzi. Az előbbi a pontbeli eltérésekből (\ref{fig:compare}) gyártott vektor, az utóbbi pedig a kísérletből fakadó zaj autokorrelációs függvénye által meghatározott kovariancia mátrix.
+Ha az adatpontokat függetleneknek, vagy függőknek tekintjük, érdemes különböző módon eljárni (független eset egyszerűsíthető):
+ 
+ \paragraph{független eset}
+Azt már említettük is fentebb, hogy független pontok esetében szorzat alakra bomlik a megoldás. Ekkor a likelihood értékek konstruálását a következő lépések írják le:
+\begin{enumerate}\label{meth:independet}
+	\item Adott paraméterkombinációval lefuttatjuk a szimulációt a NEURON program segítségével.
+	\item Megnézzük a kísérleti és a szimulációs adatok négyzetes eltérését minden pontban és összegzünk is erre.
+	\item Az összegzett értéket megszorozzuk $-1/(2 \sigma^2)$ -tel, ahol $\sigma$ a független zaj szórása.
+	\item Ezt elvégezzük az összes lehetséges paraméterkombinációra és tároljuk az eredményt. Numerikus okokból érdemes a legnagyobb értéket kivonni az összesből.
+	\item Végül ezt exponencializálva megkapjuk az összes paraméterbeállítás likelihood értéket $\Rightarrow P_i(D|\vec{\xi})$.
+\end{enumerate}
+Tulajdonképpen nem csinálunk mást, mint a \ref{eq:gauss_independent} képlet exponensébe a négyzetes eltéréseket helyettesítjük (a normálási faktorral elegendő csak a legvégén, a poszterior eloszlás megalkotásánál foglalkozni). Ezzel egy gauss jellegű likelihood függvényt kapunk a vizsgált paramétereink tartományai fölött, ami egy kísérletből származó valószínűséget rendel az egyes paraméterértékekhez.
+
+\paragraph{átalános eset}
+Általános nem független esetben az előző lépések így módosulnak:
+\begin{enumerate}\label{meth:dependet}
+	\item Adott paraméterkombinációval lefuttatjuk a szimulációt a NEURON program segítségével.
+	\item Megnézzük a kísérleti és a szimulációs adatok eltérését minden pontban és ezeket egy vektorban tároljuk.
+	\item A zaj inverz kovariancia mátrixát megszorozzuk balról és jobbról is az előbbi különbségvektorral és ezt egy további $-1/2$ faktorral.
+	\item Ezt elvégezzük az összes lehetséges paraméterkombinációra és tároljuk az eredményt. Numerikus okokból érdemes a legnagyobb értéket kivonni az összesből.
+	\item Végül ezt exponencializálva megkapjuk az összes paramétermegválasztás likelihood értéket $\Rightarrow P_i(D|\vec{\xi})$.
+\end{enumerate}
+Tulajdonképpen nem csinálunk mást, mint a \ref{eq:gaussD} képlet exponensébe a négyzetes eltérésvektorokat és a zaj inverz kovariancia mátrixát helyettesítjük (numerikusan itt sem kell törődni a normálással). Ezzel egy gauss jellegű likelihood függvényt kapunk a vizsgált paramétereink tartományai fölött, ami egy kísérletből származó valószínűséget rendel a paraméterértékekhez.
+
+Azt hogy az adatpontok milyen módon függnek és ekkor mi lesz a \ref{eq:gaussD} normál eloszlásban szereplő kovariancia mátrix, a kísérleti zaj határozza meg, ha a kísérletből nem származna zaj (\ref{sec:noise}-ben $D = D^*$ tehát $z=0$) és a kinyert adatok determinisztikusak lennének, akkor ennek a dolgozatnak nem lenne témája (függetlenek lennének nulla szórással) és egyszerű paraméteroptimalizációs algoritmus elegendő lenne a tökéletes paraméterek megtalálásához.
+
+
 
 \FloatBarrier

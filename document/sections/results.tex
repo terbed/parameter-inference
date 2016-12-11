@@ -1,6 +1,15 @@
 \section{Eredmények}
 A vizsgálatok menetének első része a szintetikus kísérleti adatok előállítása volt: Összeállítottunk egy idegsejtmodellt és ennek az adott modellparaméterek melletti áramlépcső stimulusra adott válaszfüggvényére (ami egy determinisztikus adathalmaz) egy zajmodellt (\ref{sec:noise}) raktunk, így szimulálva a kísérleti adatokat. Majd ezekre az adatokra végeztük el a paraméterbecslést. Ezzel a módszerrel meg tudjuk mondani az inferencia pontosságát adott típusú zajt feltételezve (és adott kísérleti protokoll mellett), mert ismerjük a kiinduló paramétereket.
 
+Ugyanazokat a becsléseket sokszor elvégeztük (100-szor) és a következő inferencia minőségét jellemző statisztikákat állítottuk fel rájuk:
+\begin{enumerate}
+	\item Az inferencia során becsült paraméter mennyire van távol az eredeti paramétertől. Ez relatív módon jellemzi a paraméterbecslést, függ a paraméter nagyságrendjétől. $cm = 1$-re állított kiindulási paraméter esetén ez éppen abszolút jellemzi (mivel leosztva 1-el nem változik semmi), viszont $Ra = 100$ esetén már le kell osztanunk 100-al. Ez az (abszolút) érték majd zárójelek között lesz feltüntetve.
+	\item A becsült paraméter poszterior eloszlásának maximuma (legvalószínűbbnek becsült paraméter valószínűsége, azaz maximális valószínűség) hányszorosa a kiindulási (eredeti) paraméterértékhez társított valószínűségnek.
+	\item A poszterior eloszlás hányszor élesebb a prior eloszlásnál. Ez természetesen akkor jellemzi a különböző eseteket, ha ugyanakkor prior eloszlással számolunk. Az eloszlás élességét úgy vizsgáljuk, hogy a görbe csúcsától a feléig veszünk egyenletesen 50 magasságpontot (illetve függvényértéket $y$), amikhez tartozó $x$-értékek (ebből kettő van ideális esetben, mert a normál eloszlás szimmetrikus) távolságát összegezzük, majd normáljuk 50-el az eredményt.
+\end{enumerate}
+
+Vizsgáltuk továbbá az egyes mintavételezési eljárások és paraméterek, valamint maga a kísérleti adat időbeli felbontásának paraméterbecslésre való kihatását, aminek eredményei az \ref{app:sampling} és \ref{app:timestep} függelékben találhatóak.
+
 Végül valódi mérési eredményekre is alkalmaztuk a módszereinket. Minden esetben passzív idegsejtmodellekkel dolgoztunk.
 
 \subsection{Fehér zaj}
@@ -30,7 +39,7 @@ Végeredményként ezek a statisztikák adódtak:
 	(E) A poszterior eloszlás hányszor élesebb a prior eloszlásnál átlagban: 2.75
 	(F) A felső érték szórása: 0.11	
 \end{verbatim}
-A (C) és (D) pont érdekes, azt mutatja, hogy nagy kiugrások lehetségesek. A statisztikák szemléltetése a \ref{fig:wn1-stat} ábrán látható. 
+A (C) és (D) pont érdekes, azt mutatja, hogy nagy kiugrások lehetségesek. Ez annak a következménye, hogy túl kevés a minta és ennek következtében néha eltorzítja a fehér zaj a megoldást (ha elegendő minta lenne akkor az kiösszegződne nullára a függetlensége miatt). Azért kevés a minta, mert a $cm$ paraméter hatását viszonylag kicsi tartomány fedi le, a felfutási (töltődési) és lefutási (kisülési) ág. A statisztikák szemléltetése a \ref{fig:wn1-stat} ábrán látható. 
 
 
 \begin{figure}[!htb]
@@ -69,7 +78,7 @@ hányszorosa az igazi értékhez tartozó valószínűségnek átlagban: 2.2
 (E) A poszterior eloszlás hányszor élesebb a prior eloszlásnál átlagban: 2.75
 (F) A felső érték szórása: 0.13
 \end{verbatim}
-A (C) és (D) pontokban látszik az eltérés az előző statisztikához képest. Ezek láthatóak a \ref{fig:wn2-stat} ábrán.
+A (C) és (D) pontokban látszik az eltérés az előző statisztikához képest. Lényeges romlás a becslésben viszont nem észlelhető. Ez annak tudható be, hogy a $gpas$ paraméter becslése nagyon pontos, azaz éles az eloszlása, ami jól látható a \ref{fig:wn2} (b) ábrán. Így ha ezt a paraméter kimarginalizáljuk nem változtatja meg jelentősen a másik paraméter poszterior eloszlását.
 
 \begin{figure}
 	\hfill
@@ -106,7 +115,7 @@ hányszorosa az igazi értékhez tartozó valószínűségnek átlagban: 1.2
 (E) A poszterior eloszlás hányszor élesebb a prior eloszlásnál átlagban: 1.24
 (F) A felső érték szórása: 0.01
 \end{verbatim}
-A zárójelben levő értékek le vannak osztva a paraméter nagyságrendjével, így összehasonlítható a $cm$ paraméterhez kapott eredményekkel. Az eredmények szemléltetése a \ref{fig:wn3-stat} ábrán látható. Ezekből az szűrhető le, hogy ezen az összeállításon végzett inferencia információtartalma jóval kevesebb, mint az eddig látottaké.
+A zárójelben levő értékek le vannak osztva a paraméter nagyságrendjével, így összehasonlítható a $cm$ paraméterhez kapott eredményekkel. Az eredmények szemléltetése a \ref{fig:wn3-stat} ábrán látható. Ezekből az szűrhető le, hogy ezen az összeállításon végzett inferencia információtartalma jóval kevesebb, mint az eddig látottaké, amit el is vártunk, mivel a dendrit passzív paraméterit kevésbé pontosan tudjuk meghatározni a szómán végzett mérésből.
 
 \begin{figure}
 	\hfill
@@ -146,7 +155,8 @@ hányszorosa az igazi értékhez tartozó valószínűségnek átlagban: 9
 (F) A felső érték szórása: 0.22
 \end{verbatim}
 
-Látható módon a színes zajmodell mellett az inferencia kevésbé pontosan működik.
+Látható módon a színes zajmodell mellett az inferencia kevésbé pontosan működik, mert ezek az eredmények tulajdonképpen $\sigma_{zaj} = 3$-nak megfelelő zajosságú adatok mellett születtek, fehér zajnál pedig $\sigma_{zaj} = 7$ beállítást használtunk. 
+Ez annak a következménye, hogy az adatpontok időben nem függetlenek, így az effektív független minták száma csökken (mintha csökkenne a mérésünk felbontása).
 
 \begin{figure}
 	\hfill
@@ -188,7 +198,7 @@ hányszorosa az igazi értékhez tartozó valószínűségnek átlagban: 1.25
 (F) A felső érték szórása: 0.03
 \end{verbatim}
 
-A zárójelben levő értékek le vannak osztva a paraméter nagyságrendjével, így összehasonlítható a $cm$ paraméterhez kapott eredményekkel. Az eredmények egybevágnak: a poszterior eloszlásom kevésbé éles, ennek következtében viszont ritkábban történhet rossz becslés, amikor a haranggörbe alakú eloszlásom elhagyja az eredeti értéket. 
+A zárójelben levő értékek le vannak osztva a paraméter nagyságrendjével, így összehasonlítható a $cm$ paraméterhez kapott eredményekkel. Az eredmények egybevágnak: a poszterior eloszlásom kevésbé éles, ennek következtében viszont ritkábban történhet rossz becslés, amikor a haranggörbe alakú eloszlásom elhagyja az eredeti értéket. Valamint tudjuk, hogy a dendrit-re jellemző passzív paraméter rosszul becsülhető a szómán végzett mérésből.
 
 \begin{figure}
 	\hfill
