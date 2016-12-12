@@ -10,9 +10,9 @@ def E(dt, D, lamb):
 def generate(D, lamb, t):
     """Returns the covariance matrix defined by the parameters of the colored noise
 
-    D: amplitude
-    lamb: characteristic time constant (1/tau)
-    t: the time sample values of the experiment
+    :param D: amplitude
+    :param lamb: characteristic time constant (1/tau)
+    :param t: the time sample values of the experiment
     """
     Exp = partial(E, D=D, lamb=lamb)
     covmat = [[Exp(abs(t1 - t2)) for t2 in t] for t1 in t]

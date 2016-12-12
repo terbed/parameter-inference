@@ -5,9 +5,6 @@ from multiprocessing import Pool
 from functools import partial
 import likelihood
 import plot
-from matplotlib import pyplot as plt
-import module.plot
-import os
 
 
 class RandomVariable:
@@ -69,7 +66,6 @@ class ParameterSet:
         """
         Create a set of parameters for multiprocess mapping function
 
-        :param params: a tuple of RandomVariable object
         :return: a parameter set sequence dict for multiprocessing and the shape for reshaping the list correctly
                  form: [{'Ra' = 100, 'gpas' = 0.0001, 'cm' = 1}, {'Ra' = 100, 'gpas' = 0.0001, 'cm' = 1.1}, ... ], [200,200,200]
         """
@@ -101,7 +97,6 @@ class ParameterSet:
     def joint_step(self):
         """
         Takes RandomVariable objects and compute there joint step
-        :param params: RandomVariable object
         :return: Joint step (float value)
         """
         step = 1
@@ -152,7 +147,7 @@ class Inference:
 
     def __create_posterior(self):
         self.posterior = np.multiply(self.likelihood, self.parameter_set.joint_prior)
-        self.posterior = self.posterior / (np.sum(self.posterior) * self.parameter_set.joint_step)
+        self.posterior /= np.sum(self.posterior) * self.parameter_set.joint_step
 
         # Marginalize likelihood and posterior
         for idx, item in enumerate(self.parameter_set.margin_ax):
@@ -170,8 +165,8 @@ class Inference:
 
 
 class IndependentInference(Inference):
-    def __int__(self, target_trace,  parameter_set):
-        Inference.__init__(target_trace=target_trace, parameter_set=parameter_set)
+    def __init__(self, target_trace,  parameter_set):
+        Inference.__init__(self, target_trace=target_trace, parameter_set=parameter_set)
 
     def run_sim(self, sim_protocol_func, noise_sigma):
         pool = Pool(multiprocessing.cpu_count())
@@ -184,8 +179,8 @@ class IndependentInference(Inference):
 
 
 class DependentInference(Inference):
-    def __int__(self, target_trace,  parameter_set):
-        Inference.__init__(target_trace=target_trace, parameter_set=parameter_set)
+    def __init__(self, target_trace,  parameter_set):
+        Inference.__init__(self, target_trace=target_trace, parameter_set=parameter_set)
 
     def run_sim(self, sim_protocol_func, inv_covmat):
         print "Run simulations..."
@@ -193,7 +188,8 @@ class DependentInference(Inference):
 
         if self.parameter_set.isBatch:
             for idx, batch in enumerate(self.parameter_set.parameter_set_batch_list):
-                print str(idx + 1) + ' batch of work is done out of ' + str(len(self.parameter_set.parameter_set_batch_list))
+                print str(idx + 1) + ' batch of work is done out of ' \
+                      + str(len(self.parameter_set.parameter_set_batch_list))
 
                 batch_likelihood = pool.map(partial(likelihood.deviation,
                                                     model_func=sim_protocol_func,
