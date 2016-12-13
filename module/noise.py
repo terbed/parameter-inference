@@ -124,7 +124,7 @@ def cov_mat(f, t_vec):
     :return: The covariance matrix for the given autocorrelation function
     """
 
-    return [[f(abs(t_vec(t1) - t_vec(t2))) for t2 in xrange(len(t_vec))] for t1 in xrange(len(t_vec))]
+    return [[f(abs(t_vec[t1] - t_vec[t2])) for t2 in xrange(len(t_vec))] for t1 in xrange(len(t_vec))]
 
 
 def multivariate_normal(vec, t_vec, f):
