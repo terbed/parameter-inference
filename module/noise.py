@@ -28,40 +28,6 @@ def colored(D, lamb, dt, v_vec):
 
     return np.add(v_vec, noise)
 
-
-# Create noise with known autocorrelation function ----------------------------------------------------------------
-
-def cov_mat(f, t_vec):
-    """
-    Produce the covariance matrix for the given autocorreltion function
-
-    :param f: The autocorrelation function of the noise (with fitted parameters)
-    :param t_vec: The time series vector
-    :return: The covariance matrix for the given autocorrelation function
-    """
-
-    return [[f(abs(t1 - t2)) for t2 in t_vec] for t1 in t_vec]
-
-
-def multivariate_normal(vec, t_vec, f):
-    """
-    Create a noise sampled from multivariate gaussian.
-    When the autocorrelation function of the noise is known.
-
-    :param vec: noise will be added to this vector
-    :param t_vec: The time series vector (noise is correlated in time)
-    :param f: The autocorrelation function of the noise (with fitted parameters, only one variable f(x))
-    :return: vec with noise
-    """
-
-    # Generate noise sampled from standard normal pdf
-    noise = np.random.normal(size=len(vec))
-
-    # Decompose covariance matrix
-    # And return noise with given correlation
-    return np.dot(cholesky(cov_mat(f=f, t_vec=t_vec)), noise)
-
-
 # Colored noise with generators and list comprehension ----------------------------------------------------------
 
 def colored_noise_generator(D, lamb, dt):
@@ -109,3 +75,74 @@ def colored_vector(D, lamb, dt, vec):
 
     # iterate through vec and add noise then return the list
     return [x + noise_generator.next() for x in vec]
+
+
+# Create noise with known autocorrelation function ----------------------------------------------------------------
+
+def near_psd(x, epsilon=0):
+    """
+    Calculates the nearest positive semi-definite matrix for a correlation/covariance matrix
+
+    :param x : array_like
+    Covariance/correlation matrix
+    :param epsilon : float
+    Eigenvalue limit (usually set to zero to ensure positive definiteness)
+
+    :return:
+    near_cov : array_like
+    closest positive definite covariance/correlation matrix
+    """
+
+    if min(np.linalg.eigvals(x)) > epsilon:
+        return x
+
+    # Removing scaling factor of covariance matrix
+    n = x.shape[0]
+    var_list = np.array([np.sqrt(x[i,i]) for i in xrange(n)])
+    y = np.array([[x[i, j]/(var_list[i]*var_list[j]) for i in xrange(n)] for j in xrange(n)])
+
+    # getting the nearest correlation matrix
+    eigval, eigvec = np.linalg.eig(y)
+    val = np.matrix(np.maximum(eigval, epsilon))
+    vec = np.matrix(eigvec)
+    T = 1/(np.multiply(vec, vec) * val.T)
+    T = np.matrix(np.sqrt(np.diag(np.array(T).reshape(n))))
+    B = T * vec * np.diag(np.array(np.sqrt(val)).reshape(n))
+    near_corr = B*B.T
+
+    # returning the scaling factors
+    near_cov = np.array([[near_corr[i, j]*(var_list[i]*var_list[j]) for i in xrange(n)] for j in xrange(n)])
+    return near_cov
+
+
+def cov_mat(f, t_vec):
+    """
+    Produce the covariance matrix for the given autocorrelation function
+
+    :param f: The autocorrelation function of the noise (with fitted parameters)
+    :param t_vec: The time series vector
+    :return: The covariance matrix for the given autocorrelation function
+    """
+
+    return [[f(abs(t_vec(t1) - t_vec(t2))) for t2 in xrange(len(t_vec))] for t1 in xrange(len(t_vec))]
+
+
+def multivariate_normal(vec, t_vec, f):
+    """
+    Create a noise sampled from multivariate gaussian.
+    When the autocorrelation function of the noise is known.
+
+    :param vec: noise will be added to this vector
+    :param t_vec: The time series vector (noise is correlated in time)
+    :param f: The autocorrelation function of the noise (with fitted parameters, only one variable f(x))
+    :return: vec with noise
+    """
+
+    # Generate noise sampled from standard normal pdf
+    noise = np.random.normal(size=len(vec))
+
+    # Decompose covariance matrix
+    # And transform noise
+    noise = np.dot(cholesky(cov_mat(f=f, t_vec=t_vec)), noise)
+
+    return np.add(vec, noise)
