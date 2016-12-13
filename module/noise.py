@@ -112,6 +112,8 @@ def near_psd(x, epsilon=0):
 
     # returning the scaling factors
     near_cov = np.array([[near_corr[i, j]*(var_list[i]*var_list[j]) for i in xrange(n)] for j in xrange(n)])
+
+    print "Transformed to near positive definite matrix!"
     return near_cov
 
 
