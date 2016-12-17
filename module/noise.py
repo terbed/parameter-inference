@@ -79,7 +79,7 @@ def colored_vector(D, lamb, dt, vec):
 
 # Create noise with known autocorrelation function ----------------------------------------------------------------
 
-def near_psd(x, epsilon=0):
+def near_psd(x, epsilon=0.00001):
     """
     Calculates the nearest positive semi-definite matrix for a correlation/covariance matrix
 
