@@ -28,6 +28,7 @@ def colored(D, lamb, dt, v_vec):
 
     return np.add(v_vec, noise)
 
+
 # Colored noise with generators and list comprehension ----------------------------------------------------------
 
 def colored_noise_generator(D, lamb, dt):

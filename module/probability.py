@@ -50,7 +50,7 @@ class ParameterSet:
         self.margin_ax = self.get_margin_ax()
         self.margin_step = self.get_margin_step()
         self.isBatch = False
-        self.batch_len = 250
+        self.batch_len = 500
         if len(self.parameter_set_seq) >= self.batch_len*2:
             self.isBatch = True
             self.parameter_set_batch_list = []
@@ -139,6 +139,7 @@ class Inference:
     def run_evaluation(self):
         self.__create_likelihood()
         self.__create_posterior()
+        self.__marginalize()
 
     def __create_likelihood(self):
         self.likelihood = np.reshape(self.likelihood, self.parameter_set.shape)
@@ -149,7 +150,7 @@ class Inference:
         self.posterior = np.multiply(self.likelihood, self.parameter_set.joint_prior)
         self.posterior /= np.sum(self.posterior) * self.parameter_set.joint_step
 
-        # Marginalize likelihood and posterior
+    def __marginalize(self):
         for idx, item in enumerate(self.parameter_set.margin_ax):
             self.parameter_set.params[idx].likelihood = \
                 np.sum(self.likelihood, axis=tuple(item)) * self.parameter_set.margin_step[idx]
@@ -159,8 +160,7 @@ class Inference:
 
     def __str__(self):
         for item in self.parameter_set.params:
-            plot.marginal_plot(item.name, item.unit, self.parameter_set.name, item.resolution, item.values, item.prior,
-                               item.likelihood, item.posterior)
+            plot.marginal_plot(item)
         return "Plot Done!"
 
 
@@ -169,13 +169,36 @@ class IndependentInference(Inference):
         Inference.__init__(self, target_trace=target_trace, parameter_set=parameter_set)
 
     def run_sim(self, sim_protocol_func, noise_sigma):
-        pool = Pool(multiprocessing.cpu_count())
-        self.likelihood = pool.map(partial(likelihood.independent_log_likelihood,
-                                           model_func=sim_protocol_func,
-                                           target_trace=self.target,
-                                           noise_sigma=noise_sigma), self.parameter_set.parameter_set_seq)
-        pool.close()
-        pool.join()
+        pool = Pool(multiprocessing.cpu_count()-1)
+
+        # Create mappable functions
+        dev_func = partial(likelihood.deviation, model_func=sim_protocol_func, target_trace=self.target)
+        log_likelihood_func = partial(likelihood.independent_log_likelihood, noise_sigma=noise_sigma)
+
+        if self.parameter_set.isBatch:
+            for idx, batch in enumerate(self.parameter_set.parameter_set_batch_list):
+                print str(idx) + ' batch of work is done out of ' \
+                      + str(len(self.parameter_set.parameter_set_batch_list))
+
+                batch_likelihood = pool.map(dev_func, batch)
+                batch_likelihood = map(log_likelihood_func, batch_likelihood)
+                self.likelihood.extend(batch_likelihood)
+
+            pool.close()
+            print "log_likelihood: Done!"
+        else:
+            pool = Pool(multiprocessing.cpu_count())
+            print "Running " + str(len(self.parameter_set.parameter_set_seq)) + " simulations on all cores..."
+            func = partial(likelihood.independent_log_likelihood,
+                           model_func=sim_protocol_func,
+                           target_trace=self.target,
+                           noise_sigma=noise_sigma)
+
+            self.likelihood = pool.map(func, self.parameter_set.parameter_set_seq)
+            pool.close()
+            pool.join()
+
+            print "Done with Simulations!"
 
 
 class DependentInference(Inference):
@@ -186,28 +209,31 @@ class DependentInference(Inference):
         print "Run simulations..."
         pool = Pool(multiprocessing.cpu_count())
 
+        dev_func = partial(likelihood.deviation, model_func=sim_protocol_func, target_trace=self.target)
+        log_likelihood_func = partial(likelihood.log_likelihood, inv_covmat=inv_covmat)
+
         if self.parameter_set.isBatch:
             for idx, batch in enumerate(self.parameter_set.parameter_set_batch_list):
                 print str(idx + 1) + ' batch of work is done out of ' \
                       + str(len(self.parameter_set.parameter_set_batch_list))
 
-                batch_likelihood = pool.map(partial(likelihood.deviation,
-                                                    model_func=sim_protocol_func,
-                                                    target_trace=self.target), batch)
-
-                batch_likelihood = map(partial(likelihood.log_likelihood, inv_covmat=inv_covmat), batch_likelihood)
-
+                batch_likelihood = pool.map(dev_func, batch)
+                batch_likelihood = map(log_likelihood_func, batch_likelihood)
                 self.likelihood.extend(batch_likelihood)
+
+            pool.close()
             print "log_likelihood: Done!"
         else:
+            pool = Pool(multiprocessing.cpu_count())
             self.likelihood = pool.map(partial(likelihood.deviation,
                                                model_func=sim_protocol_func,
                                                target_trace=self.target), self.parameter_set.parameter_set_seq)
 
             print "Create likelihood..."
             self.likelihood = map(partial(likelihood.log_likelihood, inv_covmat=inv_covmat), self.likelihood)
+            pool.close()
+            pool.join()
 
-        pool.close()
-        pool.join()
+
 
 

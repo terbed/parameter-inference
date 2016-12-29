@@ -5,11 +5,12 @@ and compare the prior and posterior one.
 
 import numpy as np
 from scipy.interpolate import interp1d
+from scipy.optimize import curve_fit
 
-
+# TODO OUT OF RANGE EXCEPTION handling in a better way
 def interpolate(x, y):
     """
-    Cubic interpolation for the given distribution and test the resolution
+    Cubic interpolation for the given symmetric distribution and test the resolution
 
     :param x: x codomain value vector
     :param y: y domain value vector
@@ -53,7 +54,7 @@ def interpolate(x, y):
 
 def sharpness(x, y):
     """
-    Feature the sharpness of the given trace
+    Feature the sharpness of the given symmetric trace
 
     :param x: sample vector
     :param y: (symmetric) distribution vector
@@ -99,48 +100,64 @@ def kl_test(posterior, prior, step, eps=0.0001):
     return kdl
 
 
-def stat(posterior, prior, param, true_param):
+def stat(param):
     """
     Create statistic for the inference
 
-    :param posterior: posterior distribution codomain vector
-    :param prior: prior distribution codomain vector
-    :param param: parameters domain vector
-    :param true_idx: the exact parameter to infer
-    :return: feature tuple for the inference or str if out of range
+    :param param: RandomVariable type
+    :return: feature tuple (sigma, diff, pdiff, sharper) for the inference or str if out of range
     """
+    true_param = param.value
 
-    if interpolate(param, posterior) is str:
-        return interpolate(param, posterior)
+    # Fit gaussian to posterior [the fitting may yield negative sigma values!!! ABS!]
+    def gauss(x, mean, sigma):
+        return 1 / np.sqrt(2 * np.pi * sigma ** 2) * np.exp(-(x - mean) ** 2 / (2 * sigma ** 2))
+
+    p_init = [param.mean, param.sigma]
+
+    p_opt = [0,0]
+    p_err = [0,0]
+    try:
+        p_opt, p_cov = curve_fit(gauss, param.values, param.posterior, p0=p_init)
+        p_err = np.sqrt(np.diag(p_cov))
+    except ValueError:  # ValueError: array must not contain infs or NaNs
+        p_opt[1] = param.sigma
+        p_err[1] = 0.
+
+    # Do some other statistics
+    # TODO true_idx = (np.abs(x - true_param)).argmin() TypeError: unsupported operand type(s) for -: 'str' and 'float'
+    if interpolate(param.values, param.posterior) is str:                      # In this case we cannot interpolate
+        return interpolate(param.values, param.posterior)
     else:
-        x = interpolate(param, posterior)[0]
-        posterior = interpolate(param, posterior)[1]
-        prior = interpolate(param, prior)[1]
+        x = interpolate(param.values, param.posterior)[0]
+        posterior = interpolate(param.values, param.posterior)[1]
+        prior = interpolate(param.values, param.prior)[1]
 
         true_idx = (np.abs(x - true_param)).argmin()
 
         sharper = sharpness(x, prior) / sharpness(x, posterior)
         diff = np.abs(x[np.argmax(posterior)] - x[true_idx])
-        pdiff = np.amax(posterior) / posterior[true_idx]
+        accuracy = np.multiply(posterior[true_idx] / np.amax(posterior),100)
 
-        return diff, pdiff, sharper
+        return abs(p_opt[1]), diff, accuracy, sharper, p_err[1]
 
 
 def re_sampling(old_res_trace, new_res):
     """
     Resampling trace
-    :param old_res_trace: (2, old_resolution) dimension np.ndarray()
-    :param new_res: new resolution array
-    :return: The interpolated new resolution (2, new_resolution) dimension np.ndarray()
+
+    :param old_res_trace: (elements number, 2) dimension np.ndarray()
+    :param new_res: new domain elements array
+    :return: The interpolated new resolution (new elements number, 2) dimension np.ndarray()
     """
 
-    low_res_trace = np.ndarray((len(new_res), 2))
+    new_res_trace = np.ndarray((len(new_res), 2))
     f = interp1d(old_res_trace[:, 0], old_res_trace[:, 1])
 
-    low_res_trace[:, 0] = new_res
-    low_res_trace[:, 1] = f(new_res)
+    new_res_trace[:, 0] = new_res
+    new_res_trace[:, 1] = f(new_res)
 
-    return low_res_trace
+    return new_res_trace
 
 if __name__ == "__main__":
     from matplotlib import pyplot

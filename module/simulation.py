@@ -1,7 +1,7 @@
 from neuron import h, gui
 
 
-def one_compartment(cm=1., gpas=0.0001, dt=0.1):
+def one_compartment(cm=1., gpas=0.0001, dt=0.1, stype='both'):
     """ One compartment simulation, variables: membrane capacitance and passive conductance """
     # Creating one compartment passive  model (interacting with neuron)
     soma = h.Section(name='soma')
@@ -15,10 +15,33 @@ def one_compartment(cm=1., gpas=0.0001, dt=0.1):
     soma.e_pas = -70
 
     # Creating stimulus
-    stim = h.IClamp(soma(0.5))
-    stim.delay = 30
-    stim.amp = 0.1
-    stim.dur = 100
+    # Here we define three kind of experimental protocol:
+    # 1.) brad electrode current
+    # 2.) narrow electrode current
+    # 3.) both
+    if stype == 'broad':
+        h.tstop = 300
+        stim = h.IClamp(soma(0.5))
+        stim.delay = 20
+        stim.amp = 0.1
+        stim.dur = 175
+    elif stype == 'narrow':
+        h.tstop = 100
+        stim = h.IClamp(soma(0.5))
+        stim.delay = 10
+        stim.amp = 0.5
+        stim.dur = 5
+    else:
+        h.tstop = 400
+        stim1 = h.IClamp(soma(0.5))
+        stim1.delay = 10
+        stim1.amp = 0.5
+        stim1.dur = 5
+
+        stim2 = h.IClamp(soma(0.5))
+        stim2.delay = 120
+        stim2.amp = 0.1
+        stim2.dur = 175
 
     # Print Information
     # h.psection()
@@ -31,7 +54,6 @@ def one_compartment(cm=1., gpas=0.0001, dt=0.1):
     t_vec.record(h._ref_t)
 
     # Simulation duration and RUN
-    h.tstop = 200                                       # Simulation end
     h.dt = dt                                           # Time step (iteration)
     h.steps_per_ms = 1 / dt
 
@@ -47,7 +69,7 @@ def one_compartment(cm=1., gpas=0.0001, dt=0.1):
     return t, v
 
 
-def stick_and_ball(Ra=100, gpas=0.0001, cm=1., Ra_max=150., dt=0.1):
+def stick_and_ball(Ra=100, gpas=0.0001, cm=1., Ra_max=250., dt=0.1, stype='broad'):
     """ Stick and Ball model variables: Passive conductance and axial resistance """
     # Create Sections
     soma = h.Section(name='soma')
@@ -78,10 +100,33 @@ def stick_and_ball(Ra=100, gpas=0.0001, cm=1., Ra_max=150., dt=0.1):
         sec.e_pas = -70
 
     # Stimulus
-    stim = h.IClamp(soma(0.5))
-    stim.delay = 30
-    stim.amp = 0.1
-    stim.dur = 100
+    # Here we define three kind of experimental protocol:
+    # 1.) brad electrode current
+    # 2.) narrow electrode current
+    # 3.) both
+    if stype == 'broad':
+        h.tstop = 300
+        stim = h.IClamp(soma(0.5))
+        stim.delay = 20
+        stim.amp = 0.1
+        stim.dur = 175
+    elif stype == 'narrow':
+        h.tstop = 100
+        stim = h.IClamp(soma(0.5))
+        stim.delay = 10
+        stim.amp = 0.5
+        stim.dur = 5
+    else:
+        h.tstop = 400
+        stim1 = h.IClamp(soma(0.5))
+        stim1.delay = 10
+        stim1.amp = 0.5
+        stim1.dur = 5
+
+        stim2 = h.IClamp(soma(0.5))
+        stim2.delay = 120
+        stim2.amp = 0.1
+        stim2.dur = 175
 
     # Run simulation ->
     # Print information
@@ -94,7 +139,6 @@ def stick_and_ball(Ra=100, gpas=0.0001, cm=1., Ra_max=150., dt=0.1):
     t_vec.record(h._ref_t)
 
     # Simulation duration and RUN
-    h.tstop = 200                                                   # Simulation end
     h.dt = dt                                                       # Time step (iteration)
     h.steps_per_ms = 1 / dt
 

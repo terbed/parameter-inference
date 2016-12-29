@@ -4,8 +4,7 @@ from functools import partial
 
 def normal_val(x, mean, sigma):
     """Returns a value for the given x"""
-    normal_distribution_value = 1 / np.sqrt(2 * np.pi * sigma ** 2) * np.exp(-(x - mean) ** 2 / (2 * sigma ** 2))
-    return normal_distribution_value
+    return 1 / np.sqrt(2 * np.pi * sigma ** 2) * np.exp(-(x - mean) ** 2 / (2 * sigma ** 2))
 
 
 def normal(vec, mean, sigma):

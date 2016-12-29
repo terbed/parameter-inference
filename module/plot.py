@@ -1,6 +1,7 @@
 """
 This module is to plot the results
 """
+from module.prior import normal
 from matplotlib import pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm as CM
@@ -27,35 +28,154 @@ def plot3d(param1, param2, z, title='', path=''):
     plt.savefig('{}{:d}.png'.format(filename, i))
 
 
-def marginal_plot(resolution, values, prior, likelihood, posterior, name='', unit='', paramset_name=''):
+def marginal_plot(param, paramset_name=''):
+    """
+    Plotting RandomVariable type
+
+    :param param: RandomVariable type
+    :param paramset_name: On which parameters did we inference together
+    :return: Plots marginal posteriors and likelihoods
+    """
     # Plot posterior
     plt.figure()
-    plt.title(name + " posterior (g) and prior (b) distribution")
-    plt.xlabel(name + ' ' + unit)
+    plt.title(param.name + " posterior (g) and prior (b) distribution")
+    plt.xlabel(param.name + ' ' + param.unit)
     plt.ylabel("probability")
-    plt.plot(values, posterior, '#34A52F')
-    plt.plot(values, prior, color='#2FA5A0')
-
-    filename = "/Users/Dani/TDK/parameter_estim/exp/out2/" + \
-               paramset_name + '-' + name + "-posterior_" + str(resolution) + "_"
+    plt.plot(param.values, param.posterior, '#34A52F')
+    plt.plot(param.values, param.prior, color='#2FA5A0')
+    plt.axvline(param.value, color='#34A52F')
+    filename = "/Users/Dani/TDK/parameter_estim/stim_protocol/ow/" + \
+               paramset_name + '-' + param.name + "-posterior_" + str(len(param.values)) + "_"
     i = 0
     while os.path.exists('{}{:d}.png'.format(filename, i)):
         i += 1
+    plt.show()
     plt.savefig('{}{:d}.png'.format(filename, i))
     print "Plot done! File path: " + filename
 
     # Plot likelihood
     plt.figure()
-    plt.title(name + " likelihood (r) and prior (b) distribution")
-    plt.xlabel(name + ' ' + unit)
+    plt.title(param.name + " likelihood (r) and prior (b) distribution")
+    plt.xlabel(param.name + ' ' + param.unit)
     plt.ylabel("probability")
-    plt.plot(values, likelihood, color='#A52F34')
-    plt.plot(values, prior, color='#2FA5A0')
+    plt.axvline(param.value, color='#34A52F')
+    plt.plot(param.values, param.likelihood, color='#A52F34')
 
-    filename = "/Users/Dani/TDK/parameter_estim/exp/out2/" + \
-               paramset_name + '-' + name + "-likelihood_" + str(resolution) + "_"
+    filename = "/Users/Dani/TDK/parameter_estim/stim_protocol/ow/" + \
+               paramset_name + '-' + param.name + "-likelihood_" + str(len(param.values)) + "_"
     i = 0
     while os.path.exists('{}{:d}.png'.format(filename, i)):
         i += 1
     plt.savefig('{}{:d}.png'.format(filename, i))
+    plt.show()
     print "Plot done! File path: " + filename
+
+
+def plot_stat(stat, param, path='', bin=None):
+
+    def reject_outliers(data, m=2):
+        return data[abs(data - np.mean(data)) < m * np.std(data)]
+
+    def reject_outliers_avrg(data, m=2):
+        rejected = data[abs(data - np.mean(data)) < m * np.std(data)]
+        outliers = len(data) - len(rejected)
+        return np.average(rejected), outliers
+
+    avrg_sigma = np.average(abs(stat[:, 0]))
+    print avrg_sigma
+    max_sigma_err = np.max(stat[:, 4])
+
+    print "Maximum %s sigma error of normal fitting: %.2f percentage" % (param.name, (max_sigma_err/avrg_sigma*100))
+
+    avrg_diff = np.average(stat[:, 1])
+    std_diff = np.std(stat[:, 1])
+
+    avrg_acc = np.average(stat[:, 2])
+    std_acc = np.std(stat[:, 2])
+
+    avrg_sharp = np.average(stat[:, 3])
+
+    # Plot illustration
+    x = np.linspace(param.range_min, param.range_max, 3000)
+    prior = normal(x, param.mean, param.sigma)
+    posterior = normal(x, param.mean, avrg_sigma)
+    post_max = np.amax(posterior)
+
+    plt.figure()
+    plt.title("Illustration| " +
+              ' [diff(g): %.2e, acc(b): %.2f, gain: %.2f] ' % (avrg_diff, avrg_acc, avrg_sharp) + param.name)
+    plt.xlabel(param.name + ' ' + param.unit)
+    plt.ylabel('Probability')
+    plt.grid(True)
+    plt.plot(x, posterior, color='#9c3853')
+    plt.plot(x, prior, color='#2FA5A0')
+    plt.axvspan(param.mean-avrg_diff - std_diff, param.mean+avrg_diff + std_diff, facecolor='g', alpha=0.1)
+    #plt.axvline(x=param.mean+avrg_diff, color='#389c81')
+    #plt.axvline(x=param.mean-avrg_diff, color='#389c81')
+    #plt.axhline(y=(avrg_acc/100)*post_max, xmin=0, xmax=1000, color='#38539C', linewidth=1)
+    plt.axhspan((avrg_acc/100)*post_max-(std_acc/100)*post_max, (avrg_acc/100)*post_max+(std_acc/100)*post_max,
+                facecolor='b', alpha=0.1)
+    plt.savefig(path + "/illustration_"+param.name+".png")
+
+    avrg_diff, out_diff = reject_outliers_avrg(stat[:, 1])
+    avrg_acc, out_acc = reject_outliers_avrg(stat[:, 2])
+    avrg_sharp, out_sharp = reject_outliers_avrg(stat[:, 3])
+
+    # Plot histograms
+    if bin is None:
+        bin = int(len(stat[:, 0])/2)
+
+    plt.figure()
+    plt.title("Deviation of true parameter | " + param.name + " " + str(param.mean))
+    plt.xlabel(param.name + ' ' + param.unit + ' (average: %.2e | outliers: %d)' % (avrg_diff, out_diff))
+    plt.ylabel('Occurrence ')
+    plt.grid(True)
+    plt.hist(stat[:, 1], bin, facecolor='#D44A4B', normed=False)
+    plt.savefig(path + "/deviation_"+param.name+".png")
+
+    plt.figure()
+    plt.title("Accuracy | " + param.name)
+    plt.xlabel("p_true/p_max" + ' (average: %.2f | outliers: %d)' % (avrg_acc, out_acc))
+    plt.ylabel('Occurrence')
+    plt.grid(True)
+    plt.hist(stat[:, 2], bin, facecolor='#3BA9A8', normed=False)
+    plt.savefig(path + "/accuracy_"+param.name+".png")
+
+    plt.figure()
+    plt.title("Posterior how many times sharper than prior | " + param.name)
+    plt.xlabel("Information gain" + ' ' + '(average: %.3f | outliers: %d)' % (avrg_sharp, out_sharp))
+    plt.ylabel('Occurrence')
+    plt.grid(True)
+    plt.hist(stat[:, 3], bin, facecolor='#4A4BD4', normed=False)
+    plt.savefig(path + "/igain_"+param.name+".png")
+
+    # plt.figure()
+    # plt.title("Fitted gaussian sigma parameter | " + param.name)
+    # plt.xlabel('Sigma' + ' ' + '(average: %.2e )' % avrg_sigma)
+    # plt.ylabel('Occurrence')
+    # plt.grid(True)
+    # plt.hist(stat[:, 1], bin, facecolor='#D44A4B', normed=False)
+    # plt.savefig(path + "/sigma_"+param.name+".png")
+
+if __name__ == '__main__':
+    from module.probability import RandomVariable
+
+    cm_mean = 1.
+    cm_sig = 0.2
+    gpas_mean = 0.0001
+    gpas_sig = 0.00002
+
+    cm_start = 0.5
+    cm_end = 1.5
+
+    gpas_start = gpas_mean - 0.00005
+    gpas_end = gpas_mean + 0.00005
+
+    cm = RandomVariable(name='cm', range_min=cm_start, range_max=cm_end, resolution=100, mean=cm_mean, sigma=cm_sig)
+    gpas = RandomVariable(name='gpas', range_min=gpas_start, range_max=gpas_end, resolution=100, mean=gpas_mean, sigma=gpas_sig)
+
+    stat = np.genfromtxt(fname='/Users/Dani/TDK/parameter_estim/stim_protocol/oc/broad/cm_stat.txt')
+    plot_stat(stat=stat, param=cm, path='/Users/Dani/TDK/parameter_estim/stim_protocol/oc/broad/')
+
+    stat = np.genfromtxt(fname='/Users/Dani/TDK/parameter_estim/stim_protocol/oc/broad/gpas_stat.txt')
+    plot_stat(stat, gpas, path='/Users/Dani/TDK/parameter_estim/stim_protocol/oc/broad/')

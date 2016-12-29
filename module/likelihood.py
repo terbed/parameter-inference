@@ -67,10 +67,8 @@ def dependent_2d(simulation_func, x_values, y_values, inv_covmat, target_trace):
 # For multiprocessing -------------------------------------------------------------------------------------------
 
 
-def independent_log_likelihood(param_set, model_func, target_trace, noise_sigma):
-    (_, v) = model_func(**param_set)
-    v_dev = np.subtract(target_trace, v)
-    return - np.sum(np.square(v_dev)) / (2 * noise_sigma ** 2)
+def independent_log_likelihood(dev, noise_sigma):
+    return - np.sum(np.square(dev)) / (2 * noise_sigma ** 2)
 
 
 def deviation(param_set, model_func, target_trace):
