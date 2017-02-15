@@ -5,8 +5,74 @@ from module.prior import normal
 from matplotlib import pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm as CM
+import matplotlib.patches as mpatches
 import numpy as np
 import os
+
+def plot_res(result, param1, param2):
+    """
+    Plot 2 parameters with single marginal plots and a 3d plot
+
+    :param result: Inference objekt
+    :param param1 param2: RandomVariable Objekt
+    """
+
+    path = result.working_path
+    ax1 = 0
+    ax2 = 0
+    likelihood = result.likelihood
+    posterior = result.posterior
+
+    # Axes of parameters to be plotted
+    for idx, item in enumerate(result.p.params):
+        if param1.name == item.name:
+            ax1 = idx
+        if param2.name == item.name:
+            ax2 = idx
+
+    # Set up likelihood and posterior
+    # Marginalize if more parameters...
+    if len(result.p.params) > 2:
+        for idx, item in enumerate(result.p.params):
+            if idx != ax1 and idx != ax2:
+                likelihood = np.sum(likelihood, axis=idx)*item.step
+                posterior = np.sum(posterior, axis=idx)*item.step
+
+    # 3d plot
+    fig = plt.figure()
+    ax = fig.gca(projection='3d')
+    x, y = np.meshgrid(param2.values, param1.values)
+    ax.plot_surface(x, y, likelihood, rstride=1, cstride=1, alpha=0.3, cmap=CM.rainbow)
+    ax.contourf(x, y, likelihood, zdir='z', offset=0, cmap=CM.rainbow)
+    ax.contourf(x, y, likelihood, zdir='x', offset=param2.range_min, cmap=CM.rainbow)
+    ax.contourf(x, y, likelihood, zdir='y', offset=param1.range_max, cmap=CM.rainbow)
+    ax.set_title("Joint likelihood")
+    ax.set_xlabel(param2.name + ' ' + param2.unit)
+    ax.set_ylabel(param1.name + ' ' + param1.unit)
+    filename = path + '/JointLikelihood_' + param1.name + '_' + param2.name
+    i = 0
+    while os.path.exists('{}{:d}.png'.format(filename, i)):
+        i += 1
+    plt.savefig('{}{:d}.png'.format(filename, i))
+    plt.show()
+
+    fig = plt.figure()
+    ax = fig.gca(projection='3d')
+    x, y = np.meshgrid(param2.values, param1.values)
+    ax.plot_surface(x, y, posterior, rstride=1, cstride=1, alpha=0.3, cmap=CM.rainbow)
+    # ax.plot_surface(x, y, result.p.joint_prior, rstride=1, cstride=1, alpha=0.3, cmap=CM.rainbow)
+    ax.contourf(x, y, posterior, zdir='z', offset=0, cmap=CM.rainbow)
+    ax.contourf(x, y, posterior, zdir='x', offset=param2.range_min, cmap=CM.rainbow)
+    ax.contourf(x, y, posterior, zdir='y', offset=param1.range_max, cmap=CM.rainbow)
+    ax.set_title("Joint posterior")
+    ax.set_xlabel(param2.name + ' ' + param2.unit)
+    ax.set_ylabel(param1.name + ' ' + param1.unit)
+    filename = path + '/JointPosterior_' + param1.name + '_' + param2.name
+    i = 0
+    while os.path.exists('{}{:d}.png'.format(filename, i)):
+        i += 1
+    plt.savefig('{}{:d}.png'.format(filename, i))
+    plt.show()
 
 
 def plot3d(param1, param2, z, title='', path=''):
@@ -14,9 +80,9 @@ def plot3d(param1, param2, z, title='', path=''):
     ax = fig.gca(projection='3d')
     x, y = np.meshgrid(param2.values, param1.values)
     ax.plot_surface(x, y, z, rstride=8, cstride=8, alpha=0.3)
-    cset = ax.contour(x, y, z, zdir='z', offset=0, cmap=CM.coolwarm)
-    cset = ax.contour(x, y, z, zdir='x', offset=param2.range_min, cmap=CM.coolwarm)
-    cset = ax.contour(x, y, z, zdir='y', offset=param1.range_max, cmap=CM.coolwarm)
+    cset = ax.contourf(x, y, z, zdir='z', offset=0, cmap=CM.coolwarm)
+    cset = ax.contourf(x, y, z, zdir='x', offset=param2.range_min, cmap=CM.coolwarm)
+    cset = ax.contourf(x, y, z, zdir='y', offset=param1.range_max, cmap=CM.coolwarm)
     ax.set_title(title)
     ax.set_xlabel(param2.name + ' ' + param2.unit)
     ax.set_ylabel(param1.name + ' ' + param1.unit)
@@ -28,46 +94,42 @@ def plot3d(param1, param2, z, title='', path=''):
     plt.savefig('{}{:d}.png'.format(filename, i))
 
 
-def marginal_plot(param, paramset_name=''):
+def marginal_plot(param, path=''):
     """
     Plotting RandomVariable type
 
     :param param: RandomVariable type
-    :param paramset_name: On which parameters did we inference together
+    :param path: working path
     :return: Plots marginal posteriors and likelihoods
     """
     # Plot posterior
     plt.figure()
-    plt.title(param.name + " posterior (g) and prior (b) distribution")
+    plt.title(param.name + " posterior (r) and prior (g) distribution")
     plt.xlabel(param.name + ' ' + param.unit)
-    plt.ylabel("probability")
-    plt.plot(param.values, param.posterior, '#34A52F')
-    plt.plot(param.values, param.prior, color='#2FA5A0')
+    plt.ylabel("p")
+    plt.plot(param.values, param.posterior, color='#A52F34')
+    plt.plot(param.values, param.prior, color='#34A52F')
     plt.axvline(param.value, color='#34A52F')
-    filename = "/Users/Dani/TDK/parameter_estim/stim_protocol/ow/" + \
-               paramset_name + '-' + param.name + "-posterior_" + str(len(param.values)) + "_"
+    filename = path + "/" + param.name + "_posterior"
     i = 0
     while os.path.exists('{}{:d}.png'.format(filename, i)):
         i += 1
-    plt.show()
     plt.savefig('{}{:d}.png'.format(filename, i))
     print "Plot done! File path: " + filename
 
     # Plot likelihood
     plt.figure()
-    plt.title(param.name + " likelihood (r) and prior (b) distribution")
+    plt.title(param.name + " likelihood (r) distribution")
     plt.xlabel(param.name + ' ' + param.unit)
-    plt.ylabel("probability")
+    plt.ylabel("p")
     plt.axvline(param.value, color='#34A52F')
     plt.plot(param.values, param.likelihood, color='#A52F34')
 
-    filename = "/Users/Dani/TDK/parameter_estim/stim_protocol/ow/" + \
-               paramset_name + '-' + param.name + "-likelihood_" + str(len(param.values)) + "_"
+    filename = path + "/" + param.name + "_likelihood"
     i = 0
     while os.path.exists('{}{:d}.png'.format(filename, i)):
         i += 1
     plt.savefig('{}{:d}.png'.format(filename, i))
-    plt.show()
     print "Plot done! File path: " + filename
 
 
@@ -107,6 +169,9 @@ def plot_stat(stat, param, path='', bin=None):
     plt.xlabel(param.name + ' ' + param.unit)
     plt.ylabel('Probability')
     plt.grid(True)
+    red_patch = mpatches.Patch(color='#9c3853', label='Posterior')
+    blue_patch = mpatches.Patch(color='#2FA5A0', label='Prior')
+    plt.legend(handles=[red_patch, blue_patch])
     plt.plot(x, posterior, color='#9c3853')
     plt.plot(x, prior, color='#2FA5A0')
     plt.axvspan(param.mean-avrg_diff - std_diff, param.mean+avrg_diff + std_diff, facecolor='g', alpha=0.1)
@@ -159,6 +224,11 @@ def plot_stat(stat, param, path='', bin=None):
 
 if __name__ == '__main__':
     from module.probability import RandomVariable
+    from module.probability import IndependentInference
+    from module.simulation import one_compartment
+    from module.probability import ParameterSet
+    from module.noise import white
+    from matplotlib import pyplot as plt
 
     cm_mean = 1.
     cm_sig = 0.2
@@ -171,11 +241,22 @@ if __name__ == '__main__':
     gpas_start = gpas_mean - 0.00005
     gpas_end = gpas_mean + 0.00005
 
-    cm = RandomVariable(name='cm', range_min=cm_start, range_max=cm_end, resolution=100, mean=cm_mean, sigma=cm_sig)
-    gpas = RandomVariable(name='gpas', range_min=gpas_start, range_max=gpas_end, resolution=100, mean=gpas_mean, sigma=gpas_sig)
+    cm = RandomVariable(name='cm', range_min=cm_start, range_max=cm_end, resolution=50, mean=cm_mean, sigma=cm_sig)
+    gpas = RandomVariable(name='gpas', range_min=gpas_start, range_max=gpas_end, resolution=50, mean=gpas_mean, sigma=gpas_sig)
 
-    stat = np.genfromtxt(fname='/Users/Dani/TDK/parameter_estim/stim_protocol/oc/broad/cm_stat.txt')
-    plot_stat(stat=stat, param=cm, path='/Users/Dani/TDK/parameter_estim/stim_protocol/oc/broad/')
+    exp_noise = 7.
+    t, v = one_compartment()
+    exp_v = white(exp_noise, v)
 
-    stat = np.genfromtxt(fname='/Users/Dani/TDK/parameter_estim/stim_protocol/oc/broad/gpas_stat.txt')
-    plot_stat(stat, gpas, path='/Users/Dani/TDK/parameter_estim/stim_protocol/oc/broad/')
+    plt.figure()
+    plt.plot(t, exp_v)
+    plt.show()
+
+    cm_gpas = ParameterSet(cm, gpas)
+    inf = IndependentInference(exp_v, cm_gpas, working_path="/Users/Dani/TDK/parameter_estim/3param")
+
+    inf.run_sim(one_compartment, exp_noise)
+    inf.run_evaluation()
+
+    print inf
+    plot_res(inf, cm, gpas)

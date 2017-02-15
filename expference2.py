@@ -12,8 +12,8 @@ from module.simulation import exp_model
 
 
 # --- Set Random Variables
-Ra = RandomVariable(name='Ra', range_min=100., range_max=380., resolution=50, mean=157.362128223, sigma=40)
-gpas = RandomVariable(name='gpas', range_min=0.00030, range_max=0.0005, resolution=50, mean=0.000403860792541, sigma=0.00004)
+Ra = RandomVariable(name='Ra', range_min=250., range_max=700., resolution=80, mean=157.362128223, sigma=40)
+gpas = RandomVariable(name='gpas', range_min=0.00030, range_max=0.0006, resolution=60, mean=0.000403860792541, sigma=0.00004)
 cm = RandomVariable(name='cm', range_min=5.5, range_max=9.5, resolution=50, mean=7.849480, sigma=0.4)
 
 # --- Load NEURON morphology
@@ -72,11 +72,11 @@ cm_gpas_p = np.sum(inf2.posterior, axis=0)*Ra.step
 Ra_gpas_l = np.sum(inf2.likelihood, axis=1)*cm.step
 Ra_gpas_p = np.sum(inf2.posterior, axis=1)*cm.step
 
-plot(cm, gpas, cm_gpas_l, 'Likelihood (Ra-cm-gpas inference)')
-plot(cm, gpas, cm_gpas_l, 'Posterior (Ra-cm-gpas inference)')
+plot(cm, gpas, cm_gpas_l, 'Likelihood (Ra-cm-gpas inference)', '/Users/Dani/TDK/parameter_estim/exp/out3')
+plot(cm, gpas, cm_gpas_l, 'Posterior (Ra-cm-gpas inference)', '/Users/Dani/TDK/parameter_estim/exp/out3')
 
-plot(Ra, cm, ra_cm_l, 'Likelihood (Ra-cm-gpas inference)')
+plot(Ra, cm, ra_cm_l, 'Likelihood (Ra-cm-gpas inference)', '/Users/Dani/TDK/parameter_estim/exp/out3')
 plot(Ra, cm, ra_cm_p, 'Posterior (Ra-cm-gpas inference)')
 
-plot(Ra, gpas, Ra_gpas_l, 'Likelihood (Ra-cm-gpas inference)')
-plot(Ra, gpas, Ra_gpas_p, 'Posterior (Ra-cm-gpas inference)')
+plot(Ra, gpas, Ra_gpas_l, 'Likelihood (Ra-cm-gpas inference)', '/Users/Dani/TDK/parameter_estim/exp/out3')
+plot(Ra, gpas, Ra_gpas_p, 'Posterior (Ra-cm-gpas inference)', '/Users/Dani/TDK/parameter_estim/exp/out3')

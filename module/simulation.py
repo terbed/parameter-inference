@@ -16,7 +16,7 @@ def one_compartment(cm=1., gpas=0.0001, dt=0.1, stype='both'):
 
     # Creating stimulus
     # Here we define three kind of experimental protocol:
-    # 1.) brad electrode current
+    # 1.) broad electrode current
     # 2.) narrow electrode current
     # 3.) both
     if stype == 'broad':

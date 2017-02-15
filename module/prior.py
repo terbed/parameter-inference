@@ -31,26 +31,26 @@ def normal2d(x_mean, x_sigma, x_values, y_mean, y_sigma, y_values):
     return [[normal_val_xmap(x) * normal_val_ymap(y) for y in y_values] for x in x_values]
 
 
-def normal_nd(*priors):
+def normal_nd(*params):
     """
     General normal distribution
 
-    :param priors: RandomVariable objects
+    :param params: RandomVariable objects
     :return: n dimensional normal distribution
     """
     # Trivial case
-    if len(priors) == 1:
-        return priors
+    if len(params) == 1:
+        return params[0].prior
 
     # General case
     shape = []
-    for item in priors:
+    for item in params:
         shape.append(len(item.values))
 
     n = np.ones(shape)
     for idx, _ in np.ndenumerate(n):
         for ax, element in enumerate(idx):
-            n[idx] *= priors[ax].values[element]
+            n[idx] *= params[ax].prior[element]
 
     return n
 
@@ -60,58 +60,21 @@ if __name__ == "__main__":
     from mpl_toolkits.mplot3d import Axes3D
     from matplotlib import cm as CM
     from matplotlib.ticker import LinearLocator, FormatStrFormatter
+    from module.probability import RandomVariable
 
-    x1 = np.linspace(-100, 100, 20)
-    y1 = normal(x1, 0, 18)
+    cm = RandomVariable("cm", range_min=0.5, range_max=1.5, resolution=80, mean=1., sigma=0.05)
+    gpas = RandomVariable("gpas", range_min=0.00005, range_max=0.00015, resolution=80, mean=0.0001, sigma=0.00002)
 
-    x2 = np.linspace(-50, 50, 300)
-    y2 = normal(x2, 0, 3)
-
-    x3 = np.linspace(-30, 30, 400)
-    y3 = normal(x3, 0, 6)
-
-    x4 = np.linspace(-10, 10, 50)
-    y4 = normal(x4, 0, 2)
-
-    plt.figure()
-    plt.plot(x1,y1)
-    plt.show()
-
-    z = normal2d(0,3,x2,0,4,x3)
+    prior = normal_nd(cm, gpas)
 
     fig = plt.figure()
     ax = fig.gca(projection='3d')
-    x, y = np.meshgrid(x3, x2)
-    ax.plot_surface(x, y, z, rstride=8, cstride=8, alpha=0.3)
-    cset = ax.contour(x, y, z, zdir='z', offset=-0, cmap=CM.coolwarm)
-    cset = ax.contour(x, y, z, zdir='x', offset=0.00004, cmap=CM.coolwarm)
-    cset = ax.contour(x, y, z, zdir='y', offset=160, cmap=CM.coolwarm)
+    x, y = np.meshgrid(gpas.values, cm.values)
+    ax.plot_surface(x, y, prior, rstride=1, cstride=1, alpha=0.3, cmap=CM.rainbow)
+    cset = ax.contourf(x, y, prior, zdir='z', offset=-0, cmap=CM.rainbow)
+    cset = ax.contourf(x, y, prior, zdir='x', offset=gpas.range_min, cmap=CM.rainbow)
+    cset = ax.contourf(x, y, prior, zdir='y', offset=cm.range_max, cmap=CM.rainbow)
     ax.set_title('Posterior')
     ax.set_xlabel('x2')
     ax.set_ylabel('x3')
     plt.show()
-
-# Test normal_nd
-"""
-    y1y2y3 = normal_nd(y1, y2, y3, y4)
-
-    y11 = y1y2y3.sum(axis=(1, 2, 3)) * abs(x2[1]-x2[0]) * abs(x3[1]-x3[0]) * abs(x4[1]-x4[0])
-
-    plt.figure()
-    plt.plot(x1, y1, 'r')
-    plt.plot(x1, y11)
-    plt.show()
-
-    y1y2 = np.sum(y1y2y3, axis=(2, 3))
-    fig = plt.figure()
-    ax = fig.gca(projection='3d')
-    x, y = np.meshgrid(x2, x1)
-    ax.plot_surface(x, y, y1y2, rstride=8, cstride=8, alpha=0.3)
-    cset = ax.contour(x, y, y1y2, zdir='z', offset=-0, cmap=CM.coolwarm)
-    cset = ax.contour(x, y, y1y2, zdir='x', offset=0.00004, cmap=CM.coolwarm)
-    cset = ax.contour(x, y, y1y2, zdir='y', offset=160, cmap=CM.coolwarm)
-    ax.set_title('Posterior')
-    ax.set_xlabel('x1')
-    ax.set_ylabel('x2')
-    plt.show()
-    """
