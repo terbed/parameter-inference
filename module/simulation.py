@@ -69,7 +69,7 @@ def one_compartment(cm=1., gpas=0.0001, dt=0.1, stype='both'):
     return t, v
 
 
-def stick_and_ball(Ra=100, gpas=0.0001, cm=1., Ra_max=250., dt=0.1, stype='broad'):
+def stick_and_ball(Ra=100., gpas=0.0001, cm=1., Ra_max=250., dt=0.1, stype='both'):
     """ Stick and Ball model variables: Passive conductance and axial resistance """
     # Create Sections
     soma = h.Section(name='soma')

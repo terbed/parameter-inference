@@ -141,6 +141,8 @@ class Inference:
         self.__create_likelihood()
         self.__create_posterior()
         self.__marginalize()
+        print "Likelihood and posterior evaluation is done! (You can plot them now :)"
+        print "Check FULL posterior correctness: the integrate of posterior: + " + str(np.sum(self.posterior)*self.p.joint_step)
 
     def __create_likelihood(self):
         self.likelihood = np.reshape(self.likelihood, self.p.shape)

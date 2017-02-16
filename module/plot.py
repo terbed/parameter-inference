@@ -38,6 +38,8 @@ def plot_res(result, param1, param2):
                 likelihood = np.sum(likelihood, axis=idx)*item.step
                 posterior = np.sum(posterior, axis=idx)*item.step
 
+    print "Is the JOINT posterior a probability distribution? Integrate(posterior) = " + str(np.sum(posterior)*param1.step*param2.step)
+
     # 3d plot
     fig = plt.figure()
     ax = fig.gca(projection='3d')
@@ -102,6 +104,10 @@ def marginal_plot(param, path=''):
     :param path: working path
     :return: Plots marginal posteriors and likelihoods
     """
+
+    # Check posterior distribution correctness
+    print "The MARGINAL posterior is probability distributions? Integrate(posterior) = " + str(np.sum(param.posterior)*param.step)
+
     # Plot posterior
     plt.figure()
     plt.title(param.name + " posterior (r) and prior (g) distribution")
