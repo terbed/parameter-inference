@@ -12,7 +12,18 @@ class RandomVariable:
     A class representing  random variables
     """
 
-    def __init__(self, name, range_min, range_max, resolution, mean, sigma,  value=None):
+    def __init__(self, name, range_min, range_max, resolution, mean, sigma,  value=None, p_sampling='u'):
+        """
+
+        :param name: the name of the parameter (string)
+        :param range_min: minimum simulation range
+        :param range_max: maximum simulation range
+        :param resolution: resolution of simulation
+        :param mean: the mean of the prior distribution
+        :param sigma: standard deviation of the prior distribution
+        :param value: the true value (optional) if not given, than value=mean
+        :param p_sampling: parameter sampling method: uniform: 'u' or prior: 'p' (sampled from prior distribution)
+        """
         self.name = name
         self.unit = self.get_unit()
         self.value = value
@@ -23,9 +34,15 @@ class RandomVariable:
         self.sigma = sigma
 
         self.step = np.abs(range_max-range_min)/resolution
-        self.values = np.linspace(range_min, range_max, resolution)
-        self.prior = prior.normal(self.values, mean, sigma)
+        if p_sampling == 'u':
+            self.values = np.linspace(range_min, range_max, resolution)
+            print "\nUniform parameter sampling!"
+        else:
+            self.values = np.random.normal(mean, sigma, resolution)
+            self.values = np.sort(self.values)
+            print "\nParameter sampling from prior distribution!"
 
+        self.prior = prior.normal(self.values, mean, sigma)
         self.posterior = []
         self.likelihood = []
 

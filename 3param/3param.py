@@ -14,11 +14,11 @@ import numpy as np
 
 # --- Set Random Variables
 Ra = RandomVariable(name='Ra', range_min=20., range_max=500., resolution=100, mean=100, sigma=40)
-gpas = RandomVariable(name='gpas', range_min=0.00006, range_max=0.0002, resolution=80, mean=0.0001, sigma=0.00003)
+gpas = RandomVariable(name='gpas', range_min=0.00008, range_max=0.0002, resolution=80, mean=0.0001, sigma=0.00003)
 cm = RandomVariable(name='cm', range_min=0.5, range_max=3, resolution=80, mean=1., sigma=0.4)
 
 # ---- Create synthetic experimental trace with white noise
-exp_noise = 5
+exp_noise = 6
 t, v = stick_and_ball()
 exp_v = white(exp_noise, v)
 

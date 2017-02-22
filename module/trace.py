@@ -146,13 +146,13 @@ def re_sampling(old_res_trace, new_res):
     """
     Resampling trace
 
-    :param old_res_trace: (elements number, 2) dimension np.ndarray()
-    :param new_res: new domain elements array
+    :param old_res_trace: np.ndarray(old_len, 2) o_trace[:,0] = ot_vec; o_trace[:, 1] = ov_vec;
+    :param new_res: new domain elements array (time vector)
     :return: The interpolated new resolution (new elements number, 2) dimension np.ndarray()
     """
 
     new_res_trace = np.ndarray((len(new_res), 2))
-    f = interp1d(old_res_trace[:, 0], old_res_trace[:, 1])
+    f = interp1d(old_res_trace[:,0], old_res_trace[:,1])
 
     new_res_trace[:, 0] = new_res
     new_res_trace[:, 1] = f(new_res)

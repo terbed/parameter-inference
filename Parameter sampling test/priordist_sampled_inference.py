@@ -141,7 +141,7 @@ fig.colorbar(surf, shrink=0.5, aspect=5)
 
 
 # Marginlaize for cm
-likelihood = np.sum(likelihood2d, axis = 1) / gpas_num
+likelihood = np.sum(likelihood2d, axis=1) / gpas_num
 
 # Prior distribution for cm
 prior = priorGenerator(cm_mean, cm_sig, cm_values)
