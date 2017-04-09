@@ -59,7 +59,7 @@ def plot_res(result, param1, param2):
     ax.set_title("Joint likelihood")
     ax.set_xlabel(param2.name + ' ' + param2.unit)
     ax.set_ylabel(param1.name + ' ' + param1.unit)
-    filename = path + '/JointL_' + param1.name + '_' + param2.name
+    filename = path + '/L_' + param1.name + '-' + param2.name
     i = 0
     while os.path.exists('{}({:d}).png'.format(filename, i)):
         i += 1
@@ -76,7 +76,7 @@ def plot_res(result, param1, param2):
     ax.set_title("Joint posterior")
     ax.set_xlabel(param2.name + ' ' + param2.unit)
     ax.set_ylabel(param1.name + ' ' + param1.unit)
-    filename = path + '/JointP_' + param1.name + '_' + param2.name
+    filename = path + '/P_' + param1.name + '-' + param2.name
     i = 0
     while os.path.exists('{}({:d}).png'.format(filename, i)):
         i += 1
@@ -151,6 +151,11 @@ def plot_stat(stat, param, path='', bin=None):
         return data[abs(data - np.mean(data)) < m * np.std(data)]
 
     def reject_outliers_avrg(data, m=2):
+        """
+        :param data: Data to filter outliers
+        :param m: m times std is acceptable
+        :return: tuple: (average of data without outliers, number of outliers)
+        """
         rejected = data[abs(data - np.mean(data)) < m * np.std(data)]
         outliers = len(data) - len(rejected)
         return np.average(rejected), outliers
