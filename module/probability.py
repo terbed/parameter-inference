@@ -102,7 +102,7 @@ class ParameterSet:
         shape = []
         param_seq = []
 
-        for idx, item in enumerate(self.params):
+        for item in self.params:
             shape.append(len(item.values))
 
         # Create parameter set for multiprocess simulation
@@ -121,7 +121,8 @@ class ParameterSet:
         for times in range(batch_num):
             self.parameter_set_batch_list.append(self.parameter_set_seq[times*self.batch_len: (times+1)*self.batch_len])
 
-        if len(self.parameter_set_batch_list) < float(len(self.parameter_set_seq))/float(self.batch_len):
+        # Check if there is left over
+        if float(len(self.parameter_set_batch_list)) < len(self.parameter_set_seq)/float(self.batch_len):
             self.parameter_set_batch_list.append(self.parameter_set_seq[batch_num*self.batch_len:])
 
     def joint_step(self):
@@ -136,6 +137,10 @@ class ParameterSet:
         return step
 
     def get_margin_ax(self):
+        """
+        :return: Gives back for all parameters all the other ones:
+                For example: [[1,2], [0,2], [0,1]]
+        """
         all_ax = range(len(self.params))
         margin_ax = []
         for idx, _ in enumerate(self.params):
@@ -145,6 +150,10 @@ class ParameterSet:
         return margin_ax
 
     def get_margin_step(self):
+        """
+        :return: Margin step for margin ax:
+                For example: [0.3, 234.23, 0.0034]
+        """
         margin_step = np.ones(len(self.margin_ax))
         for idx, l in enumerate(self.margin_ax):
             for item in l:
@@ -278,7 +287,7 @@ class IndependentInference(Inference):
 
             print "Running " + str(len(self.p.parameter_set_seq)) + " simulations on all cores..."
 
-            self.likelihood = pool.map( dev_func, self.p.parameter_set_seq)
+            self.likelihood = pool.map(dev_func, self.p.parameter_set_seq)
             self.likelihood = pool.map(log_likelihood_func, self.likelihood)
             pool.close()
             pool.join()
@@ -312,8 +321,8 @@ class DependentInference(Inference):
                 self.likelihood.extend(batch_likelihood)
 
             pool.close()
-            plot.save_file(self.likelihood, self.working_path, "log_likelihood.txt")
-            print "log_likelihood: Saved!"
+            #plot.save_file(self.likelihood, self.working_path, "log_likelihood.txt", header=str(self.p.name) + str(self.p.shape))
+            #print "log_likelihood: Saved!"
         else:
             print "Simulation running..."
             pool = Pool(multiprocessing.cpu_count())
