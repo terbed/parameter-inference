@@ -5,6 +5,7 @@ from multiprocessing import Pool
 from functools import partial
 import likelihood
 import plot
+import os
 
 
 class RandomVariable:
@@ -30,17 +31,11 @@ class RandomVariable:
         self.range_min = range_min
         self.range_max = range_max
         self.resolution = resolution
+        self.sampling_type = p_sampling
         self.mean = mean
         self.sigma = sigma
-
         self.step = np.abs(range_max-range_min)/resolution
-        if p_sampling == 'u':
-            self.values = np.linspace(range_min, range_max, resolution)
-            print "\nUniform parameter sampling!"
-        else:
-            self.values = np.random.normal(mean, sigma, resolution)
-            self.values = np.sort(self.values)
-            print "\nParameter sampling from prior distribution!"
+        self.values = self.__get_values()
 
         self.prior = prior.normal(self.values, mean, sigma)
         self.posterior = []
@@ -53,6 +48,16 @@ class RandomVariable:
         database = {'Ra': '[ohm cm]', 'cm': '[uF/cm^2]', 'gpas': '[uS/cm^2]'}
         return database[self.name]
 
+    def __get_values(self):
+        if self.sampling_type == 'u':
+            print "\nUniform parameter sampling: " + self.name
+            return np.linspace(self.range_min, self.range_max, self.resolution)
+        else:
+            print "\nParameter sampling from prior distribution: " + self.name
+            values = np.random.normal(self.mean, self.sigma, self.resolution)
+            values = np.sort(self.values)
+            return values
+
 
 class ParameterSet:
     """
@@ -61,13 +66,14 @@ class ParameterSet:
     def __init__(self, *params):
         self.params = params
         self.name = self.get_name()
+        self.optimized_params = self.get_optimized_params()  # This dictionary contains the prior optimized params
         self.parameter_set_seq, self.shape = self.parameter_seq_for_mapping()
         self.joint_prior = prior.normal_nd(*params)
         self.joint_step = self.joint_step()
         self.margin_ax = self.get_margin_ax()
         self.margin_step = self.get_margin_step()
         self.isBatch = False
-        self.batch_len = 500
+        self.batch_len = 100
         if len(self.parameter_set_seq) >= self.batch_len*2:
             self.isBatch = True
             self.parameter_set_batch_list = []
@@ -76,8 +82,14 @@ class ParameterSet:
     def get_name(self):
         name = ''
         for item in self.params:
-            name += item.name
+            name = name + '-' + item.name
         return name
+
+    def get_optimized_params(self):
+        opt_dict = {}
+        for item in self.params:
+            opt_dict[item.name] = item.value
+        return opt_dict
 
     def parameter_seq_for_mapping(self):
         """
@@ -86,6 +98,7 @@ class ParameterSet:
         :return: a parameter set sequence dict for multiprocessing and the shape for reshaping the list correctly
                  form: [{'Ra' = 100, 'gpas' = 0.0001, 'cm' = 1}, {'Ra' = 100, 'gpas' = 0.0001, 'cm' = 1.1}, ... ], [200,200,200]
         """
+
         shape = []
         param_seq = []
 
@@ -143,23 +156,73 @@ class Inference:
     """
     Takes a ParameterSet object
     """
-    def __init__(self, target_trace, parameter_set, working_path=''):
+    def __init__(self, target_trace, parameter_set, working_path='', debugging=False):
         self.p = parameter_set
         self.target = target_trace
         self.working_path = working_path
+        self.check_directory(working_path)
+        self.toDebug = debugging
+        if self.toDebug:
+            self.check_directory(working_path + "/debug")
+
         self.likelihood = []
         self.posterior = []
+        if self.toDebug:
+            self.deviation = []
+
+    @staticmethod
+    def check_directory(working_path):
+        if not os.path.exists(working_path):
+            os.makedirs(working_path)
 
     # Method to override
     def run_sim(self, sim_protocol_func, covmat):
         pass
 
-    def run_evaluation(self):
+    def run_evaluation(self, model=None):
+        if self.toDebug:
+            if model is None:
+                print "\nError! You are in debugging mode, so you have to give the right model function!"
+                exit(17)
+
+            data = np.zeros((len(self.p.parameter_set_seq), 4), dtype=float)
+            data[:, 0] = [np.sum(vec)**2 for vec in self.deviation]
+            data[:, 1] = self.likelihood
+            data[:, 2] = np.subtract(self.likelihood, np.amax(self.likelihood))
+            data[:, 3] = np.exp(np.subtract(self.likelihood, np.amax(self.likelihood)))
+
+            # Save out data
+            header = self.p.name + "\ndeviation^2\tlog_likelihood\tnormed\tlikelihood"
+            plot.save_file(data, self.working_path+"/debug", "data", header)
+
+            # Do some trace plot TODO plot informative cases accordingly to likelihood or deviation...
+            from matplotlib import pyplot as plt
+            # Chose parameter-sets to analyse uniformly
+            idx = np.linspace(0, len(self.p.parameter_set_seq), num=100, dtype=int, endpoint=False)
+
+            for i in idx:
+                t, v = model(**self.p.parameter_set_seq[i])
+                summed_dev = np.sum(self.deviation[i])
+
+                plt.figure()
+                plt.xlabel("Time [ms]")
+                plt.ylabel("[mV]")
+                plt.title("Current params(b): %s\n"
+                          "Summed dev: %.2e | log_L: %.2e"
+                          % (str(self.p.parameter_set_seq[i]),
+                             float(summed_dev), float(self.likelihood[i])))
+                plt.plot(t, self.target, color='#A52F34')
+                plt.plot(t, v, color='#2FA5A0')
+                filename = self.working_path + "/debug/trace" + str(i)
+                i = 0
+                while os.path.exists('{}({:d}).png'.format(filename, i)):
+                    i += 1
+                plt.savefig('{}({:d}).png'.format(filename, i))
+
         self.__create_likelihood()
         self.__create_posterior()
         self.__marginalize()
-        print "Likelihood and posterior evaluation is done! (You can plot them now :)"
-        print "Check FULL posterior correctness: the integrate of posterior: + " + str(np.sum(self.posterior)*self.p.joint_step)
+        print "\nCheck FULL posterior correctness: the integrate of posterior: + " + str(np.sum(self.posterior)*self.p.joint_step)
 
     def __create_likelihood(self):
         self.likelihood = np.reshape(self.likelihood, self.p.shape)
@@ -185,8 +248,8 @@ class Inference:
 
 
 class IndependentInference(Inference):
-    def __init__(self, target_trace,  parameter_set, working_path=''):
-        Inference.__init__(self, target_trace=target_trace, parameter_set=parameter_set, working_path=working_path)
+    def __init__(self, target_trace,  parameter_set, working_path='', debugging=False):
+        Inference.__init__(self, target_trace=target_trace, parameter_set=parameter_set, working_path=working_path, debugging=debugging)
 
     def run_sim(self, sim_protocol_func, noise_sigma):
         pool = Pool(multiprocessing.cpu_count()-1)
@@ -208,13 +271,15 @@ class IndependentInference(Inference):
             print "log_likelihood: Done!"
         else:
             pool = Pool(multiprocessing.cpu_count())
-            print "Running " + str(len(self.p.parameter_set_seq)) + " simulations on all cores..."
-            func = partial(likelihood.independent_log_likelihood,
-                           model_func=sim_protocol_func,
-                           target_trace=self.target,
-                           noise_sigma=noise_sigma)
 
-            self.likelihood = pool.map(func, self.p.parameter_set_seq)
+            # Create mappable functions
+            dev_func = partial(likelihood.deviation, model_func=sim_protocol_func, target_trace=self.target)
+            log_likelihood_func = partial(likelihood.independent_log_likelihood, noise_sigma=noise_sigma)
+
+            print "Running " + str(len(self.p.parameter_set_seq)) + " simulations on all cores..."
+
+            self.likelihood = pool.map( dev_func, self.p.parameter_set_seq)
+            self.likelihood = pool.map(log_likelihood_func, self.likelihood)
             pool.close()
             pool.join()
 
@@ -222,8 +287,8 @@ class IndependentInference(Inference):
 
 
 class DependentInference(Inference):
-    def __init__(self, target_trace,  parameter_set, working_path=''):
-        Inference.__init__(self, target_trace=target_trace, parameter_set=parameter_set, working_path=working_path)
+    def __init__(self, target_trace,  parameter_set, working_path='', debugging=False):
+        Inference.__init__(self, target_trace=target_trace, parameter_set=parameter_set, working_path=working_path, debugging=debugging)
 
     def run_sim(self, sim_protocol_func, inv_covmat):
         print "Run simulations..."
@@ -238,19 +303,29 @@ class DependentInference(Inference):
                       + str(len(self.p.parameter_set_batch_list))
 
                 batch_likelihood = pool.map(dev_func, batch)
+                # In the case of debugging we save the deviation vector too
+                if self.toDebug:
+                    self.deviation.extend(batch_likelihood)
+
+                # Compute the exponent with map function (pool.map would crash for this...)
                 batch_likelihood = map(log_likelihood_func, batch_likelihood)
                 self.likelihood.extend(batch_likelihood)
 
             pool.close()
-            print "log_likelihood: Done!"
+            plot.save_file(self.likelihood, self.working_path, "log_likelihood.txt")
+            print "log_likelihood: Saved!"
         else:
+            print "Simulation running..."
             pool = Pool(multiprocessing.cpu_count())
-            self.likelihood = pool.map(partial(likelihood.deviation,
-                                               model_func=sim_protocol_func,
-                                               target_trace=self.target), self.p.parameter_set_seq)
 
-            print "Create likelihood..."
-            self.likelihood = map(partial(likelihood.log_likelihood, inv_covmat=inv_covmat), self.likelihood)
+            dev_func = partial(likelihood.deviation, model_func=sim_protocol_func, target_trace=self.target)
+            log_likelihood_func = partial(likelihood.log_likelihood, inv_covmat=inv_covmat)
+
+            self.likelihood = pool.map(dev_func, self.p.parameter_set_seq)
+            self.likelihood = pool.map(log_likelihood_func, self.likelihood)
+            if self.toDebug:
+                self.deviation = self.likelihood
+            self.likelihood = map(log_likelihood_func, self.likelihood)
             pool.close()
             pool.join()
 

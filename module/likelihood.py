@@ -72,7 +72,7 @@ def independent_log_likelihood(dev, noise_sigma):
 
 
 def deviation(param_set, model_func, target_trace):
-    (_, v) = model_func(**param_set)
+    (_, v) = model_func(**param_set)  # ** -> to pass dictionary for function variables
     v_dev = np.array(np.subtract(target_trace, v))
     return v_dev
 

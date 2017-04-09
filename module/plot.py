@@ -9,6 +9,14 @@ import matplotlib.patches as mpatches
 import numpy as np
 import os
 
+
+def save_file(X, path, name, header=''):
+    i=0
+    while os.path.exists('{}({:d}).txt'.format(path+name, i)):
+        i += 1
+    np.savetxt('{}({:d}).txt'.format(path+name, i), X, header=header, delimiter='\t')
+
+
 def plot_res(result, param1, param2):
     """
     Plot 2 parameters with single marginal plots and a 3d plot
@@ -41,7 +49,7 @@ def plot_res(result, param1, param2):
     print "Is the JOINT posterior a probability distribution? Integrate(posterior) = " + str(np.sum(posterior)*param1.step*param2.step)
 
     # 3d plot
-    fig = plt.figure()
+    fig = plt.figure(figsize=(12,8))
     ax = fig.gca(projection='3d')
     x, y = np.meshgrid(param2.values, param1.values)
     ax.plot_surface(x, y, likelihood, rstride=1, cstride=1, alpha=0.3, cmap=CM.rainbow)
@@ -51,14 +59,13 @@ def plot_res(result, param1, param2):
     ax.set_title("Joint likelihood")
     ax.set_xlabel(param2.name + ' ' + param2.unit)
     ax.set_ylabel(param1.name + ' ' + param1.unit)
-    filename = path + '/JointLikelihood_' + param1.name + '_' + param2.name
+    filename = path + '/JointL_' + param1.name + '_' + param2.name
     i = 0
-    while os.path.exists('{}{:d}.png'.format(filename, i)):
+    while os.path.exists('{}({:d}).png'.format(filename, i)):
         i += 1
-    plt.savefig('{}{:d}.png'.format(filename, i))
-    plt.show()
+    plt.savefig('{}({:d}).png'.format(filename, i))
 
-    fig = plt.figure()
+    fig = plt.figure(figsize=(12,8))
     ax = fig.gca(projection='3d')
     x, y = np.meshgrid(param2.values, param1.values)
     ax.plot_surface(x, y, posterior, rstride=1, cstride=1, alpha=0.3, cmap=CM.rainbow)
@@ -69,12 +76,11 @@ def plot_res(result, param1, param2):
     ax.set_title("Joint posterior")
     ax.set_xlabel(param2.name + ' ' + param2.unit)
     ax.set_ylabel(param1.name + ' ' + param1.unit)
-    filename = path + '/JointPosterior_' + param1.name + '_' + param2.name
+    filename = path + '/JointP_' + param1.name + '_' + param2.name
     i = 0
-    while os.path.exists('{}{:d}.png'.format(filename, i)):
+    while os.path.exists('{}({:d}).png'.format(filename, i)):
         i += 1
-    plt.savefig('{}{:d}.png'.format(filename, i))
-    plt.show()
+    plt.savefig('{}({:d}).png'.format(filename, i))
 
 
 def plot3d(param1, param2, z, title='', path=''):
@@ -91,9 +97,9 @@ def plot3d(param1, param2, z, title='', path=''):
     filename = path + title + '_' + param1.name + str(param1.resolution) + '_' + \
                param2.name + str(param2.resolution) + '_'
     i = 0
-    while os.path.exists('{}{:d}.png'.format(filename, i)):
+    while os.path.exists('{}({:d}).png'.format(filename, i)):
         i += 1
-    plt.savefig('{}{:d}.png'.format(filename, i))
+    plt.savefig('{}({:d}).png'.format(filename, i))
 
 
 def marginal_plot(param, path=''):
@@ -109,33 +115,33 @@ def marginal_plot(param, path=''):
     print "The MARGINAL posterior is probability distributions? Integrate(posterior) = " + str(np.sum(param.posterior)*param.step)
 
     # Plot posterior
-    plt.figure()
-    plt.title(param.name + " posterior (r) and prior (g) distribution")
+    plt.figure(figsize=(12,8))
+    plt.title(param.name + " posterior (r) and prior (b) distribution")
     plt.xlabel(param.name + ' ' + param.unit)
     plt.ylabel("p")
     plt.plot(param.values, param.posterior, color='#A52F34')
-    plt.plot(param.values, param.prior, color='#34A52F')
+    plt.plot(param.values, param.prior, color='#2FA5A0')
     plt.axvline(param.value, color='#34A52F')
-    filename = path + "/" + param.name + "_posterior"
+    filename = path + "/" + param.name + "_P"
     i = 0
-    while os.path.exists('{}{:d}.png'.format(filename, i)):
+    while os.path.exists('{}({:d}).png'.format(filename, i)):
         i += 1
-    plt.savefig('{}{:d}.png'.format(filename, i))
+    plt.savefig('{}({:d}).png'.format(filename, i))
     print "Plot done! File path: " + filename
 
     # Plot likelihood
-    plt.figure()
+    plt.figure(figsize=(12,8))
     plt.title(param.name + " likelihood (r) distribution")
     plt.xlabel(param.name + ' ' + param.unit)
     plt.ylabel("p")
     plt.axvline(param.value, color='#34A52F')
     plt.plot(param.values, param.likelihood, color='#A52F34')
 
-    filename = path + "/" + param.name + "_likelihood"
+    filename = path + "/" + param.name + "_L"
     i = 0
-    while os.path.exists('{}{:d}.png'.format(filename, i)):
+    while os.path.exists('{}({:d}).png'.format(filename, i)):
         i += 1
-    plt.savefig('{}{:d}.png'.format(filename, i))
+    plt.savefig('{}({:d}).png'.format(filename, i))
     print "Plot done! File path: " + filename
 
 
@@ -169,7 +175,7 @@ def plot_stat(stat, param, path='', bin=None):
     posterior = normal(x, param.mean, avrg_sigma)
     post_max = np.amax(posterior)
 
-    plt.figure()
+    plt.figure(figsize=(12,8))
     plt.title("Illustration| " +
               ' [diff(g): %.2e, acc(b): %.2f, gain: %.2f] ' % (avrg_diff, avrg_acc, avrg_sharp) + param.name)
     plt.xlabel(param.name + ' ' + param.unit)
@@ -196,7 +202,7 @@ def plot_stat(stat, param, path='', bin=None):
     if bin is None:
         bin = int(len(stat[:, 0])/2)
 
-    plt.figure()
+    plt.figure(figsize=(12,8))
     plt.title("Deviation of true parameter | " + param.name + " " + str(param.mean))
     plt.xlabel(param.name + ' ' + param.unit + ' (average: %.2e | outliers: %d)' % (avrg_diff, out_diff))
     plt.ylabel('Occurrence ')
@@ -204,7 +210,7 @@ def plot_stat(stat, param, path='', bin=None):
     plt.hist(stat[:, 1], bin, facecolor='#D44A4B', normed=False)
     plt.savefig(path + "/deviation_"+param.name+".png")
 
-    plt.figure()
+    plt.figure(figsize=(12,8))
     plt.title("Accuracy | " + param.name)
     plt.xlabel("p_true/p_max" + ' (average: %.2f | outliers: %d)' % (avrg_acc, out_acc))
     plt.ylabel('Occurrence')
@@ -212,7 +218,7 @@ def plot_stat(stat, param, path='', bin=None):
     plt.hist(stat[:, 2], bin, facecolor='#3BA9A8', normed=False)
     plt.savefig(path + "/accuracy_"+param.name+".png")
 
-    plt.figure()
+    plt.figure(figsize=(12,8))
     plt.title("Posterior how many times sharper than prior | " + param.name)
     plt.xlabel("Information gain" + ' ' + '(average: %.3f | outliers: %d)' % (avrg_sharp, out_sharp))
     plt.ylabel('Occurrence')

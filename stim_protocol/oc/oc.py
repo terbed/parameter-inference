@@ -1,11 +1,11 @@
 import numpy as np
 from module.simulation import one_compartment
 from module.probability import RandomVariable, DependentInference, ParameterSet
-from module.noise import colored_vector
+from module.noise import colored
 from module.trace import stat
 from module.plot import plot_stat
 from functools import partial
-from matplotlib import pyplot as plt
+
 import time
 
 num_of_iter = 50
@@ -32,17 +32,17 @@ for i in range(num_of_iter):
 
     # Generate deterministic trace and create synthetic data with noise model
     t, v = one_compartment(cm=current_cm, gpas=current_gpas, stype='broad')
-    data = colored_vector(30, 0.1, 0.1, v)
-
-    if i == 0:
-        plt.figure()
-        plt.title("Neuron voltage response to stimuli")
-        plt.xlabel('Time [ms]')
-        plt.ylabel('Voltage [mV]')
-        plt.plot(t, v, color='#2FA5A0')
-        plt.plot(t, data, color='#9c3853')
-        plt.savefig('/Users/Dani/TDK/parameter_estim/stim_protocol/broad_noised.png')
-        plt.show()
+    data = colored(30, 0.1, 0.1, v)
+    #
+    # if i == 0:
+    #     plt.figure()
+    #     plt.title("Neuron voltage response to stimuli")
+    #     plt.xlabel('Time [ms]')
+    #     plt.ylabel('Voltage [mV]')
+    #     plt.plot(t, v, color='#2FA5A0')
+    #     plt.plot(t, data, color='#9c3853')
+    #     plt.savefig('/Users/Dani/TDK/parameter_estim/stim_protocol/broad_noised.png')
+    #     plt.show()
 
     # Set up range in a way that the true parameter value will be in the middle
     cm_start = current_cm - 0.5
@@ -56,7 +56,7 @@ for i in range(num_of_iter):
     gpas = RandomVariable(name='gpas', range_min=gpas_start, range_max=gpas_end, resolution=100, mean=current_gpas, sigma=pgpas.sigma)
 
     cm_gpas = ParameterSet(cm, gpas)
-    inference = DependentInference(data, cm_gpas)
+    inference = DependentInference(data, cm_gpas, working_path="/Users/Dani/TDK/parameter_estim/stim_protocol/oc/broad")
     one_comp = partial(one_compartment, stype='broad')  # fix chosen stimulus type for simulations
 
     if __name__ == '__main__':

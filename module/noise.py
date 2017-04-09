@@ -59,7 +59,7 @@ def colored_noise_generator(D, lamb, dt):
             yield e_0
 
 
-def colored_vector(D, lamb, dt, vec):
+def colored_vector(D, lamb, dt, vec):  # TODO not working properly!!!
     """
     Ads colored noise to the given vector.
     This function uses the colored_noise_generator() generator function
