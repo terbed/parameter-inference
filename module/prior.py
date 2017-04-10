@@ -55,6 +55,14 @@ def normal_nd(*params):
     return n
 
 
+def log_normal_val(x, mu, sigma):
+    return 1/(x*sigma*np.sqrt(2*np.pi))*np.exp(-(np.log(x)-mu)**2/(2*sigma**2))
+
+
+def log_normal(vec, mu, sigma):
+    lognormal = partial(log_normal_val, mu=mu, sigma=sigma)
+    return [lognormal(x) for x in vec]
+
 if __name__ == "__main__":
     from matplotlib import pyplot as plt
     from mpl_toolkits.mplot3d import Axes3D
@@ -62,19 +70,24 @@ if __name__ == "__main__":
     from matplotlib.ticker import LinearLocator, FormatStrFormatter
     from module.probability import RandomVariable
 
-    cm = RandomVariable("cm", range_min=0.5, range_max=1.5, resolution=80, mean=1., sigma=0.05)
-    gpas = RandomVariable("gpas", range_min=0.00005, range_max=0.00015, resolution=80, mean=0.0001, sigma=0.00002)
+    cm = RandomVariable("cm", range_min=50, range_max=150, resolution=1000, mean=100., sigma=20.)
+    gpas = RandomVariable("gpas", range_min=0.00005, range_max=0.00015, resolution=1000, mean=0.0001, sigma=0.00002)
 
-    prior = normal_nd(cm, gpas)
+    def get_mu(mean, var):
+        return np.log(mean/(1+var/mean**2))
 
-    fig = plt.figure()
-    ax = fig.gca(projection='3d')
-    x, y = np.meshgrid(gpas.values, cm.values)
-    ax.plot_surface(x, y, prior, rstride=1, cstride=1, alpha=0.3, cmap=CM.rainbow)
-    cset = ax.contourf(x, y, prior, zdir='z', offset=-0, cmap=CM.rainbow)
-    cset = ax.contourf(x, y, prior, zdir='x', offset=gpas.range_min, cmap=CM.rainbow)
-    cset = ax.contourf(x, y, prior, zdir='y', offset=cm.range_max, cmap=CM.rainbow)
-    ax.set_title('Posterior')
-    ax.set_xlabel('x2')
-    ax.set_ylabel('x3')
+    def get_sig(mean, var):
+        return np.sqrt(np.log(1+var/mean**2))
+
+    normal = normal(cm.values, cm.mean, cm.sigma)
+    mu = get_mu(cm.mean, cm.sigma**2)
+    sig = get_sig(cm.mean, cm.sigma**2)
+    print mu
+    print sig
+
+    lognormal = log_normal(cm.values, mu, sig-0.15)
+
+    plt.figure(figsize=(12,7))
+    plt.plot(cm.values, normal)
+    plt.plot(cm.values, lognormal)
     plt.show()

@@ -28,7 +28,7 @@ for i in range(num_of_iter):
     print str(i) + " is DONE out of " + str(num_of_iter)
 
     # Sampling current parameter from normal distribution
-    current_Ra = np.random.normal(pRa.value, pRa.sigma)
+    current_Ra = np.random.normal(pRa.value, 15)    # Lower sigma to avoid aut of range
     current_gpas = np.random.normal(pgpas.value, pgpas.sigma)
 
     # Generate deterministic trace and create synthetic data with noise model
