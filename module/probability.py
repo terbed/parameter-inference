@@ -278,6 +278,8 @@ class IndependentInference(Inference):
 
             pool.close()
             print "log_likelihood: Done!"
+            # plot.save_file(self.likelihood, self.working_path, "/log_likelihood.txt", header=str(self.p.name) + str(self.p.shape))
+            # print "log_likelihood: Saved!"
         else:
             pool = Pool(multiprocessing.cpu_count())
 
@@ -321,7 +323,7 @@ class DependentInference(Inference):
                 self.likelihood.extend(batch_likelihood)
 
             pool.close()
-            #plot.save_file(self.likelihood, self.working_path, "log_likelihood.txt", header=str(self.p.name) + str(self.p.shape))
+            #plot.save_file(self.likelihood, self.working_path, "/log_likelihood.txt", header=str(self.p.name) + str(self.p.shape))
             #print "log_likelihood: Saved!"
         else:
             print "Simulation running..."

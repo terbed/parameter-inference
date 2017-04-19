@@ -24,11 +24,11 @@ for i in range(num_of_iter):
     print str(i) + " is DONE out of " + str(num_of_iter)
 
     # Sampling current parameter from normal distribution
-    current_Ra = np.random.normal(pRa.value, pRa.sigma)
+    current_Ra = np.random.normal(pRa.value, 10.)
     current_gpas = np.random.normal(pgpas.value, pgpas.sigma)
 
     # Generate deterministic trace and create synthetic data with noise model
-    t, v = stick_and_ball(Ra=current_Ra, gpas=current_gpas, stype='broad')
+    t, v = stick_and_ball(Ra=current_Ra, gpas=current_gpas, stype='steps')
     data = white(noise_sigma, v)
 
     # if i == 0:
@@ -54,8 +54,8 @@ for i in range(num_of_iter):
     gpas = RandomVariable(name='gpas', range_min=gpas_start, range_max=gpas_end, resolution=100, mean=current_gpas, sigma=pgpas.sigma)
 
     Ra_gpas = ParameterSet(Ra, gpas)
-    inference = IndependentInference(data, Ra_gpas, working_path="/Users/Dani/TDK/parameter_estim/stim_protocol/mw/broad")
-    multi_comp = partial(stick_and_ball, stype='broad')  # fix chosen stimulus type for simulations
+    inference = IndependentInference(data, Ra_gpas, working_path="/Users/Dani/TDK/parameter_estim/stim_protocol/mw/steps")
+    multi_comp = partial(stick_and_ball, stype='steps')  # fix chosen stimulus type for simulations
 
     if __name__ == '__main__':
         inference.run_sim(multi_comp, noise_sigma)
@@ -75,18 +75,18 @@ for i in range(num_of_iter):
 runningTime = (time.time() - startTime) / 60
 lasted = "The simulation was running for %f minutes\n" % runningTime
 configuration = "MacBook Pro (Retina, Mid 2012); 2.6 GHz Intel Core i7; 8 GB 1600 MHz DDR3; macOS Sierra 10.12.1\n"
-setup1 = 'Multi compartment simulation; White noise sigma=7; broad stimulus; Ra parameter; dt=0.1\n'
-setup2 = 'Multi compartment simulation; White noise sigma=7; broad stimulus; gpas parameter; dt=0.1\n'
+setup1 = 'Multi compartment simulation; White noise sigma=7; steps stimulus; Ra parameter; dt=0.1\n'
+setup2 = 'Multi compartment simulation; White noise sigma=7; steps stimulus; gpas parameter; dt=0.1\n'
 header1 = "Number of simulations: " + str(num_of_iter) + '\n' + setup1 + configuration + lasted
 header2 = "Number of simulations: " + str(num_of_iter) + '\n' + setup2 + configuration + lasted
 
 # Save out statistic to file for occurent later analysis
-np.savetxt(fname='/Users/Dani/TDK/parameter_estim/stim_protocol/mw/broad/Ra_stat.txt', X=Ra_stat,
+np.savetxt(fname='/Users/Dani/TDK/parameter_estim/stim_protocol/mw/steps/Ra_stat.txt', X=Ra_stat,
            header=header1 + 'sigma\tdiff\taccuracy\tsharper\tsigma_err', delimiter='\t')
-np.savetxt(fname='/Users/Dani/TDK/parameter_estim/stim_protocol/mw/broad/gpas_stat.txt', X=gpas_stat,
+np.savetxt(fname='/Users/Dani/TDK/parameter_estim/stim_protocol/mw/steps/gpas_stat.txt', X=gpas_stat,
            header=header2 + '\nsigma\tdiff\taccuracy\tsharper\tsigma_err', delimiter='\t')
 
 # Plot statistics
-plot_stat(Ra_stat, pRa, path='/Users/Dani/TDK/parameter_estim/stim_protocol/mw/broad')
-plot_stat(gpas_stat, pgpas, path='/Users/Dani/TDK/parameter_estim/stim_protocol/mw/broad')
+plot_stat(Ra_stat, pRa, path='/Users/Dani/TDK/parameter_estim/stim_protocol/mw/steps')
+plot_stat(gpas_stat, pgpas, path='/Users/Dani/TDK/parameter_estim/stim_protocol/mw/steps')
 

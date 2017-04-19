@@ -31,7 +31,7 @@ for i in range(num_of_iter):
     current_gpas = np.random.normal(pgpas.mean, pgpas.sigma)
 
     # Generate deterministic trace and create synthetic data with noise model
-    t, v = one_compartment(cm=current_cm, gpas=current_gpas, stype='broad')
+    t, v = one_compartment(cm=current_cm, gpas=current_gpas, stype='steps')
     data = colored(30, 0.1, 0.1, v)
     #
     # if i == 0:
@@ -56,7 +56,7 @@ for i in range(num_of_iter):
     gpas = RandomVariable(name='gpas', range_min=gpas_start, range_max=gpas_end, resolution=100, mean=current_gpas, sigma=pgpas.sigma)
 
     cm_gpas = ParameterSet(cm, gpas)
-    inference = DependentInference(data, cm_gpas, working_path="/Users/Dani/TDK/parameter_estim/stim_protocol/oc/broad")
+    inference = DependentInference(data, cm_gpas, working_path="/Users/Dani/TDK/parameter_estim/stim_protocol/oc/steps")
     one_comp = partial(one_compartment, stype='broad')  # fix chosen stimulus type for simulations
 
     if __name__ == '__main__':
@@ -83,11 +83,11 @@ header1 = "Number of simulations: " + str(num_of_iter) + '\n' + setup1 + configu
 header2 = "Number of simulations: " + str(num_of_iter) + '\n' + setup2 + configuration + lasted
 
 # Save out statistic to file for occurent later analysis
-np.savetxt(fname='/Users/Dani/TDK/parameter_estim/stim_protocol/oc/broad/cm_stat.txt', X=cm_stat,
+np.savetxt(fname='/Users/Dani/TDK/parameter_estim/stim_protocol/oc/steps/cm_stat.txt', X=cm_stat,
            header=header1 + 'sigma\tdiff\taccuracy\tsharper\tsigma_err', delimiter='\t')
-np.savetxt(fname='/Users/Dani/TDK/parameter_estim/stim_protocol/oc/broad/gpas_stat.txt', X=gpas_stat,
+np.savetxt(fname='/Users/Dani/TDK/parameter_estim/stim_protocol/oc/steps/gpas_stat.txt', X=gpas_stat,
            header=header2 + '\nsigma\tdiff\taccuracy\tsharper\tsigma_err', delimiter='\t')
 
 # Plot statistics
-plot_stat(cm_stat, pcm, path='/Users/Dani/TDK/parameter_estim/stim_protocol/oc/broad')
-plot_stat(gpas_stat, pgpas, path='/Users/Dani/TDK/parameter_estim/stim_protocol/oc/broad')
+plot_stat(cm_stat, pcm, path='/Users/Dani/TDK/parameter_estim/stim_protocol/oc/steps')
+plot_stat(gpas_stat, pgpas, path='/Users/Dani/TDK/parameter_estim/stim_protocol/oc/steps')

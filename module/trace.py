@@ -94,11 +94,15 @@ def stat(param):
     try:
         p_opt, p_cov = curve_fit(normal_val, param.values, param.posterior, p0=p_init)
         p_err = np.sqrt(np.diag(p_cov))
-    except ValueError:  # ValueError: array must not contain infs or NaNs
+    except (ValueError, RuntimeError) as err:
+        # ValueError: array must not contain infs or NaNs
+        # RuntimeError: Optimal parameters not found: Number of calls to function has reached maxfev = 600.
         print "Something went wrong fitting gauss to data...\n"
+        print(err)
+        print(err.args)
         p_opt[1] = param.sigma
         p_err[1] = 0.
-        return abs(p_opt[1]), 0., 0., 1., p_err[1]
+        return abs(p_opt[1]), param.mean*param.sigma, 0., 1., p_err[1]
 
     # Create high resolution (prior and) posterior from fitted function
     x = np.linspace(param.range_min, param.range_max, 2000)

@@ -1,18 +1,21 @@
 from neuron import h, gui
 
 
-def one_compartment(cm=1., gpas=0.0001, dt=0.1, stype='broad'):
+def one_compartment(cm=1., gpas=0.0001, dt=0.1, stype='broad', custom_stim=None):
     """ One compartment simulation, variables: membrane capacitance and passive conductance """
     # Creating one compartment passive  model (interacting with neuron)
     soma = h.Section(name='soma')
     soma.L = soma.diam = 50                             # it is a sphere
-    soma.v = -70
+    soma.v = -65
     soma.cm = cm                                        # parameter to infer
 
     # Insert passive conductance
     soma.insert('pas')
     soma.g_pas = gpas                                  # parameter to infer
-    soma.e_pas = -70
+    soma.e_pas = -65
+
+    h.dt = dt                                           # Time step (iteration)
+    h.steps_per_ms = 1 / dt
 
     # Creating stimulus
     # Here we define three kind of experimental protocol:
@@ -31,7 +34,7 @@ def one_compartment(cm=1., gpas=0.0001, dt=0.1, stype='broad'):
         stim.delay = 10
         stim.amp = 0.5
         stim.dur = 5
-    else:
+    elif stype == 'both':
         h.tstop = 400
         stim1 = h.IClamp(soma(0.5))
         stim1.delay = 10
@@ -42,6 +45,30 @@ def one_compartment(cm=1., gpas=0.0001, dt=0.1, stype='broad'):
         stim2.delay = 120
         stim2.amp = 0.1
         stim2.dur = 175
+    elif stype == 'steps':
+        h.tstop = 500
+        stim1 = h.IClamp(soma(0.5))
+        stim1.delay = 10
+        stim1.amp = 0.5
+        stim1.dur = 5
+
+        stim2 = h.IClamp(soma(0.5))
+        stim2.delay = 120
+        stim2.amp = 0.1
+        stim2.dur = 175
+
+        stim3 = h.IClamp(soma(0.5))
+        stim3.delay = 400
+        stim3.amp = 0.35
+        stim3.dur = 5
+    elif stype == 'custom':
+        h.tstop = len(custom_stim)*dt
+        h.load_file("vplay.hoc")
+        vec = h.Vector(custom_stim)
+        istim = h.IClamp(soma(0.5))
+        vec.play(istim._ref_amp, h.dt)
+        istim.delay = 0   # Just for Neuron
+        istim.dur = 1e9   # Just for Neuron
 
     # Print Information
     # h.psection()
@@ -53,11 +80,8 @@ def one_compartment(cm=1., gpas=0.0001, dt=0.1, stype='broad'):
     v_vec.record(soma(0.5)._ref_v)
     t_vec.record(h._ref_t)
 
-    # Simulation duration and RUN
-    h.dt = dt                                           # Time step (iteration)
-    h.steps_per_ms = 1 / dt
-
-    h.v_init = -70
+    # Simulation  RUN
+    h.v_init = -65
     h.finitialize(h.v_init)                             # Starting membrane potential
 
     h.init()
@@ -69,7 +93,7 @@ def one_compartment(cm=1., gpas=0.0001, dt=0.1, stype='broad'):
     return t, v
 
 
-def stick_and_ball(Ra=100., gpas=0.0001, cm=1., Ra_max=250., dt=0.1, stype='both'):
+def stick_and_ball(Ra=100., gpas=0.0001, cm=1., Ra_max=250., dt=0.1, stype='both', stim_vec=None):
     """ Stick and Ball model variables: Passive conductance and axial resistance """
     # Create Sections
     soma = h.Section(name='soma')
@@ -93,11 +117,11 @@ def stick_and_ball(Ra=100., gpas=0.0001, cm=1., Ra_max=250., dt=0.1, stype='both
     for sec in h.allsec():
         sec.Ra = Ra                                                 # Ra is a parameter to infer
         sec.cm = cm
-        sec.v = -70
+        sec.v = -65
 
         sec.insert('pas')
         sec.g_pas = gpas                                            # gpas is a parameter to infer
-        sec.e_pas = -70
+        sec.e_pas = -65
 
     # Stimulus
     # Here we define three kind of experimental protocol:
@@ -116,7 +140,7 @@ def stick_and_ball(Ra=100., gpas=0.0001, cm=1., Ra_max=250., dt=0.1, stype='both
         stim.delay = 10
         stim.amp = 0.5
         stim.dur = 5
-    else:
+    elif stype == 'both':
         h.tstop = 400
         stim1 = h.IClamp(soma(0.5))
         stim1.delay = 10
@@ -127,6 +151,30 @@ def stick_and_ball(Ra=100., gpas=0.0001, cm=1., Ra_max=250., dt=0.1, stype='both
         stim2.delay = 120
         stim2.amp = 0.1
         stim2.dur = 175
+    elif stype == 'steps':
+        h.tstop = 500
+        stim1 = h.IClamp(soma(0.5))
+        stim1.delay = 10
+        stim1.amp = 0.5
+        stim1.dur = 5
+
+        stim2 = h.IClamp(soma(0.5))
+        stim2.delay = 120
+        stim2.amp = 0.1
+        stim2.dur = 175
+
+        stim3 = h.IClamp(soma(0.5))
+        stim3.delay = 400
+        stim3.amp = 0.35
+        stim3.dur = 5
+    elif stype == 'custom':
+        h.tstop = len(stim_vec)*dt
+        h.load_file("vplay.hoc")
+        vec = h.Vector(stim_vec)
+        stim = h.IClamp(soma(0.5))
+        vec.play(stim._ref_amp, h.dt)
+        stim.delay = 0   # Just for Neuron
+        stim.dur = 1e9   # Just for Neuron
 
     # Run simulation ->
     # Print information
@@ -142,7 +190,7 @@ def stick_and_ball(Ra=100., gpas=0.0001, cm=1., Ra_max=250., dt=0.1, stype='both
     h.dt = dt                                                       # Time step (iteration)
     h.steps_per_ms = 1 / dt
 
-    h.v_init = -70
+    h.v_init = -65
     h.finitialize(h.v_init)                                         # Starting membrane potential
 
     h.init()
@@ -201,3 +249,38 @@ def exp_model(Ra=157.3621, gpas=0.000403860792, cm=7.849480, dt=0.1):
     v = v_vec.to_python()
 
     return t, v
+
+
+if __name__ == "__main__":
+    from matplotlib import pyplot as plt
+    import numpy as np
+    from module.noise import white
+
+    stim = []
+    tv = np.linspace(0, 500, 10001)
+    f = np.linspace(0.000001,0.150, 10001)
+    T = 1/f
+    for i, t in enumerate(tv):
+        stim.append(0.3*np.sin(2*np.pi/T[i] * t))
+
+    plt.figure(figsize=(12,7))
+    plt.title("Stimulus")
+    plt.xlabel("Time [ms]")
+    plt.ylabel("I [mA]")
+    plt.plot(tv, stim)
+    #plt.savefig("/Users/Dani/TDK/parameter_estim/stim_protocol2/zap.png")
+    plt.show()
+
+    #np.savetxt("/Users/Dani/TDK/parameter_estim/stim_protocol2/zap.txt", stim)
+
+    print len(stim)
+
+    t, v = one_compartment(stype="custom", custom_stim=stim)
+    v = white(1., v)
+    print len(t)
+    print len(v)
+
+
+    plt.figure(figsize=(12,7))
+    plt.plot(t,v, '.')
+    plt.show()

@@ -14,7 +14,7 @@ def save_file(X, path, name, header=''):
     i=0
     while os.path.exists('{}({:d}).txt'.format(path+name, i)):
         i += 1
-    np.savetxt('{}({:d}).txt'.format(path+name, i), X, header=header, delimiter='\t')
+    np.savetxt('{}({:d})'.format(path+name, i), X, header=header, delimiter='\t')
 
 
 def plot_res(result, param1, param2):
