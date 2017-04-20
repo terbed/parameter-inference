@@ -32,7 +32,7 @@ for i in range(num_of_iter):
     current_cm = np.random.normal(pcm.value, 0.1)
 
     # Generate deterministic trace and create synthetic data with noise model
-    t, v = stick_and_ball(Ra=current_Ra, gpas=current_gpas, stype='custom', stim_vec=stim)
+    t, v = stick_and_ball(Ra=current_Ra, gpas=current_gpas, cm=current_cm, stype='custom', stim_vec=stim)
     data = white(noise_sigma, v)
 
     # if i == 0:
