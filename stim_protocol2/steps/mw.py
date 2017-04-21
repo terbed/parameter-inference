@@ -11,16 +11,15 @@ import time
 num_of_iter = 50
 
 noise_sigma = 1.
-stim = np.loadtxt("/Users/Dani/TDK/parameter_estim/stim_protocol2/zap/1/zap1Hz.txt")
 
 Ra_stat = np.zeros((num_of_iter, 5), dtype=np.float)
 gpas_stat = np.zeros((num_of_iter, 5), dtype=np.float)
 cm_stat = np.zeros((num_of_iter, 5), dtype=np.float)
 
 # Only for plotting
-pRa = RandomVariable(name='Ra', range_min=50, range_max=150, resolution=40, mean=100, sigma=20)
-pgpas = RandomVariable(name='gpas', range_min=0.00005, range_max=0.00015, resolution=40, mean=0.0001, sigma=0.00002)
-pcm = RandomVariable(name='cm', range_min=0.5, range_max=1.5, resolution=40, mean=1., sigma=0.2)
+pRa = RandomVariable(name='Ra', range_min=50, range_max=150, resolution=60, mean=100, sigma=20)
+pgpas = RandomVariable(name='gpas', range_min=0.00005, range_max=0.00015, resolution=60, mean=0.0001, sigma=0.00002)
+pcm = RandomVariable(name='cm', range_min=0.5, range_max=1.5, resolution=60, mean=1., sigma=0.2)
 
 startTime = time.time()
 for i in range(num_of_iter):
@@ -32,7 +31,7 @@ for i in range(num_of_iter):
     current_cm = np.random.normal(pcm.value, 0.1)
 
     # Generate deterministic trace and create synthetic data with noise model
-    t, v = stick_and_ball(Ra=current_Ra, gpas=current_gpas, cm=current_cm, stype='custom', stim_vec=stim)
+    t, v = stick_and_ball(Ra=current_Ra, gpas=current_gpas, cm=current_cm, stype='steps')
     data = white(noise_sigma, v)
 
     # if i == 0:
@@ -46,8 +45,8 @@ for i in range(num_of_iter):
     # Set up range in a way that the true parameter value will be in the middle
     Ra_start = current_Ra - 50
     Ra_end = current_Ra + 50
-    gpas_start = current_gpas - 0.00004
-    gpas_end = current_gpas + 0.00004
+    gpas_start = current_gpas - 0.00005
+    gpas_end = current_gpas + 0.00005
     cm_start = current_cm - 0.5
     cm_end = current_cm + 0.5
 
@@ -59,14 +58,14 @@ for i in range(num_of_iter):
         cm_start = 0.0001
 
     # Set up random variables
-    Ra = RandomVariable(name='Ra', range_min=Ra_start, range_max=Ra_end, resolution=40, mean=current_Ra, sigma=pRa.sigma)
-    gpas = RandomVariable(name='gpas', range_min=gpas_start, range_max=gpas_end, resolution=40, mean=current_gpas, sigma=pgpas.sigma)
-    cm = RandomVariable(name='cm', range_min=cm_start, range_max=cm_end, resolution=40, mean=current_cm, sigma=pcm.sigma)
+    Ra = RandomVariable(name='Ra', range_min=Ra_start, range_max=Ra_end, resolution=60, mean=current_Ra, sigma=pRa.sigma)
+    gpas = RandomVariable(name='gpas', range_min=gpas_start, range_max=gpas_end, resolution=60, mean=current_gpas, sigma=pgpas.sigma)
+    cm = RandomVariable(name='cm', range_min=cm_start, range_max=cm_end, resolution=60, mean=current_cm, sigma=pcm.sigma)
 
     Ra_cm_gpas = ParameterSet(Ra, cm, gpas)
-    inference = IndependentInference(data, Ra_cm_gpas, working_path="/Users/Dani/TDK/parameter_estim/stim_protocol2/zap/1")
+    inference = IndependentInference(data, Ra_cm_gpas, working_path="/Users/Dani/TDK/parameter_estim/stim_protocol2/steps")
 
-    multi_comp = partial(stick_and_ball, stype='custom', stim_vec=stim)  # fix chosen stimulus type for simulations
+    multi_comp = partial(stick_and_ball, stype='steps')  # fix chosen stimulus type for simulations
 
     if __name__ == '__main__':
         inference.run_sim(multi_comp, noise_sigma)
@@ -81,7 +80,7 @@ for i in range(num_of_iter):
 
 runningTime = (time.time() - startTime) / 60
 lasted = "The Ra-gpas-cm ball-and-stick simulation was running for %f minutes\n" % runningTime
-configuration = "--\n"
+configuration = "MacBook Pro (Retina, Mid 2012); 2.6 GHz Intel Core i7; 8 GB 1600 MHz DDR3; macOS Sierra 10.12.4\n"
 setup1 = 'Multi compartment simulation; White noise sigma=1; steps stimulus; Ra parameter; dt=0.1\n'
 setup2 = 'Multi compartment simulation; White noise sigma=1; steps stimulus; gpas parameter; dt=0.1\n'
 setup3 = 'Multi compartment simulation; White noise sigma=1; steps stimulus; cm parameter; dt=0.1\n'
@@ -90,15 +89,15 @@ header2 = "Number of simulations: " + str(num_of_iter) + '\n' + setup2 + configu
 header3 = "Number of simulations: " + str(num_of_iter) + '\n' + setup3 + configuration + lasted
 
 # Save out statistic to file for occurent later analysis
-np.savetxt(fname='/Users/Dani/TDK/parameter_estim/stim_protocol2/zap/1/Ra_stat.txt', X=Ra_stat,
+np.savetxt(fname='/Users/Dani/TDK/parameter_estim/stim_protocol2/zap/steps/Ra_stat.txt', X=Ra_stat,
            header=header1 + 'sigma\tdiff\taccuracy\tsharper\tsigma_err', delimiter='\t')
-np.savetxt(fname='/Users/Dani/TDK/parameter_estim/stim_protocol2/zap/1/gpas_stat.txt', X=gpas_stat,
+np.savetxt(fname='/Users/Dani/TDK/parameter_estim/stim_protocol2/zap/steps/gpas_stat.txt', X=gpas_stat,
            header=header2 + '\nsigma\tdiff\taccuracy\tsharper\tsigma_err', delimiter='\t')
-np.savetxt(fname='/Users/Dani/TDK/parameter_estim/stim_protocol2/zap/1/cm_stat.txt', X=cm_stat,
+np.savetxt(fname='/Users/Dani/TDK/parameter_estim/stim_protocol2/zap/steps/cm_stat.txt', X=cm_stat,
            header=header3 + '\nsigma\tdiff\taccuracy\tsharper\tsigma_err', delimiter='\t')
 
 # Plot statistics
-plot_stat(Ra_stat, pRa, path='/Users/Dani/TDK/parameter_estim/stim_protocol2/zap/1')
-plot_stat(gpas_stat, pgpas, path='/Users/Dani/TDK/parameter_estim/stim_protocol2/zap/1')
-plot_stat(cm_stat, pcm, path='/Users/Dani/TDK/parameter_estim/stim_protocol2/zap/1')
+plot_stat(Ra_stat, pRa, path='/Users/Dani/TDK/parameter_estim/stim_protocol2/steps')
+plot_stat(gpas_stat, pgpas, path='/Users/Dani/TDK/parameter_estim/stim_protocol2/steps')
+plot_stat(cm_stat, pcm, path='/Users/Dani/TDK/parameter_estim/stim_protocol2/steps')
 

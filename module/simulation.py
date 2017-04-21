@@ -258,20 +258,30 @@ if __name__ == "__main__":
 
     stim = []
     tv = np.linspace(0, 500, 10001)
-    f = np.linspace(0.000001,0.150, 10001)
-    T = 1/f
+    s = 0.
     for i, t in enumerate(tv):
-        stim.append(0.3*np.sin(2*np.pi/T[i] * t))
+        if i < 50:
+            stim.append(0.)
+        elif i < 80:
+            stim.append(-.9)
+        elif t < 450:
+            stim.append(s)
+            s += 0.00006
+        else:
+            stim.append(0.)
+
+    print s
+
 
     plt.figure(figsize=(12,7))
     plt.title("Stimulus")
     plt.xlabel("Time [ms]")
     plt.ylabel("I [mA]")
     plt.plot(tv, stim)
-    #plt.savefig("/Users/Dani/TDK/parameter_estim/stim_protocol2/zap.png")
+    #plt.savefig("/Users/Dani/TDK/parameter_estim/stim_protocol2/ramp/ramp.png")
     plt.show()
 
-    #np.savetxt("/Users/Dani/TDK/parameter_estim/stim_protocol2/zap.txt", stim)
+    #np.savetxt("/Users/Dani/TDK/parameter_estim/stim_protocol2/ramp/ramp.txt", stim)
 
     print len(stim)
 
@@ -282,5 +292,5 @@ if __name__ == "__main__":
 
 
     plt.figure(figsize=(12,7))
-    plt.plot(t,v, '.')
+    plt.plot(t,v, '-')
     plt.show()
