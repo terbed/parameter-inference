@@ -27,9 +27,9 @@ for i in range(num_of_iter):
     print str(i) + " is DONE out of " + str(num_of_iter)
 
     # Sampling current parameter from normal distribution
-    current_Ra = np.random.normal(pRa.value, 10.)
+    current_Ra = np.random.normal(pRa.value, 20.)
     current_gpas = np.random.normal(pgpas.value, 0.00002)
-    current_cm = np.random.normal(pcm.value, 0.1)
+    current_cm = np.random.normal(pcm.value, 0.2)
 
     # Generate deterministic trace and create synthetic data with noise model
     t, v = stick_and_ball(Ra=current_Ra, gpas=current_gpas, cm=current_cm, stype='custom', stim_vec=stim)
@@ -48,8 +48,8 @@ for i in range(num_of_iter):
     Ra_end = current_Ra + 50
     gpas_start = current_gpas - 0.00004
     gpas_end = current_gpas + 0.00004
-    cm_start = current_cm - 0.5
-    cm_end = current_cm + 0.5
+    cm_start = current_cm - 0.4
+    cm_end = current_cm + 0.4
 
     if Ra_start <= 0:  # ValueError: Ra must be > 0.
         Ra_start = 1
@@ -82,9 +82,9 @@ for i in range(num_of_iter):
 runningTime = (time.time() - startTime) / 60
 lasted = "The Ra-gpas-cm ball-and-stick simulation was running for %f minutes\n" % runningTime
 configuration = "--\n"
-setup1 = 'Multi compartment simulation; White noise sigma=1; steps stimulus; Ra parameter; dt=0.1\n'
-setup2 = 'Multi compartment simulation; White noise sigma=1; steps stimulus; gpas parameter; dt=0.1\n'
-setup3 = 'Multi compartment simulation; White noise sigma=1; steps stimulus; cm parameter; dt=0.1\n'
+setup1 = 'Multi compartment simulation; White noise sigma=1; ramp stimulus; Ra parameter; dt=0.1\n'
+setup2 = 'Multi compartment simulation; White noise sigma=1; ramp stimulus; gpas parameter; dt=0.1\n'
+setup3 = 'Multi compartment simulation; White noise sigma=1; ramp stimulus; cm parameter; dt=0.1\n'
 header1 = "Number of simulations: " + str(num_of_iter) + '\n' + setup1 + configuration + lasted
 header2 = "Number of simulations: " + str(num_of_iter) + '\n' + setup2 + configuration + lasted
 header3 = "Number of simulations: " + str(num_of_iter) + '\n' + setup3 + configuration + lasted

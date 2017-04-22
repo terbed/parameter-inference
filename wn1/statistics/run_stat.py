@@ -51,7 +51,7 @@ for i in range(100):
     posterior = np.multiply(likelihood, prior)
     posterior = posterior / (np.sum(posterior) * cm_step)
 
-    statmat[0][i], statmat[1][i], statmat[2][i] = stat(posterior, prior, cm_values, cm)
+    statmat[0][i], statmat[1][i], statmat[2][i] = stat(posterior, cm,)
 
     if statmat[1][i] > 10:
         print "I am here"
