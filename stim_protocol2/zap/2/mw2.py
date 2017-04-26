@@ -10,8 +10,8 @@ import time
 
 num_of_iter = 50
 
-noise_sigma = 1.
-stim = np.loadtxt("/Users/Dani/TDK/parameter_estim/stim_protocol2/zap/2/zap2Hz.txt")
+noise_sigma = 7.
+stim = np.loadtxt("/Users/Dani/TDK/parameter_estim/stim_protocol2/zap/2/stim.txt")
 
 Ra_stat = np.zeros((num_of_iter, 5), dtype=np.float)
 gpas_stat = np.zeros((num_of_iter, 5), dtype=np.float)
@@ -59,9 +59,9 @@ for i in range(num_of_iter):
         cm_start = 0.0001
 
     # Set up random variables
-    Ra = RandomVariable(name='Ra', range_min=Ra_start, range_max=Ra_end, resolution=60, mean=current_Ra, sigma=pRa.sigma)
-    gpas = RandomVariable(name='gpas', range_min=gpas_start, range_max=gpas_end, resolution=60, mean=current_gpas, sigma=pgpas.sigma)
-    cm = RandomVariable(name='cm', range_min=cm_start, range_max=cm_end, resolution=60, mean=current_cm, sigma=pcm.sigma)
+    Ra = RandomVariable(name='Ra', range_min=Ra_start, range_max=Ra_end, resolution=40, mean=current_Ra, sigma=pRa.sigma)
+    gpas = RandomVariable(name='gpas', range_min=gpas_start, range_max=gpas_end, resolution=40, mean=current_gpas, sigma=pgpas.sigma)
+    cm = RandomVariable(name='cm', range_min=cm_start, range_max=cm_end, resolution=40, mean=current_cm, sigma=pcm.sigma)
 
     Ra_cm_gpas = ParameterSet(Ra, cm, gpas)
     inference = IndependentInference(data, Ra_cm_gpas, working_path="/Users/Dani/TDK/parameter_estim/stim_protocol2/zap/2")

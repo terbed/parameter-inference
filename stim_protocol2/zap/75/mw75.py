@@ -11,7 +11,7 @@ import time
 num_of_iter = 50
 
 noise_sigma = 7.
-stim = np.loadtxt("/Users/Dani/TDK/parameter_estim/stim_protocol2/zap/100/stim.txt")
+stim = np.loadtxt("/Users/Dani/TDK/parameter_estim/stim_protocol2/zap/75/stim.txt")
 
 Ra_stat = np.zeros((num_of_iter, 5), dtype=np.float)
 gpas_stat = np.zeros((num_of_iter, 5), dtype=np.float)
@@ -64,7 +64,7 @@ for i in range(num_of_iter):
     cm = RandomVariable(name='cm', range_min=cm_start, range_max=cm_end, resolution=40, mean=current_cm, sigma=pcm.sigma)
 
     Ra_cm_gpas = ParameterSet(Ra, cm, gpas)
-    inference = IndependentInference(data, Ra_cm_gpas, working_path="/Users/Dani/TDK/parameter_estim/stim_protocol2/zap/100")
+    inference = IndependentInference(data, Ra_cm_gpas, working_path="/Users/Dani/TDK/parameter_estim/stim_protocol2/zap/75")
 
     multi_comp = partial(stick_and_ball, stype='custom', stim_vec=stim)  # fix chosen stimulus type for simulations
 
@@ -90,15 +90,15 @@ header2 = "Number of simulations: " + str(num_of_iter) + '\n' + setup2 + configu
 header3 = "Number of simulations: " + str(num_of_iter) + '\n' + setup3 + configuration + lasted
 
 # Save out statistic to file for occurent later analysis
-np.savetxt(fname='/Users/Dani/TDK/parameter_estim/stim_protocol2/zap/100/Ra_stat.txt', X=Ra_stat,
+np.savetxt(fname='/Users/Dani/TDK/parameter_estim/stim_protocol2/zap/75/Ra_stat.txt', X=Ra_stat,
            header=header1 + 'sigma\tdiff\taccuracy\tsharper\tsigma_err', delimiter='\t')
-np.savetxt(fname='/Users/Dani/TDK/parameter_estim/stim_protocol2/zap/100/gpas_stat.txt', X=gpas_stat,
+np.savetxt(fname='/Users/Dani/TDK/parameter_estim/stim_protocol2/zap/75/gpas_stat.txt', X=gpas_stat,
            header=header2 + '\nsigma\tdiff\taccuracy\tsharper\tsigma_err', delimiter='\t')
-np.savetxt(fname='/Users/Dani/TDK/parameter_estim/stim_protocol2/zap/100/cm_stat.txt', X=cm_stat,
+np.savetxt(fname='/Users/Dani/TDK/parameter_estim/stim_protocol2/zap/75/cm_stat.txt', X=cm_stat,
            header=header3 + '\nsigma\tdiff\taccuracy\tsharper\tsigma_err', delimiter='\t')
 
 # Plot statistics
-plot_stat(Ra_stat, pRa, path='/Users/Dani/TDK/parameter_estim/stim_protocol2/zap/100')
-plot_stat(gpas_stat, pgpas, path='/Users/Dani/TDK/parameter_estim/stim_protocol2/zap/100')
-plot_stat(cm_stat, pcm, path='/Users/Dani/TDK/parameter_estim/stim_protocol2/zap/100')
+plot_stat(Ra_stat, pRa, path='/Users/Dani/TDK/parameter_estim/stim_protocol2/zap/75')
+plot_stat(gpas_stat, pgpas, path='/Users/Dani/TDK/parameter_estim/stim_protocol2/zap/75')
+plot_stat(cm_stat, pcm, path='/Users/Dani/TDK/parameter_estim/stim_protocol2/zap/75')
 

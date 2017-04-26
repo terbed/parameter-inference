@@ -81,3 +81,16 @@ def log_likelihood(dev, inv_covmat):
     return - 1 / 2 * np.inner(dev, inv_covmat.dot(dev))
 
 
+def ll(param_set, model, target_trace, inv_covmat):
+    (_, v) = model(**param_set)
+    v = np.subtract(target_trace, v)
+    return - 1 / 2 * np.inner(v, inv_covmat.dot(v))
+
+
+def ill(param_set, model, target_trace, noise_sigma):
+    (_, v) = model(**param_set)
+    v = np.subtract(target_trace, v)
+    return - np.sum(np.square(v)) / (2 * noise_sigma ** 2)
+
+
+

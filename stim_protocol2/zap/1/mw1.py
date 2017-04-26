@@ -10,8 +10,8 @@ import time
 
 num_of_iter = 50
 
-noise_sigma = 1.
-stim = np.loadtxt("/Users/Dani/TDK/parameter_estim/stim_protocol2/zap/1/zap1Hz.txt")
+noise_sigma = 7.
+stim = np.loadtxt("/Users/Dani/TDK/parameter_estim/stim_protocol2/zap/1/stim.txt")
 
 Ra_stat = np.zeros((num_of_iter, 5), dtype=np.float)
 gpas_stat = np.zeros((num_of_iter, 5), dtype=np.float)
@@ -46,8 +46,8 @@ for i in range(num_of_iter):
     # Set up range in a way that the true parameter value will be in the middle
     Ra_start = current_Ra - 50
     Ra_end = current_Ra + 50
-    gpas_start = current_gpas - 0.00004
-    gpas_end = current_gpas + 0.00004
+    gpas_start = current_gpas - 0.00005
+    gpas_end = current_gpas + 0.00005
     cm_start = current_cm - 0.5
     cm_end = current_cm + 0.5
 
@@ -82,9 +82,9 @@ for i in range(num_of_iter):
 runningTime = (time.time() - startTime) / 60
 lasted = "The Ra-gpas-cm ball-and-stick simulation was running for %f minutes\n" % runningTime
 configuration = "--\n"
-setup1 = 'Multi compartment simulation; White noise sigma=1; steps stimulus; Ra parameter; dt=0.1\n'
-setup2 = 'Multi compartment simulation; White noise sigma=1; steps stimulus; gpas parameter; dt=0.1\n'
-setup3 = 'Multi compartment simulation; White noise sigma=1; steps stimulus; cm parameter; dt=0.1\n'
+setup1 = 'Multi compartment simulation; White noise sigma=5; steps stimulus; Ra parameter; dt=0.1\n'
+setup2 = 'Multi compartment simulation; White noise sigma=5; steps stimulus; gpas parameter; dt=0.1\n'
+setup3 = 'Multi compartment simulation; White noise sigma=5; steps stimulus; cm parameter; dt=0.1\n'
 header1 = "Number of simulations: " + str(num_of_iter) + '\n' + setup1 + configuration + lasted
 header2 = "Number of simulations: " + str(num_of_iter) + '\n' + setup2 + configuration + lasted
 header3 = "Number of simulations: " + str(num_of_iter) + '\n' + setup3 + configuration + lasted

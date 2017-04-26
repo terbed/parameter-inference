@@ -10,17 +10,17 @@ import time
 
 num_of_iter = 50
 
-noise_sigma = 1.
-stim = np.loadtxt("/Users/Dani/TDK/parameter_estim/stim_protocol2/zap/10/zap10Hz.txt")
+noise_sigma = 7.
+stim = np.loadtxt("/Users/Dani/TDK/parameter_estim/stim_protocol2/zap/10/stim.txt")
 
 Ra_stat = np.zeros((num_of_iter, 5), dtype=np.float)
 gpas_stat = np.zeros((num_of_iter, 5), dtype=np.float)
 cm_stat = np.zeros((num_of_iter, 5), dtype=np.float)
 
 # Only for plotting
-pRa = RandomVariable(name='Ra', range_min=50, range_max=150, resolution=60, mean=100, sigma=20)
-pgpas = RandomVariable(name='gpas', range_min=0.00005, range_max=0.00015, resolution=60, mean=0.0001, sigma=0.00002)
-pcm = RandomVariable(name='cm', range_min=0.5, range_max=1.5, resolution=60, mean=1., sigma=0.2)
+pRa = RandomVariable(name='Ra', range_min=50, range_max=150, resolution=40, mean=100, sigma=20)
+pgpas = RandomVariable(name='gpas', range_min=0.00005, range_max=0.00015, resolution=40, mean=0.0001, sigma=0.00002)
+pcm = RandomVariable(name='cm', range_min=0.5, range_max=1.5, resolution=40, mean=1., sigma=0.2)
 
 startTime = time.time()
 for i in range(num_of_iter):
@@ -59,9 +59,9 @@ for i in range(num_of_iter):
         cm_start = 0.0001
 
     # Set up random variables
-    Ra = RandomVariable(name='Ra', range_min=Ra_start, range_max=Ra_end, resolution=60, mean=current_Ra, sigma=pRa.sigma)
-    gpas = RandomVariable(name='gpas', range_min=gpas_start, range_max=gpas_end, resolution=60, mean=current_gpas, sigma=pgpas.sigma)
-    cm = RandomVariable(name='cm', range_min=cm_start, range_max=cm_end, resolution=60, mean=current_cm, sigma=pcm.sigma)
+    Ra = RandomVariable(name='Ra', range_min=Ra_start, range_max=Ra_end, resolution=40, mean=current_Ra, sigma=pRa.sigma)
+    gpas = RandomVariable(name='gpas', range_min=gpas_start, range_max=gpas_end, resolution=40, mean=current_gpas, sigma=pgpas.sigma)
+    cm = RandomVariable(name='cm', range_min=cm_start, range_max=cm_end, resolution=40, mean=current_cm, sigma=pcm.sigma)
 
     Ra_cm_gpas = ParameterSet(Ra, cm, gpas)
     inference = IndependentInference(data, Ra_cm_gpas, working_path="/Users/Dani/TDK/parameter_estim/stim_protocol2/zap/10")
@@ -82,9 +82,9 @@ for i in range(num_of_iter):
 runningTime = (time.time() - startTime) / 60
 lasted = "The Ra-gpas-cm ball-and-stick simulation was running for %f minutes\n" % runningTime
 configuration = "--\n"
-setup1 = 'Multi compartment simulation; White noise sigma=1; steps stimulus; Ra parameter; dt=0.1\n'
-setup2 = 'Multi compartment simulation; White noise sigma=1; steps stimulus; gpas parameter; dt=0.1\n'
-setup3 = 'Multi compartment simulation; White noise sigma=1; steps stimulus; cm parameter; dt=0.1\n'
+setup1 = 'Multi compartment simulation; White noise sigma=7; steps stimulus; Ra parameter; dt=0.1\n'
+setup2 = 'Multi compartment simulation; White noise sigma=7; steps stimulus; gpas parameter; dt=0.1\n'
+setup3 = 'Multi compartment simulation; White noise sigma=7; steps stimulus; cm parameter; dt=0.1\n'
 header1 = "Number of simulations: " + str(num_of_iter) + '\n' + setup1 + configuration + lasted
 header2 = "Number of simulations: " + str(num_of_iter) + '\n' + setup2 + configuration + lasted
 header3 = "Number of simulations: " + str(num_of_iter) + '\n' + setup3 + configuration + lasted

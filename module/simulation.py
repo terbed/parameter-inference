@@ -257,40 +257,50 @@ if __name__ == "__main__":
     from module.noise import white
 
     stim = []
-    tv = np.linspace(0, 500, 10001)
+    tv = np.linspace(0, 500, 5001)
+
+    # Ramp Stimulus
     s = 0.
     for i, t in enumerate(tv):
         if i < 50:
             stim.append(0.)
-        elif i < 80:
-            stim.append(-.9)
-        elif t < 450:
+        elif t < 400:
             stim.append(s)
-            s += 0.00006
+            s += 0.0001
         else:
             stim.append(0.)
 
     print s
 
+    # F = 100.
+    # f = F*1e-3
+    # fa = np.linspace(0, 150e-3, 5001)
+    #
+    # for i,t in enumerate(tv):
+    #     stim.append(0.2*np.sin(2*np.pi*fa[i]*t))
 
     plt.figure(figsize=(12,7))
     plt.title("Stimulus")
     plt.xlabel("Time [ms]")
     plt.ylabel("I [mA]")
     plt.plot(tv, stim)
-    #plt.savefig("/Users/Dani/TDK/parameter_estim/stim_protocol2/ramp/ramp.png")
+    plt.savefig("/Users/Dani/TDK/parameter_estim/stim_protocol2/ramp/rampi.png")
     plt.show()
 
-    #np.savetxt("/Users/Dani/TDK/parameter_estim/stim_protocol2/ramp/ramp.txt", stim)
+    np.savetxt("/Users/Dani/TDK/parameter_estim/stim_protocol2/ramp/stim.txt", stim)
 
     print len(stim)
 
     t, v = one_compartment(stype="custom", custom_stim=stim)
-    v = white(1., v)
-    print len(t)
-    print len(v)
-
+    v = white(7., v)
 
     plt.figure(figsize=(12,7))
-    plt.plot(t,v, '-')
+    plt.title("Voltage response with noise")
+    plt.xlabel("Time [ms]")
+    plt.ylabel("Voltage [mV]")
+    plt.plot(t, v)
+    plt.savefig("/Users/Dani/TDK/parameter_estim/stim_protocol2/ramp/rampv.png")
     plt.show()
+
+    print len(t)
+    print len(v)
