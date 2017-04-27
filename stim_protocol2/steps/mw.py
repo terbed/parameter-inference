@@ -4,6 +4,7 @@ from module.probability import RandomVariable, IndependentInference, ParameterSe
 from module.noise import white
 from module.trace import stat
 from module.plot import plot_stat
+from module.plot import plot_res
 from functools import partial
 from matplotlib import pyplot as plt
 import time

@@ -66,8 +66,18 @@ def sharpness(x, y):
     full_dev = 0.
     for i in res:
         value = y[max_idx] * i
-        left_idx = (np.abs(y[:max_idx] - value)).argmin()
-        right_idx = len(y[:max_idx]) + (np.abs(y[max_idx:] - value)).argmin()
+
+        try:
+            left_idx = (np.abs(y[:max_idx] - value)).argmin()
+            right_idx = len(y[:max_idx]) + (np.abs(y[max_idx:] - value)).argmin()
+        except ValueError:
+            print "ValueError in sharpness checking!"
+            from matplotlib import pyplot as plt
+            plt.figure()
+            plt.title("Fitted posterior")
+            plt.plot(x,y)
+            plt.show()
+            exit(17)
 
         full_dev += np.abs(x[right_idx] - x[left_idx])
 
@@ -79,7 +89,7 @@ def stat(param):
     Create statistic for the inference
 
     :param param: RandomVariable type
-    :return: feature tuple (sigma, diff, pdiff, sharper) for the inference or str if out of range
+    :return: feature tuple (sigma, diff, pdiff, sharper, sigma_err, rdiff) for the inference or str if out of range
     """
     true_param = param.value
 
@@ -102,19 +112,23 @@ def stat(param):
         print(err.args)
         p_opt[1] = param.sigma
         p_err[1] = 0.
-        return abs(p_opt[1]), param.mean*param.sigma, 0., 1., p_err[1]
+        return abs(p_opt[1]), param.sigma, 0., 1., p_err[1]
 
     # Create high resolution (prior and) posterior from fitted function
-    x = np.linspace(param.range_min, param.range_max, 2000)
+    x = np.linspace(param.range_min, param.range_max, 10000)
     prior = normal(x, param.mean, param.sigma)
     posterior = normal(x, p_opt[0], p_opt[1])
+
+    # Range for posterior: [mean-2sig, mean+2sig]
+    x2 = np.linspace(p_opt[0]-2*p_opt[1], p_opt[0]+2*p_opt[1], 10000)
+    posharp = normal(x2, p_opt[0], p_opt[1])
 
     # Do some statistics
     true_idx = (np.abs(x - true_param)).argmin()
 
-    sharper = sharpness(x, prior) / sharpness(x, posterior)
-    diff = np.abs(x[np.argmax(posterior)] - x[true_idx])
-    accuracy = np.multiply(posterior[true_idx] / np.amax(posterior), 100)
+    sharper = sharpness(x, prior) / sharpness(x2, posharp)
+    diff = np.abs(p_opt[0] - true_param)
+    accuracy = np.multiply(posterior[true_idx] / np.amax(posharp), 100)
 
     return abs(p_opt[1]), diff, accuracy, sharper, p_err[1]
 

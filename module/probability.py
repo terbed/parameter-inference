@@ -73,7 +73,7 @@ class ParameterSet:
         self.margin_ax = self.get_margin_ax()
         self.margin_step = self.get_margin_step()
         self.isBatch = False
-        self.batch_len = 100
+        self.batch_len = 500
         if len(self.parameter_set_seq) >= self.batch_len*2:
             self.isBatch = True
             self.parameter_set_batch_list = []
@@ -165,11 +165,19 @@ class Inference:
     """
     Takes a ParameterSet object
     """
-    def __init__(self, target_trace, parameter_set, working_path='', debugging=False):
+    def __init__(self, target_trace, parameter_set, working_path='', debugging=False, speed='max'):
+        """
+        :param target_trace: Experimental (or synthetic) data
+        :param parameter_set: ParameterSet object
+        :param working_path: The result will be saved here
+        :param debugging: 
+        :param speed: 'max', 'mid' or 'min'  multiprocessing options. In some system only the 'min' works...
+        """
         self.p = parameter_set
         self.target = target_trace
         self.working_path = working_path
         self.check_directory(working_path)
+        self.speed = speed
         self.toDebug = debugging
         if self.toDebug:
             self.check_directory(working_path + "/debug")
@@ -185,7 +193,7 @@ class Inference:
             os.makedirs(working_path)
 
     # Method to override
-    def run_sim(self, sim_protocol_func, covmat):
+    def run_sim(self, sim_func, covmat):
         pass
 
     def run_evaluation(self, model=None):
@@ -257,34 +265,51 @@ class Inference:
 
 
 class IndependentInference(Inference):
-    def __init__(self, target_trace,  parameter_set, working_path='', debugging=False):
-        Inference.__init__(self, target_trace=target_trace, parameter_set=parameter_set, working_path=working_path, debugging=debugging)
+    def __init__(self, target_trace,  parameter_set, working_path='', debugging=False, speed='max'):
+        Inference.__init__(self, target_trace=target_trace, parameter_set=parameter_set,
+                           working_path=working_path, debugging=debugging, speed=speed)
 
-    def run_sim(self, sim_protocol_func, noise_sigma):
-        pool = Pool(multiprocessing.cpu_count()-1)
+    def run_sim(self, sim_func, noise_sigma):
+        if self.speed == "min":
+            if self.p.isBatch:
+                pool = Pool(multiprocessing.cpu_count() - 1)
 
-        # Create mappable functions
-        dev_func = partial(likelihood.deviation, model_func=sim_protocol_func, target_trace=self.target)
-        log_likelihood_func = partial(likelihood.independent_log_likelihood, noise_sigma=noise_sigma)
+                # Create mappable functions
+                dev_func = partial(likelihood.deviation, model_func=sim_func, target_trace=self.target)
+                log_likelihood_func = partial(likelihood.independent_log_likelihood, noise_sigma=noise_sigma)
 
-        if self.p.isBatch:
-            for idx, batch in enumerate(self.p.parameter_set_batch_list):
-                print str(idx) + ' batch of work is done out of ' \
-                      + str(len(self.p.parameter_set_batch_list))
-
-                batch_likelihood = pool.map(dev_func, batch)
-                batch_likelihood = map(log_likelihood_func, batch_likelihood)
-                self.likelihood.extend(batch_likelihood)
-
-            pool.close()
-            print "log_likelihood: Done!"
-            # plot.save_file(self.likelihood, self.working_path, "/log_likelihood.txt", header=str(self.p.name) + str(self.p.shape))
-            # print "log_likelihood: Saved!"
-        else:
-            pool = Pool(multiprocessing.cpu_count())
+                for idx, batch in enumerate(self.p.parameter_set_batch_list):
+                    print str(idx) + ' batch of work is done out of ' \
+                          + str(len(self.p.parameter_set_batch_list))
+    
+                    batch_likelihood = pool.map(dev_func, batch)
+                    batch_likelihood = map(log_likelihood_func, batch_likelihood)
+                    self.likelihood.extend(batch_likelihood)
+    
+                pool.close()
+                print "log_likelihood: Done!"
+                # plot.save_file(self.likelihood, self.working_path, "/log_likelihood.txt", header=str(self.p.name) + str(self.p.shape))
+                # print "log_likelihood: Saved!"
+            else:
+                pool = Pool(multiprocessing.cpu_count()-1)
+    
+                # Create mappable functions
+                dev_func = partial(likelihood.deviation, model_func=sim_func, target_trace=self.target)
+                log_likelihood_func = partial(likelihood.independent_log_likelihood, noise_sigma=noise_sigma)
+    
+                print "Running " + str(len(self.p.parameter_set_seq)) + " simulations on all cores..."
+    
+                self.likelihood = pool.map(dev_func, self.p.parameter_set_seq)
+                self.likelihood = pool.map(log_likelihood_func, self.likelihood)
+                pool.close()
+                pool.join()
+    
+                print "Done with Simulations!"
+        elif self.speed == 'mid':
+            pool = Pool(multiprocessing.cpu_count() - 1)
 
             # Create mappable functions
-            dev_func = partial(likelihood.deviation, model_func=sim_protocol_func, target_trace=self.target)
+            dev_func = partial(likelihood.deviation, model_func=sim_func, target_trace=self.target)
             log_likelihood_func = partial(likelihood.independent_log_likelihood, noise_sigma=noise_sigma)
 
             print "Running " + str(len(self.p.parameter_set_seq)) + " simulations on all cores..."
@@ -293,43 +318,68 @@ class IndependentInference(Inference):
             self.likelihood = pool.map(log_likelihood_func, self.likelihood)
             pool.close()
             pool.join()
+        else:
+            pool = Pool(multiprocessing.cpu_count() - 1)
+            log_likelihood_func = partial(likelihood.ill, model=sim_func, target_trace=self.target, noise_sigma=noise_sigma)
+            print "Running " + str(len(self.p.parameter_set_seq)) + " simulations on all cores..."
 
-            print "Done with Simulations!"
+            self.likelihood = pool.map(log_likelihood_func, self.p.parameter_set_seq)
+            pool.close()
+            pool.join()
+
+            print "log likelihood DONE!"
 
 
 class DependentInference(Inference):
-    def __init__(self, target_trace,  parameter_set, working_path='', debugging=False):
-        Inference.__init__(self, target_trace=target_trace, parameter_set=parameter_set, working_path=working_path, debugging=debugging)
+    def __init__(self, target_trace,  parameter_set, working_path='', debugging=False, speed='max'):
+        Inference.__init__(self, target_trace=target_trace, parameter_set=parameter_set,
+                           working_path=working_path, debugging=debugging, speed=speed)
 
-    def run_sim(self, sim_protocol_func, inv_covmat):
+    def run_sim(self, sim_func, inv_covmat):
         print "Run simulations..."
-        pool = Pool(multiprocessing.cpu_count())
 
-        dev_func = partial(likelihood.deviation, model_func=sim_protocol_func, target_trace=self.target)
-        log_likelihood_func = partial(likelihood.log_likelihood, inv_covmat=inv_covmat)
+        if self.speed == "min":
+            if self.p.isBatch:
+                pool = Pool(multiprocessing.cpu_count())
 
-        if self.p.isBatch:
-            for idx, batch in enumerate(self.p.parameter_set_batch_list):
-                print str(idx + 1) + ' batch of work is done out of ' \
-                      + str(len(self.p.parameter_set_batch_list))
+                dev_func = partial(likelihood.deviation, model_func=sim_func, target_trace=self.target)
+                log_likelihood_func = partial(likelihood.log_likelihood, inv_covmat=inv_covmat)
 
-                batch_likelihood = pool.map(dev_func, batch)
-                # In the case of debugging we save the deviation vector too
+                for idx, batch in enumerate(self.p.parameter_set_batch_list):
+                    print str(idx + 1) + ' batch of work is done out of ' \
+                          + str(len(self.p.parameter_set_batch_list))
+
+                    batch_likelihood = pool.map(dev_func, batch)
+                    # In the case of debugging we save the deviation vector too
+                    if self.toDebug:
+                        self.deviation.extend(batch_likelihood)
+
+                    # Compute the exponent with map function (pool.map would crash for this...)
+                    batch_likelihood = map(log_likelihood_func, batch_likelihood)
+                    self.likelihood.extend(batch_likelihood)
+
+                pool.close()
+                #plot.save_file(self.likelihood, self.working_path, "/log_likelihood.txt", header=str(self.p.name) + str(self.p.shape))
+                #print "log_likelihood: Saved!"
+            else:
+                print "Simulation running..."
+                pool = Pool(multiprocessing.cpu_count()-1)
+
+                dev_func = partial(likelihood.deviation, model_func=sim_func, target_trace=self.target)
+                log_likelihood_func = partial(likelihood.log_likelihood, inv_covmat=inv_covmat)
+
+                self.likelihood = pool.map(dev_func, self.p.parameter_set_seq)
+                self.likelihood = pool.map(log_likelihood_func, self.likelihood)
                 if self.toDebug:
-                    self.deviation.extend(batch_likelihood)
-
-                # Compute the exponent with map function (pool.map would crash for this...)
-                batch_likelihood = map(log_likelihood_func, batch_likelihood)
-                self.likelihood.extend(batch_likelihood)
-
-            pool.close()
-            #plot.save_file(self.likelihood, self.working_path, "/log_likelihood.txt", header=str(self.p.name) + str(self.p.shape))
-            #print "log_likelihood: Saved!"
-        else:
+                    self.deviation = self.likelihood
+                self.likelihood = map(log_likelihood_func, self.likelihood)
+                pool.close()
+                pool.join()
+        elif self.speed == "mid":
             print "Simulation running..."
-            pool = Pool(multiprocessing.cpu_count())
+            pool = Pool(multiprocessing.cpu_count() - 1)
 
-            dev_func = partial(likelihood.deviation, model_func=sim_protocol_func, target_trace=self.target)
+            dev_func = partial(likelihood.deviation, model_func=sim_func, target_trace=self.target)
             log_likelihood_func = partial(likelihood.log_likelihood, inv_covmat=inv_covmat)
 
             self.likelihood = pool.map(dev_func, self.p.parameter_set_seq)
@@ -339,6 +389,17 @@ class DependentInference(Inference):
             self.likelihood = map(log_likelihood_func, self.likelihood)
             pool.close()
             pool.join()
+        else:
+            pool = Pool(multiprocessing.cpu_count() - 1)
+            log_likelihood_func = partial(likelihood.ll, model=sim_func, target_trace=self.target,
+                                          inv_covmat=inv_covmat)
+            print "Running " + str(len(self.p.parameter_set_seq)) + " simulations on all cores..."
+
+            self.likelihood = pool.map(log_likelihood_func, self.p.parameter_set_seq)
+            pool.close()
+            pool.join()
+
+            print "log likelihood DONE!"
 
 
 

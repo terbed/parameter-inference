@@ -3,7 +3,7 @@ from module.simulation import stick_and_ball
 from module.probability import RandomVariable, IndependentInference, ParameterSet
 from module.noise import white
 from module.trace import stat
-from module.plot import plot_stat
+from module.plot import plot_stat, plot_res
 from functools import partial
 from matplotlib import pyplot as plt
 import time
@@ -18,9 +18,9 @@ gpas_stat = np.zeros((num_of_iter, 5), dtype=np.float)
 cm_stat = np.zeros((num_of_iter, 5), dtype=np.float)
 
 # Only for plotting
-pRa = RandomVariable(name='Ra', range_min=50, range_max=150, resolution=40, mean=100, sigma=20)
-pgpas = RandomVariable(name='gpas', range_min=0.00005, range_max=0.00015, resolution=40, mean=0.0001, sigma=0.00002)
-pcm = RandomVariable(name='cm', range_min=0.5, range_max=1.5, resolution=40, mean=1., sigma=0.2)
+pRa = RandomVariable(name='Ra', range_min=50, range_max=150, resolution=60, mean=100, sigma=20)
+pgpas = RandomVariable(name='gpas', range_min=0.00005, range_max=0.00015, resolution=60, mean=0.0001, sigma=0.00002)
+pcm = RandomVariable(name='cm', range_min=0.5, range_max=1.5, resolution=60, mean=1., sigma=0.2)
 
 startTime = time.time()
 for i in range(num_of_iter):
@@ -29,7 +29,7 @@ for i in range(num_of_iter):
     # Sampling current parameter from normal distribution
     current_Ra = np.random.normal(pRa.value, 10.)
     current_gpas = np.random.normal(pgpas.value, 0.00002)
-    current_cm = np.random.normal(pcm.value, 0.1)
+    current_cm = np.random.normal(pcm.value, 0.2)
 
     # Generate deterministic trace and create synthetic data with noise model
     t, v = stick_and_ball(Ra=current_Ra, gpas=current_gpas, cm=current_cm, stype='custom', stim_vec=stim)
@@ -77,6 +77,18 @@ for i in range(num_of_iter):
     Ra_stat[i, 0], Ra_stat[i, 1], Ra_stat[i, 2], Ra_stat[i, 3], Ra_stat[4] = stat(Ra)
     gpas_stat[i, 0], gpas_stat[i, 1], gpas_stat[i, 2], gpas_stat[i, 3], gpas_stat[4] = stat(gpas)
     cm_stat[i, 0], cm_stat[i, 1], cm_stat[i, 2], cm_stat[i, 3], cm_stat[4] = stat(cm)
+
+    print "\nsig\t diff\t acc\t sharper\t sig_err"
+    print "Ra: " + str(Ra_stat[i, :])
+    print "cm: " + str(cm_stat[i, :])
+    print "gpas: " + str(gpas_stat[i, :])
+    print "\n"
+
+    # Plot some single joint distribution
+    if i == num_of_iter-1:
+        plot_res(inference, Ra, gpas)
+        plot_res(inference, Ra, cm)
+        plot_res(inference, cm, gpas)
 
 
 runningTime = (time.time() - startTime) / 60

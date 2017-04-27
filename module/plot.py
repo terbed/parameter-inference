@@ -10,11 +10,22 @@ import numpy as np
 import os
 
 
+def check_directory(working_path):
+    if not os.path.exists(working_path):
+        os.makedirs(working_path)
+
 def save_file(X, path, name, header=''):
     i=0
     while os.path.exists('{}({:d}).txt'.format(path+name, i)):
         i += 1
     np.savetxt('{}({:d})'.format(path+name, i), X, header=header, delimiter='\t')
+
+def fullplot(result):
+    """
+    
+    :param result: Inference object after computed results
+    :return: Plots a joint and marginal full plot
+    """
 
 
 def plot_res(result, param1, param2):
@@ -25,7 +36,9 @@ def plot_res(result, param1, param2):
     :param param1 param2: RandomVariable Objekt
     """
 
-    path = result.working_path
+    path = result.working_path + "/joint"
+    check_directory(path)
+
     ax1 = 0
     ax2 = 0
     likelihood = result.likelihood
@@ -161,7 +174,8 @@ def plot_stat(stat, param, path='', bin=None):
         return np.average(rejected), outliers
 
     avrg_sigma = np.average(abs(stat[:, 0]))
-    print avrg_sigma
+    std_sigma = np.std(abs(stat[:, 0]))
+
     max_sigma_err = np.max(stat[:, 4])
 
     print "Maximum %s sigma error of normal fitting: %.2f percentage" % (param.name, (max_sigma_err/avrg_sigma*100))
@@ -173,6 +187,7 @@ def plot_stat(stat, param, path='', bin=None):
     std_acc = np.std(stat[:, 2])
 
     avrg_sharp = np.average(stat[:, 3])
+    std_sharp = np.std(stat[:,3])
 
     # Plot illustration
     x = np.linspace(param.range_min, param.range_max, 3000)
@@ -181,39 +196,62 @@ def plot_stat(stat, param, path='', bin=None):
     post_max = np.amax(posterior)
 
     plt.figure(figsize=(12,8))
-    plt.title("Illustration| " +
-              ' [diff(g): %.2e, acc(b): %.2f, gain: %.2f] ' % (avrg_diff, avrg_acc, avrg_sharp) + param.name)
+    plt.title(' [rdiff(g): %.0f, acc(b): %.2f, gain: %.2f pm %.2f] ' % (avrg_diff/param.value*100, avrg_acc, avrg_sharp, std_sharp) + param.name)
     plt.xlabel(param.name + ' ' + param.unit)
     plt.ylabel('Probability')
     plt.grid(True)
-    red_patch = mpatches.Patch(color='#9c3853', label='Posterior')
-    blue_patch = mpatches.Patch(color='#2FA5A0', label='Prior')
-    plt.legend(handles=[red_patch, blue_patch])
-    plt.plot(x, posterior, color='#9c3853')
-    plt.plot(x, prior, color='#2FA5A0')
+    plt.plot(x, posterior, color='#9c3853', label="posterior")
+    plt.plot(x, prior, color='#2FA5A0', label="prior")
     plt.axvspan(param.mean-avrg_diff - std_diff, param.mean+avrg_diff + std_diff, facecolor='g', alpha=0.1)
     #plt.axvline(x=param.mean+avrg_diff, color='#389c81')
     #plt.axvline(x=param.mean-avrg_diff, color='#389c81')
     #plt.axhline(y=(avrg_acc/100)*post_max, xmin=0, xmax=1000, color='#38539C', linewidth=1)
     plt.axhspan((avrg_acc/100)*post_max-(std_acc/100)*post_max, (avrg_acc/100)*post_max+(std_acc/100)*post_max,
                 facecolor='b', alpha=0.1)
+    plt.legend()
     plt.savefig(path + "/illustration_"+param.name+".png")
+
+
+    # Plot shape of posterior
+    max_p = normal(x, param.mean, avrg_sigma + std_sigma)
+    min_p = normal(x, param.mean, avrg_sigma - std_sigma)
+
+    # Sharper than prior minimum value is 1
+    gain_bot = avrg_sharp-std_sharp
+    if gain_bot < 1:
+        gain_bot = 1.
+
+    plt.figure(figsize=(12,8))
+    plt.title("Sharpness of posterior")
+    plt.xlabel(param.name + ' ' + param.unit)
+    plt.ylabel('Probability')
+    plt.grid(True)
+    plt.plot(x, posterior, color='#9c3853', label="average: %.2f" % avrg_sharp)
+    plt.plot(x, max_p, color='#fff34d', label="avrg+std: %.2f" % (avrg_sharp+std_sharp))
+    plt.plot(x, min_p, color='#f9484f', label="avrg-std: %.2f" % (gain_bot))
+    plt.plot(x, prior, color='#2FA5A0', label="prior")
+
+    plt.legend()
+    plt.savefig(path + "/plook_"+param.name+".png")
+
 
     avrg_diff, out_diff = reject_outliers_avrg(stat[:, 1])
     avrg_acc, out_acc = reject_outliers_avrg(stat[:, 2])
     avrg_sharp, out_sharp = reject_outliers_avrg(stat[:, 3])
+
+    rel_diff = np.multiply(stat[:, 1], 1/param.value)*100
 
     # Plot histograms
     if bin is None:
         bin = int(len(stat[:, 0])/2)
 
     plt.figure(figsize=(12,8))
-    plt.title("Deviation of true parameter | " + param.name + " " + str(param.mean))
-    plt.xlabel(param.name + ' ' + param.unit + ' (average: %.2e | outliers: %d)' % (avrg_diff, out_diff))
+    plt.title("Relative deviation of true parameter | " + param.name + " " + str(param.mean))
+    plt.xlabel(param.name + ' ' + param.unit + ' (average: %.2e | outliers: %d)' % (avrg_diff/param.value*100, out_diff))
     plt.ylabel('Occurrence ')
     plt.grid(True)
-    plt.hist(stat[:, 1], bin, facecolor='#D44A4B', normed=False)
-    plt.savefig(path + "/deviation_"+param.name+".png")
+    plt.hist(rel_diff, bin, facecolor='#D44A4B', normed=False)
+    plt.savefig(path + "/rdeviation_"+param.name+".png")
 
     plt.figure(figsize=(12,8))
     plt.title("Accuracy | " + param.name)

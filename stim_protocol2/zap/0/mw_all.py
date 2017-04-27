@@ -3,7 +3,7 @@ from module.simulation import stick_and_ball
 from module.probability import RandomVariable, IndependentInference, ParameterSet
 from module.noise import white
 from module.trace import stat
-from module.plot import plot_stat
+from module.plot import plot_stat, plot_res
 from functools import partial
 from matplotlib import pyplot as plt
 import time
@@ -11,7 +11,7 @@ import time
 num_of_iter = 50
 
 noise_sigma = 7.
-stim = np.loadtxt("/Users/Dani/TDK/parameter_estim/stim_protocol2/zap/all/stim.txt")
+stim = np.loadtxt("/Users/Dani/TDK/parameter_estim/stim_protocol2/zap/0/stim.txt")
 
 Ra_stat = np.zeros((num_of_iter, 5), dtype=np.float)
 gpas_stat = np.zeros((num_of_iter, 5), dtype=np.float)
@@ -24,7 +24,10 @@ pcm = RandomVariable(name='cm', range_min=0.5, range_max=1.5, resolution=40, mea
 
 startTime = time.time()
 for i in range(num_of_iter):
-    print str(i) + " is DONE out of " + str(num_of_iter)
+    print '\n' + str(i) + " is DONE out of " + str(num_of_iter)
+
+    # Create indexes for plotting some single result
+    idx = np.linspace(0, num_of_iter, 3, dtype=int)
 
     # Sampling current parameter from normal distribution
     current_Ra = np.random.normal(pRa.value, 10.)
@@ -64,7 +67,7 @@ for i in range(num_of_iter):
     cm = RandomVariable(name='cm', range_min=cm_start, range_max=cm_end, resolution=40, mean=current_cm, sigma=pcm.sigma)
 
     Ra_cm_gpas = ParameterSet(Ra, cm, gpas)
-    inference = IndependentInference(data, Ra_cm_gpas, working_path="/Users/Dani/TDK/parameter_estim/stim_protocol2/zap/all")
+    inference = IndependentInference(data, Ra_cm_gpas, working_path="/Users/Dani/TDK/parameter_estim/stim_protocol2/zap/0", speed='min')
 
     multi_comp = partial(stick_and_ball, stype='custom', stim_vec=stim)  # fix chosen stimulus type for simulations
 
@@ -73,11 +76,22 @@ for i in range(num_of_iter):
 
     inference.run_evaluation()
 
+    # Plot some single joint distribution
+    if i == num_of_iter-1:
+        plot_res(inference, Ra, gpas)
+        plot_res(inference, Ra, cm)
+        plot_res(inference, cm, gpas)
+
     # Do statistics for the current inference
     Ra_stat[i, 0], Ra_stat[i, 1], Ra_stat[i, 2], Ra_stat[i, 3], Ra_stat[4] = stat(Ra)
     gpas_stat[i, 0], gpas_stat[i, 1], gpas_stat[i, 2], gpas_stat[i, 3], gpas_stat[4] = stat(gpas)
     cm_stat[i, 0], cm_stat[i, 1], cm_stat[i, 2], cm_stat[i, 3], cm_stat[4] = stat(cm)
 
+    print "\nsig\t rdiff\t acc\t sharper\t sig_err"
+    print "Ra: " + str(Ra_stat[i, :])
+    print "cm: " + str(cm_stat[i, :])
+    print "Ra: " + str(gpas_stat[i, :])
+    print "\n"
 
 runningTime = (time.time() - startTime) / 60
 lasted = "The Ra-gpas-cm ball-and-stick simulation was running for %f minutes\n" % runningTime
@@ -90,15 +104,15 @@ header2 = "Number of simulations: " + str(num_of_iter) + '\n' + setup2 + configu
 header3 = "Number of simulations: " + str(num_of_iter) + '\n' + setup3 + configuration + lasted
 
 # Save out statistic to file for occurent later analysis
-np.savetxt(fname='/Users/Dani/TDK/parameter_estim/stim_protocol2/zap/all/Ra_stat.txt', X=Ra_stat,
+np.savetxt(fname='/Users/Dani/TDK/parameter_estim/stim_protocol2/zap/0/Ra_stat.txt', X=Ra_stat,
            header=header1 + 'sigma\tdiff\taccuracy\tsharper\tsigma_err', delimiter='\t')
-np.savetxt(fname='/Users/Dani/TDK/parameter_estim/stim_protocol2/zap/all/gpas_stat.txt', X=gpas_stat,
+np.savetxt(fname='/Users/Dani/TDK/parameter_estim/stim_protocol2/zap/0/gpas_stat.txt', X=gpas_stat,
            header=header2 + '\nsigma\tdiff\taccuracy\tsharper\tsigma_err', delimiter='\t')
-np.savetxt(fname='/Users/Dani/TDK/parameter_estim/stim_protocol2/zap/all/cm_stat.txt', X=cm_stat,
+np.savetxt(fname='/Users/Dani/TDK/parameter_estim/stim_protocol2/zap/0/cm_stat.txt', X=cm_stat,
            header=header3 + '\nsigma\tdiff\taccuracy\tsharper\tsigma_err', delimiter='\t')
 
 # Plot statistics
-plot_stat(Ra_stat, pRa, path='/Users/Dani/TDK/parameter_estim/stim_protocol2/zap/all')
-plot_stat(gpas_stat, pgpas, path='/Users/Dani/TDK/parameter_estim/stim_protocol2/zap/all')
-plot_stat(cm_stat, pcm, path='/Users/Dani/TDK/parameter_estim/stim_protocol2/zap/all')
+plot_stat(Ra_stat, pRa, path='/Users/Dani/TDK/parameter_estim/stim_protocol2/zap/0')
+plot_stat(gpas_stat, pgpas, path='/Users/Dani/TDK/parameter_estim/stim_protocol2/zap/0')
+plot_stat(cm_stat, pcm, path='/Users/Dani/TDK/parameter_estim/stim_protocol2/zap/0')
 
