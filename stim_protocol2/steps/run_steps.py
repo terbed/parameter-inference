@@ -3,7 +3,7 @@ from module.simulation import stick_and_ball
 from module.probability import RandomVariable, IndependentInference, ParameterSet
 from module.noise import white
 from module.trace import stat
-from module.plot import plot_stat, plot_res
+from module.plot import plot_stat, plot_res, fullplot
 from functools import partial
 from matplotlib import pyplot as plt
 import time
@@ -73,7 +73,7 @@ for item in hz:
 
         Ra_cm_gpas = ParameterSet(Ra, cm, gpas)
         inference = IndependentInference(data, Ra_cm_gpas,
-                                         working_path="/Users/Dani/TDK/parameter_estim/stim_protocol2/steps/" + str(item))
+                                         working_path="/Users/Dani/TDK/parameter_estim/stim_protocol2/steps/" + str(item), speed='mid')
 
         multi_comp = partial(stick_and_ball, stype='custom', custom_stim=stim)  # fix chosen stimulus type for simulations
 
@@ -95,9 +95,13 @@ for item in hz:
 
         # Plot some single joint distribution
         if i == num_of_iter - 1:
+            print inference
+            fullplot(inference)
             plot_res(inference, Ra, gpas)
             plot_res(inference, Ra, cm)
             plot_res(inference, cm, gpas)
+
+        print "\n\n"
 
     runningTime = (time.time() - startTime) / 60
     print "Running time %f min" % runningTime

@@ -3,7 +3,7 @@ from module.simulation import stick_and_ball
 from module.probability import RandomVariable, IndependentInference, ParameterSet
 from module.noise import white
 from module.trace import stat
-from module.plot import plot_stat
+from module.plot import plot_stat, plot_res, fullplot
 from functools import partial
 from matplotlib import pyplot as plt
 import time
@@ -32,7 +32,7 @@ for i in range(num_of_iter):
     current_cm = np.random.normal(pcm.value, 0.2)
 
     # Generate deterministic trace and create synthetic data with noise model
-    t, v = stick_and_ball(Ra=current_Ra, gpas=current_gpas, cm=current_cm, stype='custom', stim_vec=stim)
+    t, v = stick_and_ball(Ra=current_Ra, gpas=current_gpas, cm=current_cm, stype='custom', custom_stim=stim)
     data = white(noise_sigma, v)
 
     # if i == 0:
@@ -64,9 +64,9 @@ for i in range(num_of_iter):
     cm = RandomVariable(name='cm', range_min=cm_start, range_max=cm_end, resolution=40, mean=current_cm, sigma=pcm.sigma)
 
     Ra_cm_gpas = ParameterSet(Ra, cm, gpas)
-    inference = IndependentInference(data, Ra_cm_gpas, working_path="/Users/Dani/TDK/parameter_estim/stim_protocol2/ramp")
+    inference = IndependentInference(data, Ra_cm_gpas, working_path="/Users/Dani/TDK/parameter_estim/stim_protocol2/ramp", speed='mid')
 
-    multi_comp = partial(stick_and_ball, stype='custom', stim_vec=stim)  # fix chosen stimulus type for simulations
+    multi_comp = partial(stick_and_ball, stype='custom', custom_stim=stim)  # fix chosen stimulus type for simulations
 
     if __name__ == '__main__':
         inference.run_sim(multi_comp, noise_sigma)
@@ -78,6 +78,20 @@ for i in range(num_of_iter):
     gpas_stat[i, 0], gpas_stat[i, 1], gpas_stat[i, 2], gpas_stat[i, 3], gpas_stat[4] = stat(gpas)
     cm_stat[i, 0], cm_stat[i, 1], cm_stat[i, 2], cm_stat[i, 3], cm_stat[4] = stat(cm)
 
+    print "\nsig\t diff\t acc\t sharper\t sig_err"
+    print "Ra: " + str(Ra_stat[i, :])
+    print "cm: " + str(cm_stat[i, :])
+    print "gpas: " + str(gpas_stat[i, :])
+
+    # Plot some single joint distribution
+    if i == num_of_iter - 1:
+        print inference
+        fullplot(inference)
+        plot_res(inference, Ra, gpas)
+        plot_res(inference, Ra, cm)
+        plot_res(inference, cm, gpas)
+
+    print "\n\n"
 
 runningTime = (time.time() - startTime) / 60
 lasted = "The Ra-gpas-cm ball-and-stick simulation was running for %f minutes\n" % runningTime

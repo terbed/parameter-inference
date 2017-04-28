@@ -73,7 +73,7 @@ for item in hz:
 
         Ra_cm_gpas = ParameterSet(Ra, cm, gpas)
         inference = IndependentInference(data, Ra_cm_gpas,
-                                         working_path="/Users/Dani/TDK/parameter_estim/stim_protocol2/zap/" + str(item))
+                                         working_path="/Users/Dani/TDK/parameter_estim/stim_protocol2/zap/" + str(item), speed='mid')
 
         multi_comp = partial(stick_and_ball, stype='custom', custom_stim=stim)  # fix chosen stimulus type for simulations
 
