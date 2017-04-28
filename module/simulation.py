@@ -93,7 +93,7 @@ def one_compartment(cm=1., gpas=0.0001, dt=0.1, stype='broad', custom_stim=None)
     return t, v
 
 
-def stick_and_ball(Ra=100., gpas=0.0001, cm=1., Ra_max=250., dt=0.1, stype='both', stim_vec=None):
+def stick_and_ball(Ra=100., gpas=0.0001, cm=1., Ra_max=250., dt=0.1, stype='both', custom_stim=None):
     """ Stick and Ball model variables: Passive conductance and axial resistance """
     # Create Sections
     soma = h.Section(name='soma')
@@ -106,6 +106,10 @@ def stick_and_ball(Ra=100., gpas=0.0001, cm=1., Ra_max=250., dt=0.1, stype='both
     soma.L = soma.diam = 30
     dend.L = 1000
     dend.diam = 3
+
+    # Simulation duration and RUN
+    h.dt = dt                                                       # Time step (iteration)
+    h.steps_per_ms = 1 / dt
 
     # Set the appropriate "nseg"
     for sec in h.allsec():
@@ -168,13 +172,13 @@ def stick_and_ball(Ra=100., gpas=0.0001, cm=1., Ra_max=250., dt=0.1, stype='both
         stim3.amp = 0.35
         stim3.dur = 5
     elif stype == 'custom':
-        h.tstop = len(stim_vec)*dt
+        h.tstop = len(custom_stim)*dt
         h.load_file("vplay.hoc")
-        vec = h.Vector(stim_vec)
-        stim = h.IClamp(soma(0.5))
-        vec.play(stim._ref_amp, h.dt)
-        stim.delay = 0   # Just for Neuron
-        stim.dur = 1e9   # Just for Neuron
+        vec = h.Vector(custom_stim)
+        istim = h.IClamp(soma(0.5))
+        vec.play(istim._ref_amp, h.dt)
+        istim.delay = 0   # Just for Neuron
+        istim.dur = 1e9   # Just for Neuron
 
     # Run simulation ->
     # Print information
@@ -185,10 +189,6 @@ def stick_and_ball(Ra=100., gpas=0.0001, cm=1., Ra_max=250., dt=0.1, stype='both
     t_vec = h.Vector()
     v_vec.record(soma(0.5)._ref_v)
     t_vec.record(h._ref_t)
-
-    # Simulation duration and RUN
-    h.dt = dt                                                       # Time step (iteration)
-    h.steps_per_ms = 1 / dt
 
     h.v_init = -65
     h.finitialize(h.v_init)                                         # Starting membrane potential
@@ -260,38 +260,45 @@ if __name__ == "__main__":
     tv = np.linspace(0, 500, 5001)
 
     # Ramp Stimulus
-    s = 0.
-    for i, t in enumerate(tv):
-        if i < 50:
-            stim.append(0.)
-        elif t < 400:
-            stim.append(s)
-            s += 0.0001
-        else:
-            stim.append(0.)
+    # s = 0.
+    # for i, t in enumerate(tv):
+    #     if t < 50:
+    #         stim.append(0.)
+    #     elif t < 400:
+    #         stim.append(s)
+    #         s += 0.0001
+    #     else:
+    #         stim.append(0.)
+    # print s
 
-    print s
-
-    # F = 100.
+    # F = 1.
     # f = F*1e-3
-    # fa = np.linspace(0, 150e-3, 5001)
+    # #fa = np.linspace(0, 150e-3, 5001)
     #
     # for i,t in enumerate(tv):
-    #     stim.append(0.2*np.sin(2*np.pi*fa[i]*t))
+    #     stim.append(0.2*np.sin(2*np.pi*f*t))
+
+    for i, t in enumerate(tv):
+        if t < 10:
+            stim.append(0.)
+        elif t<= 410:
+            stim.append(0.5)
+        else:
+            stim.append(0.)
 
     plt.figure(figsize=(12,7))
     plt.title("Stimulus")
     plt.xlabel("Time [ms]")
     plt.ylabel("I [mA]")
     plt.plot(tv, stim)
-    plt.savefig("/Users/Dani/TDK/parameter_estim/stim_protocol2/ramp/rampi.png")
+    plt.savefig("/Users/Dani/TDK/parameter_estim/stim_protocol2/steps/400/imp.png")
     plt.show()
 
-    np.savetxt("/Users/Dani/TDK/parameter_estim/stim_protocol2/ramp/stim.txt", stim)
+    np.savetxt("/Users/Dani/TDK/parameter_estim/stim_protocol2/steps/400/stim.txt", stim)
 
     print len(stim)
 
-    t, v = one_compartment(stype="custom", custom_stim=stim)
+    t, v = stick_and_ball(stype="custom", custom_stim=stim)
     v = white(7., v)
 
     plt.figure(figsize=(12,7))
@@ -299,7 +306,7 @@ if __name__ == "__main__":
     plt.xlabel("Time [ms]")
     plt.ylabel("Voltage [mV]")
     plt.plot(t, v)
-    plt.savefig("/Users/Dani/TDK/parameter_estim/stim_protocol2/ramp/rampv.png")
+    plt.savefig("/Users/Dani/TDK/parameter_estim/stim_protocol2/steps/400/resp.png")
     plt.show()
 
     print len(t)
