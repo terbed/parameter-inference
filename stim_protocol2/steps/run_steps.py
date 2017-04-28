@@ -8,7 +8,7 @@ from functools import partial
 from matplotlib import pyplot as plt
 import time
 
-hz = [0, 1, 2,3,4,5,10,25,50,75,100,150]
+hz = [3, 5, 7,10,15,20,50,100,200,400]
 num_of_iter = 50
 
 # Only for plotting
@@ -19,9 +19,9 @@ pcm = RandomVariable(name='cm', range_min=0.5, range_max=1.5, resolution=60, mea
 noise_sigma = 7.
 
 for item in hz:
-    print "\n\n---------------------------------------- Running %i Hz zap protocol" % item
+    print "\n\n---------------------------------------- Running %i ms impulse protocol" % item
 
-    stim = np.loadtxt("/Users/Dani/TDK/parameter_estim/stim_protocol2/zap/%i/stim.txt" % item)
+    stim = np.loadtxt("/Users/Dani/TDK/parameter_estim/stim_protocol2/steps/%i/stim.txt" % item)
 
     Ra_stat = np.zeros((num_of_iter, 5), dtype=np.float)
     gpas_stat = np.zeros((num_of_iter, 5), dtype=np.float)
@@ -73,7 +73,7 @@ for item in hz:
 
         Ra_cm_gpas = ParameterSet(Ra, cm, gpas)
         inference = IndependentInference(data, Ra_cm_gpas,
-                                         working_path="/Users/Dani/TDK/parameter_estim/stim_protocol2/zap/" + str(item))
+                                         working_path="/Users/Dani/TDK/parameter_estim/stim_protocol2/steps/" + str(item))
 
         multi_comp = partial(stick_and_ball, stype='custom', custom_stim=stim)  # fix chosen stimulus type for simulations
 
@@ -111,14 +111,14 @@ for item in hz:
     header3 = "Number of simulations: " + str(num_of_iter) + '\n' + setup3 + configuration + lasted
 
     # Save out statistic to file for occurent later analysis
-    np.savetxt(fname='/Users/Dani/TDK/parameter_estim/stim_protocol2/zap/%i/Ra_stat.txt' %item, X=Ra_stat,
+    np.savetxt(fname='/Users/Dani/TDK/parameter_estim/stim_protocol2/steps/%i/Ra_stat.txt' %item, X=Ra_stat,
                header=header1 + 'sigma\tdiff\taccuracy\tsharper\tsigma_err', delimiter='\t')
-    np.savetxt(fname='/Users/Dani/TDK/parameter_estim/stim_protocol2/zap/%i/gpas_stat.txt' %item, X=gpas_stat,
+    np.savetxt(fname='/Users/Dani/TDK/parameter_estim/stim_protocol2/steps/%i/gpas_stat.txt' %item, X=gpas_stat,
                header=header2 + '\nsigma\tdiff\taccuracy\tsharper\tsigma_err', delimiter='\t')
-    np.savetxt(fname='/Users/Dani/TDK/parameter_estim/stim_protocol2/zap/%i/cm_stat.txt' %item, X=cm_stat,
+    np.savetxt(fname='/Users/Dani/TDK/parameter_estim/stim_protocol2/steps/%i/cm_stat.txt' %item, X=cm_stat,
                header=header3 + '\nsigma\tdiff\taccuracy\tsharper\tsigma_err', delimiter='\t')
 
     # Plot statistics
-    plot_stat(Ra_stat, pRa, path='/Users/Dani/TDK/parameter_estim/stim_protocol2/zap/' + str(item))
-    plot_stat(gpas_stat, pgpas, path='/Users/Dani/TDK/parameter_estim/stim_protocol2/zap/' + str(item))
-    plot_stat(cm_stat, pcm, path='/Users/Dani/TDK/parameter_estim/stim_protocol2/zap/' + str(item))
+    plot_stat(Ra_stat, pRa, path='/Users/Dani/TDK/parameter_estim/stim_protocol2/steps/' + str(item))
+    plot_stat(gpas_stat, pgpas, path='/Users/Dani/TDK/parameter_estim/stim_protocol2/steps/' + str(item))
+    plot_stat(cm_stat, pcm, path='/Users/Dani/TDK/parameter_estim/stim_protocol2/steps/' + str(item))
