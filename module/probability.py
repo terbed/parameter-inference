@@ -177,6 +177,9 @@ class Inference:
         self.target = target_trace
         self.working_path = working_path
         self.check_directory(working_path)
+        self.check_directory(working_path + "/marginal")
+        self.check_directory(working_path + "/joint")
+        self.check_directory(working_path + "/loglikelihood")
         self.speed = speed
         self.toDebug = debugging
         if self.toDebug:
@@ -236,6 +239,7 @@ class Inference:
                     i += 1
                 plt.savefig('{}({:d}).png'.format(filename, i))
 
+        self.__save_result()
         self.__create_likelihood()
         self.__create_posterior()
         self.__marginalize()
@@ -257,6 +261,10 @@ class Inference:
 
             self.p.params[idx].posterior = \
                 np.sum(self.posterior, axis=tuple(item)) * self.p.margin_step[idx]
+
+    def __save_result(self):
+        plot.save_file(self.likelihood, self.working_path + "loglikelihood", "loglikelihood", header=str(self.p.name) + str(self.p.shape))
+        print "loglikelihood.txt data Saved! Please save the settings too for later use..."
 
     def __str__(self):
         for item in self.p.params:
@@ -288,8 +296,6 @@ class IndependentInference(Inference):
     
                 pool.close()
                 print "log_likelihood: Done!"
-                # plot.save_file(self.likelihood, self.working_path, "/log_likelihood.txt", header=str(self.p.name) + str(self.p.shape))
-                # print "log_likelihood: Saved!"
             else:
                 pool = Pool(multiprocessing.cpu_count()-1)
     
