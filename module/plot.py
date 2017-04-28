@@ -6,6 +6,7 @@ from matplotlib import pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm as CM
 import matplotlib.patches as mpatches
+from matplotlib.ticker import MultipleLocator, FormatStrFormatter, ScalarFormatter, MaxNLocator
 import numpy as np
 import os
 
@@ -18,7 +19,7 @@ def save_file(X, path, name, header=''):
     i=0
     while os.path.exists('{}({:d}).txt'.format(path+name, i)):
         i += 1
-    np.savetxt('{}({:d})'.format(path+name, i), X, header=header, delimiter='\t')
+    np.savetxt('{}({:d}).txt'.format(path+"/"+name, i), X, header=header, delimiter='\t')
 
 def fullplot(result):
     """
@@ -26,6 +27,123 @@ def fullplot(result):
     :param result: Inference object after computed results
     :return: Plots a joint and marginal full plot
     """
+    plt.close('all')
+    pnum = len(result.p.params)
+
+    # Check there is more parameters
+    if pnum < 2:
+        return 0
+
+    num_of_plot = pnum + (pnum**2 - pnum)/2
+
+    f, ax = plt.subplots(pnum, pnum, figsize=(14,9))
+    f.subplots_adjust(hspace=.001, wspace=.001)
+
+    for row in range(pnum):
+        for col in range(pnum):
+            # Marginal plots
+            if row == col:
+                i = row
+                ax[i, i].grid()
+                ax[row, col].set_xlabel(result.p.params[i].name + ' ' + result.p.params[i].unit)
+                ax[row, col].plot(result.p.params[i].values, result.p.params[i].likelihood, marker='o', color="#ffc82e")
+
+                ax[row, col].tick_params(axis='y', which='both', left='off', right='on', labelleft='off', labelright='on')
+                ax[row, col].tick_params(axis='x', which='both', top='off', bottom='off', labelbottom='off', labeltop='off')
+                ax[row, col].xaxis.set_label_position('top')
+
+                if row == pnum-1:
+                    ax[row, col].tick_params(axis='x', which='both', top='off', bottom='on', labelbottom='on',
+                                             labeltop='off')
+            # Joint plots
+            elif col < row:
+                likelihood = result.likelihood
+                ax[row, col].grid()
+                # Marginalize if needed
+                if len(result.p.params) > 2:
+                    for idx, item in enumerate(result.p.params):
+                        if idx != row and idx != col:
+                            likelihood = np.sum(likelihood, axis=idx) * item.step
+
+                # Contour plot
+                x, y = np.meshgrid(result.p.params[col].values, result.p.params[row].values)
+                cs = ax[row, col].contour(x, y, likelihood)
+                if col == 0:
+                    ax[row, col].set_ylabel(result.p.params[row].name + ' ' + result.p.params[row].unit)
+                #ax[row, col].clabel(cs, inline=1, fontsize=5)
+
+                # Set up labels
+                ax[row, col].tick_params(axis='y', which='both', left='off', right='off', labelleft='off', labelright='off')
+                ax[row, col].tick_params(axis='x', which='both', top='off', bottom='off', labelbottom='off', labeltop='off')
+
+
+                if row == pnum-1:
+                    ax[row, col].tick_params(axis='x', which='both', top='off', bottom='on', labelbottom='on',
+                                             labeltop='off')
+                    ax[row, col].set_xlabel(result.p.params[col].name + ' ' + result.p.params[col].unit)
+
+                if col == 0:
+                    ax[row, col].tick_params(axis='y', which='both', left='on', right='off', labelleft='on',
+                                             labelright='off')
+            else:
+                ax[row, col].set_axis_off()
+
+    plt.savefig(result.working_path + "/fullplot_L.png")
+
+    f, ax = plt.subplots(pnum, pnum, figsize=(14,9))
+    f.subplots_adjust(hspace=.001, wspace=.001)
+
+    for row in range(pnum):
+        for col in range(pnum):
+            # Marginal plots
+            if row == col:
+                i = row
+                ax[i, i].grid()
+                ax[row, col].set_xlabel(result.p.params[i].name + ' ' + result.p.params[i].unit)
+                ax[row, col].plot(result.p.params[i].values, result.p.params[i].posterior, marker='o', color="#FF5F2E", label="posterior")
+                ax[row, col].plot(result.p.params[i].values, result.p.params[i].prior, color="#2EFFC8", label="prior")
+                ax[row, col].legend()
+
+                ax[row, col].tick_params(axis='y', which='both', left='off', right='on', labelleft='off', labelright='on')
+                ax[row, col].tick_params(axis='x', which='both', top='off', bottom='off', labelbottom='off', labeltop='off')
+                ax[row, col].xaxis.set_label_position('top')
+
+                if row == pnum-1:
+                    ax[row, col].tick_params(axis='x', which='both', top='off', bottom='on', labelbottom='on',
+                                             labeltop='off')
+            # Joint plots
+            elif col < row:
+                posterior = result.posterior
+                ax[row, col].grid()
+                # Marginalize if needed
+                if len(result.p.params) > 2:
+                    for idx, item in enumerate(result.p.params):
+                        if idx != row and idx != col:
+                            posterior = np.sum(posterior, axis=idx) * item.step
+
+                # Contour plot
+                x, y = np.meshgrid(result.p.params[col].values, result.p.params[row].values)
+                cs = ax[row, col].contour(x, y, posterior)
+                if col == 0:
+                    ax[row, col].set_ylabel(result.p.params[row].name + ' ' + result.p.params[row].unit)
+                #ax[row, col].clabel(cs, inline=1, fontsize=5)
+
+                # Set up labels
+                ax[row, col].tick_params(axis='y', which='both', left='off', right='off', labelleft='off', labelright='off')
+                ax[row, col].tick_params(axis='x', which='both', top='off', bottom='off', labelbottom='off', labeltop='off')
+
+                if row == pnum-1:
+                    ax[row, col].tick_params(axis='x', which='both', top='off', bottom='on', labelbottom='on',
+                                             labeltop='off')
+                    ax[row, col].set_xlabel(result.p.params[col].name + ' ' + result.p.params[col].unit)
+
+                if col == 0:
+                    ax[row, col].tick_params(axis='y', which='both', left='on', right='off', labelleft='on',
+                                             labelright='off')
+            else:
+                ax[row, col].set_axis_off()
+
+    plt.savefig(result.working_path + "/fullplot_P.png")
 
 
 def plot_res(result, param1, param2):
@@ -132,10 +250,10 @@ def marginal_plot(param, path=''):
     plt.title(param.name + " posterior (r) and prior (b) distribution")
     plt.xlabel(param.name + ' ' + param.unit)
     plt.ylabel("p")
-    plt.plot(param.values, param.posterior, color='#A52F34')
+    plt.plot(param.values, param.posterior,  marker='o', color="#FF5F2E", label="posterior")
     plt.plot(param.values, param.prior, color='#2FA5A0')
     plt.axvline(param.value, color='#34A52F')
-    filename = path + "/" + param.name + "_P"
+    filename = path + "/marginal/" + param.name + "_P"
     i = 0
     while os.path.exists('{}({:d}).png'.format(filename, i)):
         i += 1
@@ -148,9 +266,9 @@ def marginal_plot(param, path=''):
     plt.xlabel(param.name + ' ' + param.unit)
     plt.ylabel("p")
     plt.axvline(param.value, color='#34A52F')
-    plt.plot(param.values, param.likelihood, color='#A52F34')
+    plt.plot(param.values, param.likelihood,  marker='o', color="#ffc82e")
 
-    filename = path + "/" + param.name + "_L"
+    filename = path + "/marginal/" + param.name + "_L"
     i = 0
     while os.path.exists('{}({:d}).png'.format(filename, i)):
         i += 1
