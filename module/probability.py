@@ -177,8 +177,6 @@ class Inference:
         self.target = target_trace
         self.working_path = working_path
         self.check_directory(working_path)
-        self.check_directory(working_path + "/marginal")
-        self.check_directory(working_path + "/joint")
         self.check_directory(working_path + "/loglikelihood")
         self.speed = speed
         self.toDebug = debugging

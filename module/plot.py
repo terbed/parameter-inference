@@ -241,6 +241,7 @@ def marginal_plot(param, path=''):
     :param path: working path
     :return: Plots marginal posteriors and likelihoods
     """
+    check_directory(path + "/marginal")
 
     # Check posterior distribution correctness
     print "The MARGINAL posterior is probability distributions? Integrate(posterior) = " + str(np.sum(param.posterior)*param.step)
@@ -314,7 +315,7 @@ def plot_stat(stat, param, path='', bin=None):
     post_max = np.amax(posterior)
 
     plt.figure(figsize=(12,8))
-    plt.title(' [rdiff(g): %.0f, acc(b): %.2f, gain: %.2f pm %.2f] ' % (avrg_diff/param.value*100, avrg_acc, avrg_sharp, std_sharp) + param.name)
+    plt.title(' [rdiff(g): %.0f, acc(b): %.2f, gain: (%.2f pm %.2f)] ' % (avrg_diff/param.value*100, avrg_acc, avrg_sharp, std_sharp) + param.name)
     plt.xlabel(param.name + ' ' + param.unit)
     plt.ylabel('Probability')
     plt.grid(True)
@@ -330,27 +331,27 @@ def plot_stat(stat, param, path='', bin=None):
     plt.savefig(path + "/illustration_"+param.name+".png")
 
 
-    # Plot shape of posterior
-    max_p = normal(x, param.mean, avrg_sigma + std_sigma)
-    min_p = normal(x, param.mean, avrg_sigma - std_sigma)
-
-    # Sharper than prior minimum value is 1
-    gain_bot = avrg_sharp-std_sharp
-    if gain_bot < 1:
-        gain_bot = 1.
-
-    plt.figure(figsize=(12,8))
-    plt.title("Sharpness of posterior")
-    plt.xlabel(param.name + ' ' + param.unit)
-    plt.ylabel('Probability')
-    plt.grid(True)
-    plt.plot(x, posterior, color='#9c3853', label="average: %.2f" % avrg_sharp)
-    plt.plot(x, max_p, color='#fff34d', label="avrg+std: %.2f" % (avrg_sharp+std_sharp))
-    plt.plot(x, min_p, color='#f9484f', label="avrg-std: %.2f" % (gain_bot))
-    plt.plot(x, prior, color='#2FA5A0', label="prior")
-
-    plt.legend()
-    plt.savefig(path + "/plook_"+param.name+".png")
+    # # Plot shape of posterior
+    # max_p = normal(x, param.mean, avrg_sigma + std_sigma)
+    # min_p = normal(x, param.mean, avrg_sigma - std_sigma)
+    #
+    # # Sharper than prior minimum value is 1
+    # gain_bot = avrg_sharp-std_sharp
+    # if gain_bot < 1:
+    #     gain_bot = 1.
+    #
+    # plt.figure(figsize=(12,8))
+    # plt.title("Sharpness of posterior")
+    # plt.xlabel(param.name + ' ' + param.unit)
+    # plt.ylabel('Probability')
+    # plt.grid(True)
+    # plt.plot(x, posterior, color='#9c3853', label="average: %.2f" % avrg_sharp)
+    # plt.plot(x, max_p, color='#fff34d', label="avrg+std: %.2f" % (avrg_sharp+std_sharp))
+    # plt.plot(x, min_p, color='#f9484f', label="avrg-std: %.2f" % (gain_bot))
+    # plt.plot(x, prior, color='#2FA5A0', label="prior")
+    #
+    # plt.legend()
+    # plt.savefig(path + "/plook_"+param.name+".png")
 
 
     avrg_diff, out_diff = reject_outliers_avrg(stat[:, 1])
@@ -360,6 +361,7 @@ def plot_stat(stat, param, path='', bin=None):
     rel_diff = np.multiply(stat[:, 1], 1/param.value)*100
 
     # Plot histograms
+    check_directory(path + "/histograms")
     if bin is None:
         bin = int(len(stat[:, 0])/2)
 
@@ -369,7 +371,7 @@ def plot_stat(stat, param, path='', bin=None):
     plt.ylabel('Occurrence ')
     plt.grid(True)
     plt.hist(rel_diff, bin, facecolor='#D44A4B', normed=False)
-    plt.savefig(path + "/rdeviation_"+param.name+".png")
+    plt.savefig(path + "/histograms/rdeviation_"+param.name+".png")
 
     plt.figure(figsize=(12,8))
     plt.title("Accuracy | " + param.name)
@@ -377,7 +379,7 @@ def plot_stat(stat, param, path='', bin=None):
     plt.ylabel('Occurrence')
     plt.grid(True)
     plt.hist(stat[:, 2], bin, facecolor='#3BA9A8', normed=False)
-    plt.savefig(path + "/accuracy_"+param.name+".png")
+    plt.savefig(path + "/histograms/accuracy_"+param.name+".png")
 
     plt.figure(figsize=(12,8))
     plt.title("Posterior how many times sharper than prior | " + param.name)
@@ -385,7 +387,7 @@ def plot_stat(stat, param, path='', bin=None):
     plt.ylabel('Occurrence')
     plt.grid(True)
     plt.hist(stat[:, 3], bin, facecolor='#4A4BD4', normed=False)
-    plt.savefig(path + "/igain_"+param.name+".png")
+    plt.savefig(path + "/histograms/igain_"+param.name+".png")
 
     # plt.figure()
     # plt.title("Fitted gaussian sigma parameter | " + param.name)
