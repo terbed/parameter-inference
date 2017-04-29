@@ -55,7 +55,7 @@ class RandomVariable:
         else:
             print "\nParameter sampling from prior distribution: " + self.name
             values = np.random.normal(self.mean, self.sigma, self.resolution)
-            values = np.sort(self.values)
+            values = np.sort(values)
             return values
 
 
