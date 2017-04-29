@@ -261,7 +261,7 @@ class Inference:
                 np.sum(self.posterior, axis=tuple(item)) * self.p.margin_step[idx]
 
     def __save_result(self):
-        plot.save_file(self.likelihood, self.working_path + "loglikelihood", "loglikelihood", header=str(self.p.name) + str(self.p.shape))
+        plot.save_file(self.likelihood, self.working_path + "\loglikelihood", "loglikelihood", header=str(self.p.name) + str(self.p.shape))
         print "loglikelihood.txt data Saved! Please save the settings too for later use..."
 
     def __str__(self):
