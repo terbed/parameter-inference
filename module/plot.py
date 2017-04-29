@@ -17,7 +17,7 @@ def check_directory(working_path):
 
 def save_file(X, path, name, header=''):
     i=0
-    while os.path.exists('{}({:d}).txt'.format(path+name, i)):
+    while os.path.exists('{}({:d}).txt'.format(path+"/"+name, i)):
         i += 1
     np.savetxt('{}({:d}).txt'.format(path+"/"+name, i), X, header=header, delimiter='\t')
 
@@ -47,6 +47,7 @@ def fullplot(result):
                 ax[i, i].grid()
                 ax[row, col].set_xlabel(result.p.params[i].name + ' ' + result.p.params[i].unit)
                 ax[row, col].plot(result.p.params[i].values, result.p.params[i].likelihood, marker='o', color="#ffc82e")
+                ax[row, col].axvline(result.p.params[i].value, color='#3acead', linewidth=0.8, alpha=1)
 
                 ax[row, col].tick_params(axis='y', which='both', left='off', right='on', labelleft='off', labelright='on')
                 ax[row, col].tick_params(axis='x', which='both', top='off', bottom='off', labelbottom='off', labeltop='off')
@@ -59,6 +60,9 @@ def fullplot(result):
             elif col < row:
                 likelihood = result.likelihood
                 ax[row, col].grid()
+                ax[row, col].axvline(result.p.params[col].value, color='#3acead', linewidth=0.8, alpha=1)
+                ax[row, col].axhline(result.p.params[row].value, color='#3acead', linewidth=0.8, alpha=1)
+
                 # Marginalize if needed
                 if len(result.p.params) > 2:
                     for idx, item in enumerate(result.p.params):
@@ -88,7 +92,11 @@ def fullplot(result):
             else:
                 ax[row, col].set_axis_off()
 
-    plt.savefig(result.working_path + "/fullplot_L.png")
+    i=0
+    while os.path.exists('{}({:d}).png'.format(result.working_path + "/fullplot_L", i)):
+        i += 1
+    plt.savefig('{}({:d}).png'.format(result.working_path + "/fullplot_L", i))
+
 
     f, ax = plt.subplots(pnum, pnum, figsize=(14,9))
     f.subplots_adjust(hspace=.001, wspace=.001)
@@ -99,6 +107,7 @@ def fullplot(result):
             if row == col:
                 i = row
                 ax[i, i].grid()
+                ax[row, col].axvline(result.p.params[i].value, color='#3acead', linewidth=0.8, alpha=1)
                 ax[row, col].set_xlabel(result.p.params[i].name + ' ' + result.p.params[i].unit)
                 ax[row, col].plot(result.p.params[i].values, result.p.params[i].posterior, marker='o', color="#FF5F2E", label="posterior")
                 ax[row, col].plot(result.p.params[i].values, result.p.params[i].prior, color="#2EFFC8", label="prior")
@@ -115,6 +124,8 @@ def fullplot(result):
             elif col < row:
                 posterior = result.posterior
                 ax[row, col].grid()
+                ax[row, col].axvline(result.p.params[col].value, color='#3acead', linewidth=0.8, alpha=1)
+                ax[row, col].axhline(result.p.params[row].value, color='#3acead', linewidth=0.8, alpha=1)
                 # Marginalize if needed
                 if len(result.p.params) > 2:
                     for idx, item in enumerate(result.p.params):
@@ -143,7 +154,10 @@ def fullplot(result):
             else:
                 ax[row, col].set_axis_off()
 
-    plt.savefig(result.working_path + "/fullplot_P.png")
+    i=0
+    while os.path.exists('{}({:d}).png'.format(result.working_path + "/fullplot_P", i)):
+        i += 1
+    plt.savefig('{}({:d}).png'.format(result.working_path + "/fullplot_P", i))
 
 
 def plot_res(result, param1, param2):

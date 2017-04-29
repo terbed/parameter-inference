@@ -73,7 +73,7 @@ class ParameterSet:
         self.margin_ax = self.get_margin_ax()
         self.margin_step = self.get_margin_step()
         self.isBatch = False
-        self.batch_len = 500
+        self.batch_len = 10000
         if len(self.parameter_set_seq) >= self.batch_len*2:
             self.isBatch = True
             self.parameter_set_batch_list = []
@@ -261,7 +261,7 @@ class Inference:
                 np.sum(self.posterior, axis=tuple(item)) * self.p.margin_step[idx]
 
     def __save_result(self):
-        plot.save_file(self.likelihood, self.working_path + "\loglikelihood", "loglikelihood", header=str(self.p.name) + str(self.p.shape))
+        plot.save_file(self.likelihood, self.working_path + "/loglikelihood", "loglikelihood", header=str(self.p.name) + str(self.p.shape))
         print "loglikelihood.txt data Saved! Please save the settings too for later use..."
 
     def __str__(self):

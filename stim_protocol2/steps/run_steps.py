@@ -8,7 +8,7 @@ from functools import partial
 from matplotlib import pyplot as plt
 import time
 
-hz = [3, 5, 7,10,15,20,50,100,200,400]
+hz = [3, 5, 10,15,20,50,100,200,400]
 num_of_iter = 50
 
 # Only for plotting
@@ -87,11 +87,11 @@ for item in hz:
         gpas_stat[i, 0], gpas_stat[i, 1], gpas_stat[i, 2], gpas_stat[i, 3], gpas_stat[4] = stat(gpas)
         cm_stat[i, 0], cm_stat[i, 1], cm_stat[i, 2], cm_stat[i, 3], cm_stat[4] = stat(cm)
 
-        print "\nsig\t diff\t acc\t sharper\t sig_err"
-        print "Ra: " + str(Ra_stat[i, :])
-        print "cm: " + str(cm_stat[i, :])
-        print "gpas: " + str(gpas_stat[i, :])
-        print "\n"
+        # print "\nsig\t diff\t acc\t sharper\t sig_err"
+        # print "Ra: " + str(Ra_stat[i, :])
+        # print "cm: " + str(cm_stat[i, :])
+        # print "gpas: " + str(gpas_stat[i, :])
+        # print "\n"
 
         # Plot some single joint distribution
         if i == num_of_iter - 1:
