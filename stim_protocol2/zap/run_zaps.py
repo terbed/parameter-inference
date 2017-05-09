@@ -12,7 +12,7 @@ hz = [0, 1, 2,3,4,5,10,25,50,75,100,150]
 num_of_iter = 50
 
 # Only for plotting
-pRa = RandomVariable(name='Ra', range_min=50, range_max=150, resolution=60, mean=100, sigma=20)
+pRa = RandomVariable(name='Ra', range_min=50, range_max=150, resolution=60, mean=100., sigma=20)
 pgpas = RandomVariable(name='gpas', range_min=0.00005, range_max=0.00015, resolution=60, mean=0.0001, sigma=0.00002)
 pcm = RandomVariable(name='cm', range_min=0.5, range_max=1.5, resolution=60, mean=1., sigma=0.2)
 

@@ -25,11 +25,13 @@ class RandomVariable:
         :param value: the true value (optional) if not given, than value=mean
         :param p_sampling: parameter sampling method: uniform: 'u' or prior: 'p' (sampled from prior distribution)
         """
+        self.init = [name, str(range_min), str(range_max), str(resolution), str(mean), str(sigma)]
         self.name = name
         self.unit = self.get_unit()
         self.value = value
         self.range_min = range_min
         self.range_max = range_max
+        self.offset = self.get_offset()
         self.resolution = resolution
         self.sampling_type = p_sampling
         self.mean = mean
@@ -38,8 +40,9 @@ class RandomVariable:
         self.values = self.__get_values()
 
         self.prior = prior.normal(self.values, mean, sigma)
-        self.posterior = []
         self.likelihood = []
+        self.posterior = []
+        self.fitted_gauss = []
 
         if self.value is None:
             self.value = self.mean
@@ -48,12 +51,15 @@ class RandomVariable:
         database = {'Ra': '[ohm cm]', 'cm': '[uF/cm^2]', 'gpas': '[uS/cm^2]'}
         return database[self.name]
 
+    # The typical range around mean fo parameter
+    def get_offset(self):
+        database = {'Ra': 50., 'cm': 0.5, 'gpas': 0.00005}
+        return database[self.name]
+
     def __get_values(self):
         if self.sampling_type == 'u':
-            print "\nUniform parameter sampling: " + self.name
             return np.linspace(self.range_min, self.range_max, self.resolution)
         else:
-            print "\nParameter sampling from prior distribution: " + self.name
             values = np.random.normal(self.mean, self.sigma, self.resolution)
             values = np.sort(values)
             return values
@@ -165,7 +171,7 @@ class Inference:
     """
     Takes a ParameterSet object
     """
-    def __init__(self, target_trace, parameter_set, working_path='', debugging=False, speed='max'):
+    def __init__(self, target_trace, parameter_set, working_path='', save=True, speed='max'):
         """
         :param target_trace: Experimental (or synthetic) data
         :param parameter_set: ParameterSet object
@@ -178,15 +184,11 @@ class Inference:
         self.working_path = working_path
         self.check_directory(working_path)
         self.check_directory(working_path + "/loglikelihood")
+        self.save = save
         self.speed = speed
-        self.toDebug = debugging
-        if self.toDebug:
-            self.check_directory(working_path + "/debug")
 
         self.likelihood = []
         self.posterior = []
-        if self.toDebug:
-            self.deviation = []
 
     @staticmethod
     def check_directory(working_path):
@@ -197,51 +199,17 @@ class Inference:
     def run_sim(self, sim_func, covmat):
         pass
 
-    def run_evaluation(self, model=None):
-        if self.toDebug:
-            if model is None:
-                print "\nError! You are in debugging mode, so you have to give the right model function!"
-                exit(17)
+    def run_evaluation(self):
+        print "\nRunning evaluation of the result..."
+        if self.save:
+            self.__save_result()
 
-            data = np.zeros((len(self.p.parameter_set_seq), 4), dtype=float)
-            data[:, 0] = [np.sum(vec)**2 for vec in self.deviation]
-            data[:, 1] = self.likelihood
-            data[:, 2] = np.subtract(self.likelihood, np.amax(self.likelihood))
-            data[:, 3] = np.exp(np.subtract(self.likelihood, np.amax(self.likelihood)))
-
-            # Save out data
-            header = self.p.name + "\ndeviation^2\tlog_likelihood\tnormed\tlikelihood"
-            plot.save_file(data, self.working_path+"/debug", "data", header)
-
-            # Do some trace plot TODO plot informative cases accordingly to likelihood or deviation...
-            from matplotlib import pyplot as plt
-            # Chose parameter-sets to analyse uniformly
-            idx = np.linspace(0, len(self.p.parameter_set_seq), num=100, dtype=int, endpoint=False)
-
-            for i in idx:
-                t, v = model(**self.p.parameter_set_seq[i])
-                summed_dev = np.sum(self.deviation[i])
-
-                plt.figure()
-                plt.xlabel("Time [ms]")
-                plt.ylabel("[mV]")
-                plt.title("Current params(b): %s\n"
-                          "Summed dev: %.2e | log_L: %.2e"
-                          % (str(self.p.parameter_set_seq[i]),
-                             float(summed_dev), float(self.likelihood[i])))
-                plt.plot(t, self.target, color='#A52F34')
-                plt.plot(t, v, color='#2FA5A0')
-                filename = self.working_path + "/debug/trace" + str(i)
-                i = 0
-                while os.path.exists('{}({:d}).png'.format(filename, i)):
-                    i += 1
-                plt.savefig('{}({:d}).png'.format(filename, i))
-
-        self.__save_result()
         self.__create_likelihood()
         self.__create_posterior()
         self.__marginalize()
-        print "\nCheck FULL posterior correctness: the integrate of posterior: + " + str(np.sum(self.posterior)*self.p.joint_step)
+        self.__fit_posterior()
+
+        print "Check FULL posterior correctness: the integrate of posterior: + " + str(np.sum(self.posterior)*self.p.joint_step)
 
     def __create_likelihood(self):
         self.likelihood = np.reshape(self.likelihood, self.p.shape)
@@ -260,20 +228,43 @@ class Inference:
             self.p.params[idx].posterior = \
                 np.sum(self.posterior, axis=tuple(item)) * self.p.margin_step[idx]
 
+    def __fit_posterior(self):
+        from module.trace import fit_normal
+        for item in self.p.params:
+            item.fitted_gauss = fit_normal(item.values, item.posterior, item.mean, item.sigma)
+
     def __save_result(self):
         plot.save_file(self.likelihood, self.working_path + "/loglikelihood", "loglikelihood", header=str(self.p.name) + str(self.p.shape))
-        print "loglikelihood.txt data Saved! Please save the settings too for later use..."
+        plot.save_params(self.p.params, path=self.working_path + "/loglikelihood")
+        print "loglikelihood.txt data Saved!"
 
     def __str__(self):
         for item in self.p.params:
             plot.marginal_plot(item, path=self.working_path)
         return "Marginal Plot Done!"
 
+    def analyse_result(self):
+        """
+        :return:  (param1_stat, param2_stat, ... , paramn_stat)
+        """
+        from module.trace import analyse
+        print "\n Running analysation..."
+
+        # Do some analysis on results
+        info = []
+        for item in self.p.params:
+            if item.fitted_gauss[0][0] is not None:
+                info.append(analyse(item, item.fitted_gauss))
+            else:
+                return None
+
+        return info
+
 
 class IndependentInference(Inference):
-    def __init__(self, target_trace,  parameter_set, working_path='', debugging=False, speed='max'):
+    def __init__(self, target_trace,  parameter_set, working_path='',speed='max'):
         Inference.__init__(self, target_trace=target_trace, parameter_set=parameter_set,
-                           working_path=working_path, debugging=debugging, speed=speed)
+                           working_path=working_path,speed=speed)
 
     def run_sim(self, sim_func, noise_sigma):
         if self.speed == "min":
@@ -335,9 +326,9 @@ class IndependentInference(Inference):
 
 
 class DependentInference(Inference):
-    def __init__(self, target_trace,  parameter_set, working_path='', debugging=False, speed='max'):
+    def __init__(self, target_trace,  parameter_set, working_path='',speed='max'):
         Inference.__init__(self, target_trace=target_trace, parameter_set=parameter_set,
-                           working_path=working_path, debugging=debugging, speed=speed)
+                           working_path=working_path, speed=speed)
 
     def run_sim(self, sim_func, inv_covmat):
         print "Run simulations..."
@@ -354,9 +345,6 @@ class DependentInference(Inference):
                           + str(len(self.p.parameter_set_batch_list))
 
                     batch_likelihood = pool.map(dev_func, batch)
-                    # In the case of debugging we save the deviation vector too
-                    if self.toDebug:
-                        self.deviation.extend(batch_likelihood)
 
                     # Compute the exponent with map function (pool.map would crash for this...)
                     batch_likelihood = map(log_likelihood_func, batch_likelihood)
@@ -374,8 +362,6 @@ class DependentInference(Inference):
 
                 self.likelihood = pool.map(dev_func, self.p.parameter_set_seq)
                 self.likelihood = pool.map(log_likelihood_func, self.likelihood)
-                if self.toDebug:
-                    self.deviation = self.likelihood
                 self.likelihood = map(log_likelihood_func, self.likelihood)
                 pool.close()
                 pool.join()
@@ -388,8 +374,6 @@ class DependentInference(Inference):
 
             self.likelihood = pool.map(dev_func, self.p.parameter_set_seq)
             self.likelihood = pool.map(log_likelihood_func, self.likelihood)
-            if self.toDebug:
-                self.deviation = self.likelihood
             self.likelihood = map(log_likelihood_func, self.likelihood)
             pool.close()
             pool.join()

@@ -3,7 +3,7 @@ from module.simulation import stick_and_ball
 from module.probability import RandomVariable, IndependentInference, ParameterSet
 from module.noise import white
 from module.trace import stat
-from module.plot import plot_stat, plot_res
+from module.plot import plot_stat
 from functools import partial
 from matplotlib import pyplot as plt
 import time
@@ -13,29 +13,27 @@ num_of_iter = 50
 noise_sigma = 7.
 stim = np.loadtxt("/Users/Dani/TDK/parameter_estim/stim_protocol2/zap/0/stim.txt")
 
-Ra_stat = np.zeros((num_of_iter, 5), dtype=np.float)
-gpas_stat = np.zeros((num_of_iter, 5), dtype=np.float)
-cm_stat = np.zeros((num_of_iter, 5), dtype=np.float)
+Ra_stat = np.zeros((num_of_iter, 6), dtype=np.float)
+gpas_stat = np.zeros((num_of_iter, 6), dtype=np.float)
+cm_stat = np.zeros((num_of_iter, 6), dtype=np.float)
 
 # Only for plotting
-pRa = RandomVariable(name='Ra', range_min=50, range_max=150, resolution=40, mean=100, sigma=20)
+pRa = RandomVariable(name='Ra', range_min=50., range_max=150., resolution=40, mean=100., sigma=20.)
 pgpas = RandomVariable(name='gpas', range_min=0.00005, range_max=0.00015, resolution=40, mean=0.0001, sigma=0.00002)
 pcm = RandomVariable(name='cm', range_min=0.5, range_max=1.5, resolution=40, mean=1., sigma=0.2)
 
 startTime = time.time()
 for i in range(num_of_iter):
+    m = 0
     print '\n' + str(i) + " is DONE out of " + str(num_of_iter)
-
-    # Create indexes for plotting some single result
-    idx = np.linspace(0, num_of_iter, 3, dtype=int)
 
     # Sampling current parameter from normal distribution
     current_Ra = np.random.normal(pRa.value, 10.)
     current_gpas = np.random.normal(pgpas.value, 0.00002)
-    current_cm = np.random.normal(pcm.value, 0.1)
+    current_cm = np.random.normal(pcm.value, 0.2)
 
     # Generate deterministic trace and create synthetic data with noise model
-    t, v = stick_and_ball(Ra=current_Ra, gpas=current_gpas, cm=current_cm, stype='custom', stim_vec=stim)
+    t, v = stick_and_ball(Ra=current_Ra, gpas=current_gpas, cm=current_cm, stype='custom', custom_stim=stim)
     data = white(noise_sigma, v)
 
     # if i == 0:
@@ -55,7 +53,7 @@ for i in range(num_of_iter):
     cm_end = current_cm + 0.5
 
     if Ra_start <= 0:  # ValueError: Ra must be > 0.
-        Ra_start = 1
+        Ra_start = 1.
     if gpas_start <= 0:  # ValueError: Ra must be > 0.
         gpas_start = 0.0000001
     if cm_start <= 0:
@@ -69,29 +67,27 @@ for i in range(num_of_iter):
     Ra_cm_gpas = ParameterSet(Ra, cm, gpas)
     inference = IndependentInference(data, Ra_cm_gpas, working_path="/Users/Dani/TDK/parameter_estim/stim_protocol2/zap/0", speed='min')
 
-    multi_comp = partial(stick_and_ball, stype='custom', stim_vec=stim)  # fix chosen stimulus type for simulations
+    multi_comp = partial(stick_and_ball, stype='custom', custom_stim=stim)  # fix chosen stimulus type for simulations
 
     if __name__ == '__main__':
         inference.run_sim(multi_comp, noise_sigma)
 
     inference.run_evaluation()
 
-    # Plot some single joint distribution
-    if i == num_of_iter-1:
-        plot_res(inference, Ra, gpas)
-        plot_res(inference, Ra, cm)
-        plot_res(inference, cm, gpas)
+    if inference.analyse_result() is None:
+        print "\nCouldn't fit gauss to data!"
+        Ra_stat = np.delete(Ra_stat, (i-m), axis=0)
+        gpas_stat = np.delete(gpas_stat, (i-m), axis=0)
+        cm_stat = np.delete(cm_stat, (i-m), axis=0)
+        m += 1
+    else:
+        Ras, cms, gpass = inference.analyse_result()
 
-    # Do statistics for the current inference
-    Ra_stat[i, 0], Ra_stat[i, 1], Ra_stat[i, 2], Ra_stat[i, 3], Ra_stat[4] = stat(Ra)
-    gpas_stat[i, 0], gpas_stat[i, 1], gpas_stat[i, 2], gpas_stat[i, 3], gpas_stat[4] = stat(gpas)
-    cm_stat[i, 0], cm_stat[i, 1], cm_stat[i, 2], cm_stat[i, 3], cm_stat[4] = stat(cm)
+        # Do statistics for the current inference
+        Ra_stat[i-m, 0], Ra_stat[i-m, 1], Ra_stat[i-m, 2], Ra_stat[i-m, 3], Ra_stat[i-m, 4], Ra_stat[i-m,5] = Ras
+        cm_stat[i-m, 0], gpas_stat[i-m, 1], gpas_stat[i-m, 2], gpas_stat[i-m, 3], gpas_stat[i-m, 4], gpas_stat[i-m, 5] = cms
+        gpas_stat[i-m, 0], cm_stat[i-m, 1], cm_stat[i-m, 2], cm_stat[i-m, 3], cm_stat[i-m, 4], gpas_stat[i-m, 5] = gpass
 
-    print "\nsig\t rdiff\t acc\t sharper\t sig_err"
-    print "Ra: " + str(Ra_stat[i, :])
-    print "cm: " + str(cm_stat[i, :])
-    print "Ra: " + str(gpas_stat[i, :])
-    print "\n"
 
 runningTime = (time.time() - startTime) / 60
 lasted = "The Ra-gpas-cm ball-and-stick simulation was running for %f minutes\n" % runningTime
@@ -105,11 +101,11 @@ header3 = "Number of simulations: " + str(num_of_iter) + '\n' + setup3 + configu
 
 # Save out statistic to file for occurent later analysis
 np.savetxt(fname='/Users/Dani/TDK/parameter_estim/stim_protocol2/zap/0/Ra_stat.txt', X=Ra_stat,
-           header=header1 + 'sigma\tdiff\taccuracy\tsharper\tsigma_err', delimiter='\t')
+           header=header1 + '\nsigma\tsigma_err\trdiff\taccuracy\tsharper\tbroadness', delimiter='\t')
 np.savetxt(fname='/Users/Dani/TDK/parameter_estim/stim_protocol2/zap/0/gpas_stat.txt', X=gpas_stat,
-           header=header2 + '\nsigma\tdiff\taccuracy\tsharper\tsigma_err', delimiter='\t')
+           header=header2 + '\nsigma\tsigma_err\trdiff\taccuracy\tsharper\tbroadness', delimiter='\t')
 np.savetxt(fname='/Users/Dani/TDK/parameter_estim/stim_protocol2/zap/0/cm_stat.txt', X=cm_stat,
-           header=header3 + '\nsigma\tdiff\taccuracy\tsharper\tsigma_err', delimiter='\t')
+           header=header3 + '\nsigma\tsigma_err\trdiff\taccuracy\tsharper\tbroadness', delimiter='\t')
 
 # Plot statistics
 plot_stat(Ra_stat, pRa, path='/Users/Dani/TDK/parameter_estim/stim_protocol2/zap/0')

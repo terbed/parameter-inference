@@ -62,7 +62,7 @@ def sharpness(x, y):
     """
     max_idx = np.argmax(y)
 
-    res = np.linspace(0.5, 1., 50, dtype=float, endpoint=False)
+    res = np.linspace(0.5, 1., 50, endpoint=False, dtype=float)
     full_dev = 0.
     for i in res:
         value = y[max_idx] * i
@@ -70,6 +70,7 @@ def sharpness(x, y):
         try:
             left_idx = (np.abs(y[:max_idx] - value)).argmin()
             right_idx = len(y[:max_idx]) + (np.abs(y[max_idx:] - value)).argmin()
+            full_dev += np.abs(x[right_idx] - x[left_idx])
         except ValueError:
             print "ValueError in sharpness checking!"
             from matplotlib import pyplot as plt
@@ -77,13 +78,45 @@ def sharpness(x, y):
             plt.title("Fitted posterior")
             plt.plot(x,y)
             plt.show()
-            exit(17)
 
-        full_dev += np.abs(x[right_idx] - x[left_idx])
-
-    return full_dev / 50
+    return full_dev / 50.
 
 
+def fit_normal(x, y, *p_init):
+    try:
+        p_opt, p_cov = curve_fit(normal_val, x, y, p0=p_init)
+        p_err = np.sqrt(np.diag(p_cov))
+        return (p_opt, p_err)
+    except (ValueError, RuntimeError) as err:
+        # ValueError: array must not contain infs or NaNs
+        # RuntimeError: Optimal parameters not found: Number of calls to function has reached maxfev = 600.
+        print "Something went wrong fitting gauss to data...\n"
+        print(err)
+        print(err.args)
+        return ([None, None], [None, None])
+
+
+def analyse(param, p_opt):
+    # Create high resolution (prior and) posterior from fitted function
+    x = np.linspace(param.range_min, param.range_max, 5000)
+    prior = normal(x, param.mean, param.sigma)
+    posterior = normal(x, p_opt[0][0], p_opt[0][1])
+
+    # Do some statistics
+    true_idx = (np.abs(x - param.value)).argmin()
+
+    sharper = sharpness(x, prior) / sharpness(x, posterior)
+    broadness = sharpness(x, posterior) / sharpness(x, prior) * 100
+    rdiff = (p_opt[0][0] - param.value) / param.value * 100
+    accuracy = posterior[true_idx] / np.amax(posterior) * 100
+
+    # The relative sigma + mean error
+    fit_err = (abs(p_opt[1][1])/abs(p_opt[0][1]) + abs(p_opt[1][0])/abs(p_opt[0][0]))*100
+
+    return abs(p_opt[0][1]), fit_err, rdiff, accuracy, sharper, broadness
+
+
+# OLD...
 def stat(param):
     """
     Create statistic for the inference
@@ -93,17 +126,13 @@ def stat(param):
     """
     true_param = param.value
 
-    # Fit gaussian to data points
-    # Normal distribution function [the fitting may yield negative sigma values!!! ABS!]
-    def gauss(x, mean, sigma):
-        return 1 / np.sqrt(2 * np.pi * sigma ** 2) * np.exp(-(x - mean) ** 2 / (2 * sigma ** 2))
-
     p_init = [param.mean, param.sigma]
     p_opt = [0,0]
     p_err = [0,0]
     try:
         p_opt, p_cov = curve_fit(normal_val, param.values, param.posterior, p0=p_init)
         p_err = np.sqrt(np.diag(p_cov))
+        print "\nError of fitting gauss to posterior: " + str(p_err)
     except (ValueError, RuntimeError) as err:
         # ValueError: array must not contain infs or NaNs
         # RuntimeError: Optimal parameters not found: Number of calls to function has reached maxfev = 600.
@@ -112,7 +141,7 @@ def stat(param):
         print(err.args)
         p_opt[1] = param.sigma
         p_err[1] = 0.
-        return abs(p_opt[1]), param.sigma, 0., 1., p_err[1]
+        return abs(p_opt[1]), param.sigma, 0., 1., p_err[1], 0.
 
     # Create high resolution (prior and) posterior from fitted function
     x = np.linspace(param.range_min, param.range_max, 10000)
@@ -127,10 +156,11 @@ def stat(param):
     true_idx = (np.abs(x - true_param)).argmin()
 
     sharper = sharpness(x, prior) / sharpness(x2, posharp)
-    diff = np.abs(p_opt[0] - true_param)
+    broader = sharpness(x2, posharp) / sharpness(x, prior)
+    diff = p_opt[0] - true_param
     accuracy = np.multiply(posterior[true_idx] / np.amax(posharp), 100)
 
-    return abs(p_opt[1]), diff, accuracy, sharper, p_err[1]
+    return abs(p_opt[1]), diff, accuracy, sharper, p_err[1], broader
 
 
 def kl_test(posterior, prior, step, eps=0.0001):

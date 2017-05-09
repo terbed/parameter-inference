@@ -2,31 +2,44 @@
 This module is to plot the results
 """
 from module.prior import normal
-from matplotlib import pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
+#from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm as CM
 import matplotlib.patches as mpatches
-from matplotlib.ticker import MultipleLocator, FormatStrFormatter, ScalarFormatter, MaxNLocator
-import numpy as np
+#from matplotlib.ticker import MultipleLocator, FormatStrFormatter, ScalarFormatter, MaxNLocator
 import os
+import numpy as np
+from matplotlib import cm as CM
+from matplotlib import pyplot as plt
+from module.prior import normal
 
 
 def check_directory(working_path):
     if not os.path.exists(working_path):
         os.makedirs(working_path)
 
+
 def save_file(X, path, name, header=''):
-    i=0
-    while os.path.exists('{}({:d}).txt'.format(path+"/"+name, i)):
+    i = 0
+    while os.path.exists('{}({:d}).txt'.format(path + "/" + name, i)):
         i += 1
-    np.savetxt('{}({:d}).txt'.format(path+"/"+name, i), X, header=header, delimiter='\t')
+    np.savetxt('{}({:d}).txt'.format(path + "/" + name, i), X, header=header, delimiter='\t')
+
+
+def save_params(params, path):
+    for item in params:
+        i = 0
+        while os.path.exists('{}({:d}).txt'.format(path + "/" + item.name, i)):
+            i += 1
+        np.savetxt('{}({:d}).txt'.format(path + "/" + item.name, i), item.init, fmt="%s")
 
 def fullplot(result):
     """
-    
+
     :param result: Inference object after computed results
     :return: Plots a joint and marginal full plot
     """
+    from module.prior import normal
+
     plt.close('all')
     pnum = len(result.p.params)
 
@@ -34,9 +47,9 @@ def fullplot(result):
     if pnum < 2:
         return 0
 
-    num_of_plot = pnum + (pnum**2 - pnum)/2
+    num_of_plot = pnum + (pnum ** 2 - pnum) / 2
 
-    f, ax = plt.subplots(pnum, pnum, figsize=(14,9))
+    f, ax = plt.subplots(pnum, pnum, figsize=(14, 9))
     f.subplots_adjust(hspace=.001, wspace=.001)
 
     for row in range(pnum):
@@ -49,11 +62,13 @@ def fullplot(result):
                 ax[row, col].plot(result.p.params[i].values, result.p.params[i].likelihood, marker='o', color="#ffc82e")
                 ax[row, col].axvline(result.p.params[i].value, color='#3acead', linewidth=0.8, alpha=1)
 
-                ax[row, col].tick_params(axis='y', which='both', left='off', right='on', labelleft='off', labelright='on')
-                ax[row, col].tick_params(axis='x', which='both', top='off', bottom='off', labelbottom='off', labeltop='off')
+                ax[row, col].tick_params(axis='y', which='both', left='off', right='on', labelleft='off',
+                                         labelright='on')
+                ax[row, col].tick_params(axis='x', which='both', top='off', bottom='off', labelbottom='off',
+                                         labeltop='off')
                 ax[row, col].xaxis.set_label_position('top')
 
-                if row == pnum-1:
+                if row == pnum - 1:
                     ax[row, col].tick_params(axis='x', which='both', top='off', bottom='on', labelbottom='on',
                                              labeltop='off')
             # Joint plots
@@ -74,14 +89,15 @@ def fullplot(result):
                 cs = ax[row, col].contour(x, y, likelihood)
                 if col == 0:
                     ax[row, col].set_ylabel(result.p.params[row].name + ' ' + result.p.params[row].unit)
-                #ax[row, col].clabel(cs, inline=1, fontsize=5)
+                # ax[row, col].clabel(cs, inline=1, fontsize=5)
 
                 # Set up labels
-                ax[row, col].tick_params(axis='y', which='both', left='off', right='off', labelleft='off', labelright='off')
-                ax[row, col].tick_params(axis='x', which='both', top='off', bottom='off', labelbottom='off', labeltop='off')
+                ax[row, col].tick_params(axis='y', which='both', left='off', right='off', labelleft='off',
+                                         labelright='off')
+                ax[row, col].tick_params(axis='x', which='both', top='off', bottom='off', labelbottom='off',
+                                         labeltop='off')
 
-
-                if row == pnum-1:
+                if row == pnum - 1:
                     ax[row, col].tick_params(axis='x', which='both', top='off', bottom='on', labelbottom='on',
                                              labeltop='off')
                     ax[row, col].set_xlabel(result.p.params[col].name + ' ' + result.p.params[col].unit)
@@ -92,13 +108,12 @@ def fullplot(result):
             else:
                 ax[row, col].set_axis_off()
 
-    i=0
+    i = 0
     while os.path.exists('{}({:d}).png'.format(result.working_path + "/fullplot_L", i)):
         i += 1
     plt.savefig('{}({:d}).png'.format(result.working_path + "/fullplot_L", i))
 
-
-    f, ax = plt.subplots(pnum, pnum, figsize=(14,9))
+    f, ax = plt.subplots(pnum, pnum, figsize=(14, 9))
     f.subplots_adjust(hspace=.001, wspace=.001)
 
     for row in range(pnum):
@@ -109,15 +124,24 @@ def fullplot(result):
                 ax[i, i].grid()
                 ax[row, col].axvline(result.p.params[i].value, color='#3acead', linewidth=0.8, alpha=1)
                 ax[row, col].set_xlabel(result.p.params[i].name + ' ' + result.p.params[i].unit)
-                ax[row, col].plot(result.p.params[i].values, result.p.params[i].posterior, marker='o', color="#FF5F2E", label="posterior")
-                ax[row, col].plot(result.p.params[i].values, result.p.params[i].prior, color="#2EFFC8", label="prior")
-                ax[row, col].legend()
+                ax[row, col].plot(result.p.params[i].values, result.p.params[i].posterior, 'o', color="#FF5F2E",
+                                  label="posterior")
 
-                ax[row, col].tick_params(axis='y', which='both', left='off', right='on', labelleft='off', labelright='on')
-                ax[row, col].tick_params(axis='x', which='both', top='off', bottom='off', labelbottom='off', labeltop='off')
+                tt = np.linspace(result.p.params[i].range_min, result.p.params[i].range_max, 2000)
+                fitted = normal(tt, result.p.params[i].fitted_gauss[0][0], result.p.params[i].fitted_gauss[0][1])
+                ax[row, col].plot(tt, fitted, color="#FF5F2E", label="fitted")
+
+                ax[row, col].plot(result.p.params[i].values, result.p.params[i].prior, color="#2EFFC8", label="prior")
+                # leg = ax[row, col].legend()
+                # leg.get_frame().set_alpha(0.3)
+
+                ax[row, col].tick_params(axis='y', which='both', left='off', right='on', labelleft='off',
+                                         labelright='on')
+                ax[row, col].tick_params(axis='x', which='both', top='off', bottom='off', labelbottom='off',
+                                         labeltop='off')
                 ax[row, col].xaxis.set_label_position('top')
 
-                if row == pnum-1:
+                if row == pnum - 1:
                     ax[row, col].tick_params(axis='x', which='both', top='off', bottom='on', labelbottom='on',
                                              labeltop='off')
             # Joint plots
@@ -137,13 +161,15 @@ def fullplot(result):
                 cs = ax[row, col].contour(x, y, posterior)
                 if col == 0:
                     ax[row, col].set_ylabel(result.p.params[row].name + ' ' + result.p.params[row].unit)
-                #ax[row, col].clabel(cs, inline=1, fontsize=5)
+                # ax[row, col].clabel(cs, inline=1, fontsize=5)
 
                 # Set up labels
-                ax[row, col].tick_params(axis='y', which='both', left='off', right='off', labelleft='off', labelright='off')
-                ax[row, col].tick_params(axis='x', which='both', top='off', bottom='off', labelbottom='off', labeltop='off')
+                ax[row, col].tick_params(axis='y', which='both', left='off', right='off', labelleft='off',
+                                         labelright='off')
+                ax[row, col].tick_params(axis='x', which='both', top='off', bottom='off', labelbottom='off',
+                                         labeltop='off')
 
-                if row == pnum-1:
+                if row == pnum - 1:
                     ax[row, col].tick_params(axis='x', which='both', top='off', bottom='on', labelbottom='on',
                                              labeltop='off')
                     ax[row, col].set_xlabel(result.p.params[col].name + ' ' + result.p.params[col].unit)
@@ -154,13 +180,13 @@ def fullplot(result):
             else:
                 ax[row, col].set_axis_off()
 
-    i=0
+    i = 0
     while os.path.exists('{}({:d}).png'.format(result.working_path + "/fullplot_P", i)):
         i += 1
     plt.savefig('{}({:d}).png'.format(result.working_path + "/fullplot_P", i))
 
 
-def plot_res(result, param1, param2):
+def plot_joint(result, param1, param2):
     """
     Plot 2 parameters with single marginal plots and a 3d plot
 
@@ -188,13 +214,14 @@ def plot_res(result, param1, param2):
     if len(result.p.params) > 2:
         for idx, item in enumerate(result.p.params):
             if idx != ax1 and idx != ax2:
-                likelihood = np.sum(likelihood, axis=idx)*item.step
-                posterior = np.sum(posterior, axis=idx)*item.step
+                likelihood = np.sum(likelihood, axis=idx) * item.step
+                posterior = np.sum(posterior, axis=idx) * item.step
 
-    print "Is the JOINT posterior a probability distribution? Integrate(posterior) = " + str(np.sum(posterior)*param1.step*param2.step)
+    print "Is the JOINT posterior a probability distribution? Integrate(posterior) = " + str(
+        np.sum(posterior) * param1.step * param2.step)
 
     # 3d plot
-    fig = plt.figure(figsize=(12,8))
+    fig = plt.figure(figsize=(12, 8))
     ax = fig.gca(projection='3d')
     x, y = np.meshgrid(param2.values, param1.values)
     ax.plot_surface(x, y, likelihood, rstride=1, cstride=1, alpha=0.3, cmap=CM.rainbow)
@@ -210,7 +237,7 @@ def plot_res(result, param1, param2):
         i += 1
     plt.savefig('{}({:d}).png'.format(filename, i))
 
-    fig = plt.figure(figsize=(12,8))
+    fig = plt.figure(figsize=(12, 8))
     ax = fig.gca(projection='3d')
     x, y = np.meshgrid(param2.values, param1.values)
     ax.plot_surface(x, y, posterior, rstride=1, cstride=1, alpha=0.3, cmap=CM.rainbow)
@@ -258,15 +285,21 @@ def marginal_plot(param, path=''):
     check_directory(path + "/marginal")
 
     # Check posterior distribution correctness
-    print "The MARGINAL posterior is probability distributions? Integrate(posterior) = " + str(np.sum(param.posterior)*param.step)
+    print "The MARGINAL posterior is probability distributions? Integrate(posterior) = " + str(
+        np.sum(param.posterior) * param.step)
 
     # Plot posterior
     plt.figure(figsize=(12,8))
     plt.title(param.name + " posterior (r) and prior (b) distribution")
     plt.xlabel(param.name + ' ' + param.unit)
     plt.ylabel("p")
-    plt.plot(param.values, param.posterior,  marker='o', color="#FF5F2E", label="posterior")
+    plt.plot(param.values, param.posterior,  'o', color="#FF5F2E", label="posterior")
     plt.plot(param.values, param.prior, color='#2FA5A0')
+
+    tt = np.linspace(param.range_min, param.range_max, 2000)
+    fitted = normal(tt, param.fitted_gauss[0][0], param.fitted_gauss[0][1])
+    plt.plot(tt, fitted, color="#FF5F2E", label="fitted")
+
     plt.axvline(param.value, color='#34A52F')
     filename = path + "/marginal/" + param.name + "_P"
     i = 0
@@ -276,12 +309,12 @@ def marginal_plot(param, path=''):
     print "Plot done! File path: " + filename
 
     # Plot likelihood
-    plt.figure(figsize=(12,8))
+    plt.figure(figsize=(12, 8))
     plt.title(param.name + " likelihood (r) distribution")
     plt.xlabel(param.name + ' ' + param.unit)
     plt.ylabel("p")
     plt.axvline(param.value, color='#34A52F')
-    plt.plot(param.values, param.likelihood,  marker='o', color="#ffc82e")
+    plt.plot(param.values, param.likelihood, marker='o', color="#ffc82e")
 
     filename = path + "/marginal/" + param.name + "_L"
     i = 0
@@ -293,57 +326,50 @@ def marginal_plot(param, path=''):
 
 def plot_stat(stat, param, path='', bin=None):
 
-    def reject_outliers(data, m=2):
-        return data[abs(data - np.mean(data)) < m * np.std(data)]
+    avrg_sigma = np.average(stat[:, 0])
+    std_sigma = np.std(stat[:, 0])
 
-    def reject_outliers_avrg(data, m=2):
-        """
-        :param data: Data to filter outliers
-        :param m: m times std is acceptable
-        :return: tuple: (average of data without outliers, number of outliers)
-        """
-        rejected = data[abs(data - np.mean(data)) < m * np.std(data)]
-        outliers = len(data) - len(rejected)
-        return np.average(rejected), outliers
+    avrg_sigma_err = np.average(stat[:,1])
 
-    avrg_sigma = np.average(abs(stat[:, 0]))
-    std_sigma = np.std(abs(stat[:, 0]))
+    avrg_rdiff = np.average(abs(stat[:, 2]))
+    std_rdiff = np.std(abs(stat[:, 2]))
 
-    max_sigma_err = np.max(stat[:, 4])
+    avrg_acc = np.average(stat[:, 3])
+    std_acc = np.std(stat[:, 3])
 
-    print "Maximum %s sigma error of normal fitting: %.2f percentage" % (param.name, (max_sigma_err/avrg_sigma*100))
+    avrg_sharp = np.average(stat[:, 4])
+    std_sharp = np.std(stat[:, 4])
 
-    avrg_diff = np.average(stat[:, 1])
-    std_diff = np.std(stat[:, 1])
-
-    avrg_acc = np.average(stat[:, 2])
-    std_acc = np.std(stat[:, 2])
-
-    avrg_sharp = np.average(stat[:, 3])
-    std_sharp = np.std(stat[:,3])
+    avrg_broad = np.average(stat[:, 5])
+    std_broad = np.std(stat[:, 5])
 
     # Plot illustration
-    x = np.linspace(param.range_min, param.range_max, 3000)
+    x = np.linspace(param.range_min, param.range_max,  2000, dtype=float)
     prior = normal(x, param.mean, param.sigma)
+
     posterior = normal(x, param.mean, avrg_sigma)
     post_max = np.amax(posterior)
 
-    plt.figure(figsize=(12,8))
-    plt.title(' [rdiff(g): %.0f, acc(b): %.2f, gain: (%.2f pm %.2f)] ' % (avrg_diff/param.value*100, avrg_acc, avrg_sharp, std_sharp) + param.name)
+
+    plt.figure(figsize=(12, 8))
+    plt.title('rdiff(g): %.0f%%, acc(b): %.2f%%, gain: (%.2f pm %.2f), broad: (%.1f%% pm %.1f%%) |' % (
+        avrg_rdiff, avrg_acc, avrg_sharp, std_sharp, avrg_broad, std_broad) + param.name)
     plt.xlabel(param.name + ' ' + param.unit)
     plt.ylabel('Probability')
     plt.grid(True)
     plt.plot(x, posterior, color='#9c3853', label="posterior")
     plt.plot(x, prior, color='#2FA5A0', label="prior")
-    plt.axvspan(param.mean-avrg_diff - std_diff, param.mean+avrg_diff + std_diff, facecolor='g', alpha=0.1)
-    #plt.axvline(x=param.mean+avrg_diff, color='#389c81')
-    #plt.axvline(x=param.mean-avrg_diff, color='#389c81')
-    #plt.axhline(y=(avrg_acc/100)*post_max, xmin=0, xmax=1000, color='#38539C', linewidth=1)
-    plt.axhspan((avrg_acc/100)*post_max-(std_acc/100)*post_max, (avrg_acc/100)*post_max+(std_acc/100)*post_max,
+    diff = avrg_rdiff/100*param.value
+    std = std_rdiff/100*param.value
+    plt.axvspan(param.mean - diff - std, param.mean + diff + std, facecolor='g', alpha=0.1)
+    # plt.axvline(x=param.mean+avrg_diff, color='#389c81')
+    # plt.axvline(x=param.mean-avrg_diff, color='#389c81')
+    # plt.axhline(y=(avrg_acc/100)*post_max, xmin=0, xmax=1000, color='#38539C', linewidth=1)
+    plt.axhspan((avrg_acc / 100) * post_max - (std_acc / 100) * post_max,
+                (avrg_acc / 100) * post_max + (std_acc / 100) * post_max,
                 facecolor='b', alpha=0.1)
     plt.legend()
-    plt.savefig(path + "/illustration_"+param.name+".png")
-
+    plt.savefig(path + "/illustration_" + param.name + ".png")
 
     # # Plot shape of posterior
     # max_p = normal(x, param.mean, avrg_sigma + std_sigma)
@@ -368,40 +394,50 @@ def plot_stat(stat, param, path='', bin=None):
     # plt.savefig(path + "/plook_"+param.name+".png")
 
 
-    avrg_diff, out_diff = reject_outliers_avrg(stat[:, 1])
-    avrg_acc, out_acc = reject_outliers_avrg(stat[:, 2])
-    avrg_sharp, out_sharp = reject_outliers_avrg(stat[:, 3])
-
-    rel_diff = np.multiply(stat[:, 1], 1/param.value)*100
-
     # Plot histograms
     check_directory(path + "/histograms")
     if bin is None:
-        bin = int(len(stat[:, 0])/2)
+        bin = int(len(stat[:, 0]) / 2)
 
-    plt.figure(figsize=(12,8))
+    plt.figure(figsize=(12, 8))
     plt.title("Relative deviation of true parameter | " + param.name + " " + str(param.mean))
-    plt.xlabel(param.name + ' ' + param.unit + ' (average: %.2e | outliers: %d)' % (avrg_diff/param.value*100, out_diff))
+    plt.xlabel(param.name + ' (average: %.1f%%)' % avrg_rdiff)
     plt.ylabel('Occurrence ')
     plt.grid(True)
-    plt.hist(rel_diff, bin, facecolor='#D44A4B', normed=False)
-    plt.savefig(path + "/histograms/rdeviation_"+param.name+".png")
+    plt.hist(stat[:,2], bin, facecolor='#D44A4B', normed=False)
+    plt.savefig(path + "/histograms/rdeviation_" + param.name + ".png")
 
-    plt.figure(figsize=(12,8))
+    plt.figure(figsize=(12, 8))
     plt.title("Accuracy | " + param.name)
-    plt.xlabel("p_true/p_max" + ' (average: %.2f | outliers: %d)' % (avrg_acc, out_acc))
+    plt.xlabel("p_true/p_max" + ' (average: %.1f%% )' % avrg_acc)
     plt.ylabel('Occurrence')
     plt.grid(True)
-    plt.hist(stat[:, 2], bin, facecolor='#3BA9A8', normed=False)
-    plt.savefig(path + "/histograms/accuracy_"+param.name+".png")
+    plt.hist(stat[:, 3], bin, facecolor='#3BA9A8', normed=False)
+    plt.savefig(path + "/histograms/accuracy_" + param.name + ".png")
 
-    plt.figure(figsize=(12,8))
+    plt.figure(figsize=(12, 8))
     plt.title("Posterior how many times sharper than prior | " + param.name)
-    plt.xlabel("Information gain" + ' ' + '(average: %.3f | outliers: %d)' % (avrg_sharp, out_sharp))
+    plt.xlabel("(prior sharpness)/(posterior sharpness)" + ' ' + '(avrg: %.2f )' % avrg_sharp)
     plt.ylabel('Occurrence')
     plt.grid(True)
-    plt.hist(stat[:, 3], bin, facecolor='#4A4BD4', normed=False)
-    plt.savefig(path + "/histograms/igain_"+param.name+".png")
+    plt.hist(stat[:, 4], bin, facecolor='#4A4BD4', normed=False)
+    plt.savefig(path + "/histograms/pSharpness_" + param.name + ".png")
+
+    plt.figure(figsize=(12, 8))
+    plt.title("Posterior broadness relative to prior | " + param.name)
+    plt.xlabel("(posterior sharpness)/(prior sharpness)*100" + ' ' + '(avrg: %.1f%% )' % avrg_broad)
+    plt.ylabel('Occurrence')
+    plt.grid(True)
+    plt.hist(stat[:, 5], bin, facecolor='#d4d34a', normed=False)
+    plt.savefig(path + "/histograms/pBroadness_" + param.name + ".png")
+
+    plt.figure(figsize=(12, 8))
+    plt.title("Relative error of fitting | " + param.name)
+    plt.xlabel("(sigma_err/sigma + mean_err/mean)*100" + ' ' + '(avrg: %.1f%% )' % avrg_sigma_err)
+    plt.ylabel('Occurrence')
+    plt.grid(True)
+    plt.hist(stat[:, 1], bin, facecolor='#3ce1bb', normed=False)
+    plt.savefig(path + "/histograms/fiterr_" + param.name + ".png")
 
     # plt.figure()
     # plt.title("Fitted gaussian sigma parameter | " + param.name)
@@ -413,39 +449,16 @@ def plot_stat(stat, param, path='', bin=None):
 
 if __name__ == '__main__':
     from module.probability import RandomVariable
-    from module.probability import IndependentInference
-    from module.simulation import one_compartment
-    from module.probability import ParameterSet
-    from module.noise import white
-    from matplotlib import pyplot as plt
 
-    cm_mean = 1.
-    cm_sig = 0.2
-    gpas_mean = 0.0001
-    gpas_sig = 0.00002
+    pRa = RandomVariable(name='Ra', range_min=50, range_max=150, resolution=40, mean=100., sigma=20)
+    pgpas = RandomVariable(name='gpas', range_min=0.00005, range_max=0.00015, resolution=40, mean=0.0001, sigma=0.00002)
+    pcm = RandomVariable(name='cm', range_min=0.5, range_max=1.5, resolution=40, mean=1., sigma=0.2)
 
-    cm_start = 0.5
-    cm_end = 1.5
+    cm_stat = np.loadtxt("/Users/Dani/TDK/parameter_estim/stim_protocol2/ramp/cm_stat.txt")
+    Ra_stat = np.loadtxt("/Users/Dani/TDK/parameter_estim/stim_protocol2/ramp/Ra_stat.txt")
+    gpas_stat = np.loadtxt("/Users/Dani/TDK/parameter_estim/stim_protocol2/ramp/gpas_stat.txt")
 
-    gpas_start = gpas_mean - 0.00005
-    gpas_end = gpas_mean + 0.00005
+    plot_stat(cm_stat, pcm, path="/Users/Dani/TDK/parameter_estim/stim_protocol2/ramp")
+    plot_stat(Ra_stat, pRa, path="/Users/Dani/TDK/parameter_estim/stim_protocol2/ramp")
+    plot_stat(gpas_stat, pgpas, path="/Users/Dani/TDK/parameter_estim/stim_protocol2/ramp")
 
-    cm = RandomVariable(name='cm', range_min=cm_start, range_max=cm_end, resolution=50, mean=cm_mean, sigma=cm_sig)
-    gpas = RandomVariable(name='gpas', range_min=gpas_start, range_max=gpas_end, resolution=50, mean=gpas_mean, sigma=gpas_sig)
-
-    exp_noise = 7.
-    t, v = one_compartment()
-    exp_v = white(exp_noise, v)
-
-    plt.figure()
-    plt.plot(t, exp_v)
-    plt.show()
-
-    cm_gpas = ParameterSet(cm, gpas)
-    inf = IndependentInference(exp_v, cm_gpas, working_path="/Users/Dani/TDK/parameter_estim/3param")
-
-    inf.run_sim(one_compartment, exp_noise)
-    inf.run_evaluation()
-
-    print inf
-    plot_res(inf, cm, gpas)
