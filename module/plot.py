@@ -2,10 +2,9 @@
 This module is to plot the results
 """
 from module.prior import normal
-#from mpl_toolkits.mplot3d import Axes3D
+from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm as CM
 import matplotlib.patches as mpatches
-#from matplotlib.ticker import MultipleLocator, FormatStrFormatter, ScalarFormatter, MaxNLocator
 import os
 import numpy as np
 from matplotlib import cm as CM
