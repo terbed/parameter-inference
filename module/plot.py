@@ -289,17 +289,18 @@ def marginal_plot(param, path=''):
 
     # Plot posterior
     plt.figure(figsize=(12,8))
+    plt.grid()
     plt.title(param.name + " posterior (r) and prior (b) distribution")
     plt.xlabel(param.name + ' ' + param.unit)
     plt.ylabel("p")
     plt.plot(param.values, param.posterior,  'o', color="#FF5F2E", label="posterior")
-    plt.plot(param.values, param.prior, color='#2FA5A0')
+    plt.plot(param.values, param.prior, color='#2FA5A0', label="prior")
 
     tt = np.linspace(param.range_min, param.range_max, 2000)
     fitted = normal(tt, param.fitted_gauss[0][0], param.fitted_gauss[0][1])
-    plt.plot(tt, fitted, color="#FF5F2E", label="fitted")
-
-    plt.axvline(param.value, color='#34A52F')
+    plt.plot(tt, fitted, color="#FF5F2E", label="fitted posterior")
+    plt.axvline(param.value, color='#34A52F', label = "true value", linestyle='dashed')
+    plt.legend()
     filename = path + "/marginal/" + param.name + "_P"
     i = 0
     while os.path.exists('{}({:d}).png'.format(filename, i)):
@@ -309,12 +310,13 @@ def marginal_plot(param, path=''):
 
     # Plot likelihood
     plt.figure(figsize=(12, 8))
-    plt.title(param.name + " likelihood (r) distribution")
+    plt.title(param.name + " likelihood distribution")
+    plt.grid()
     plt.xlabel(param.name + ' ' + param.unit)
     plt.ylabel("p")
-    plt.axvline(param.value, color='#34A52F')
-    plt.plot(param.values, param.likelihood, marker='o', color="#ffc82e")
-
+    plt.axvline(param.value, color='#34A52F', label="ture value", linestyle='dashed')
+    plt.plot(param.values, param.likelihood, marker='o', color="#ffc82e", label="likelihood")
+    plt.legend()
     filename = path + "/marginal/" + param.name + "_L"
     i = 0
     while os.path.exists('{}({:d}).png'.format(filename, i)):
