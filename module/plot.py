@@ -85,8 +85,8 @@ def fullplot(result):
                             likelihood = np.sum(likelihood, axis=idx) * item.step
 
                 # Contour plot
-                x, y = np.meshgrid(result.p.params[col].values, result.p.params[row].values)
-                cs = ax[row, col].contour(x, y, likelihood)
+                y, x = np.meshgrid(result.p.params[row].values, result.p.params[col].values)
+                cs = ax[row, col].contour(x, y, likelihood, cmap=CM.rainbow)
                 if col == 0:
                     ax[row, col].set_ylabel(result.p.params[row].name + ' ' + result.p.params[row].unit)
                 # ax[row, col].clabel(cs, inline=1, fontsize=5)
@@ -157,8 +157,8 @@ def fullplot(result):
                             posterior = np.sum(posterior, axis=idx) * item.step
 
                 # Contour plot
-                x, y = np.meshgrid(result.p.params[col].values, result.p.params[row].values)
-                cs = ax[row, col].contour(x, y, posterior)
+                y, x = np.meshgrid(result.p.params[row].values, result.p.params[col].values)
+                cs = ax[row, col].contour(x, y, posterior, cmap=CM.rainbow)
                 if col == 0:
                     ax[row, col].set_ylabel(result.p.params[row].name + ' ' + result.p.params[row].unit)
                 # ax[row, col].clabel(cs, inline=1, fontsize=5)
@@ -225,7 +225,7 @@ def plot_joint(result, param1, param2):
     ax = fig.gca(projection='3d')
     x, y = np.meshgrid(param2.values, param1.values)
     ax.plot_surface(x, y, likelihood, rstride=1, cstride=1, alpha=0.3, cmap=CM.rainbow)
-    ax.contourf(x, y, likelihood, zdir='z', offset=0, cmap=CM.rainbow)
+    ax.contour(x, y, likelihood, zdir='z', offset=0, cmap=CM.rainbow)
     ax.contourf(x, y, likelihood, zdir='x', offset=param2.range_min, cmap=CM.rainbow)
     ax.contourf(x, y, likelihood, zdir='y', offset=param1.range_max, cmap=CM.rainbow)
     ax.set_title("Joint likelihood")
@@ -242,7 +242,7 @@ def plot_joint(result, param1, param2):
     x, y = np.meshgrid(param2.values, param1.values)
     ax.plot_surface(x, y, posterior, rstride=1, cstride=1, alpha=0.3, cmap=CM.rainbow)
     # ax.plot_surface(x, y, result.p.joint_prior, rstride=1, cstride=1, alpha=0.3, cmap=CM.rainbow)
-    ax.contourf(x, y, posterior, zdir='z', offset=0, cmap=CM.rainbow)
+    ax.contour(x, y, posterior, zdir='z', offset=0, cmap=CM.rainbow)
     ax.contourf(x, y, posterior, zdir='x', offset=param2.range_min, cmap=CM.rainbow)
     ax.contourf(x, y, posterior, zdir='y', offset=param1.range_max, cmap=CM.rainbow)
     ax.set_title("Joint posterior")
@@ -438,6 +438,8 @@ def plot_stat(stat, param, path='', bin=None):
     plt.grid(True)
     plt.hist(stat[:, 1], bin, facecolor='#3ce1bb', normed=False)
     plt.savefig(path + "/histograms/fiterr_" + param.name + ".png")
+
+    print "Stat plotted to: " + path
 
     # plt.figure()
     # plt.title("Fitted gaussian sigma parameter | " + param.name)
