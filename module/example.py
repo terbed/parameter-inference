@@ -18,11 +18,12 @@ t, v = stick_and_ball()
 exp_v = white(noise, v)
 
 # 4.) Set up inference
-inf = IndependentInference(exp_v, cm_gpas, "/Users/Dani/TDK/parameter_estim/module/debug", speed='max')
+inf = IndependentInference(model=stick_and_ball, noise_std=noise, target_trace=exp_v, parameter_set=cm_gpas,
+                           working_path="/Users/Dani/TDK/parameter_estim/module/debug", speed='max', save=False)
 
 # 5.) Run inference
 if __name__ == "__main__":
-    inf.run_sim(stick_and_ball, noise)
+    inf.run_sim()
 
 # 6.) Run evaluation
 inf.run_evaluation()
