@@ -27,7 +27,7 @@ def load_inference(loglikelihood, working_path, *param_data):
             RandomVariable(item[0], float(item[1]), float(item[2]), float(item[3]), float(item[4]), float(item[5])))
 
     pset = ParameterSet(*p)
-    inf = Inference(target_trace=None, parameter_set=pset, working_path=working_path, save=False)
+    inf = Inference(model=None, target_trace=None, parameter_set=pset, working_path=working_path, save=False)
     inf.likelihood = loglikelihood
     print "Previous inference data result loaded!"
 

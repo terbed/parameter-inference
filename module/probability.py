@@ -44,6 +44,10 @@ class RandomVariable:
         self.posterior = []
         self.fitted_gauss = []
 
+        # Maximum inferred parameter values
+        self.max_p = None
+        self.max_l = None
+
         if self.value is None:
             self.value = self.mean
 
@@ -179,7 +183,7 @@ class Inference:
         :param noise: Noise sigma or inverse covariant matrix
         :param working_path: The result will be saved here
         :param debugging: 
-        :param speed: 'max', 'mid' or 'min'  multiprocessing options. In some system only the 'min' works...
+        :param speed: 'max', 'mid', 'min' or single multiprocessing options. In some system only the 'single' works...
         """
         self.m = model
         self.p = parameter_set
@@ -209,6 +213,7 @@ class Inference:
 
         self.__create_likelihood()
         self.__create_posterior()
+        self.__max_probability()
         self.__marginalize()
         self.__fit_posterior()
 
@@ -222,6 +227,14 @@ class Inference:
     def __create_posterior(self):
         self.posterior = np.multiply(self.likelihood, self.p.joint_prior)
         self.posterior /= np.sum(self.posterior) * self.p.joint_step
+
+    def __max_probability(self):
+        max_l = self.p.parameter_set_seq[np.argmax(self.likelihood)]
+        max_p = self.p.parameter_set_seq[np.argmax(self.posterior)]
+
+        for item in self.p.params:
+            item.max_l = max_l[item.name]
+            item.max_p = max_p[item.name]
 
     def __marginalize(self):
         for idx, item in enumerate(self.p.margin_ax):
@@ -300,7 +313,7 @@ class IndependentInference(Inference):
                 print "Running " + str(len(self.p.parameter_set_seq)) + " simulations on all cores..."
     
                 self.likelihood = pool.map(dev_func, self.p.parameter_set_seq)
-                self.likelihood = pool.map(log_likelihood_func, self.likelihood)
+                self.likelihood = map(log_likelihood_func, self.likelihood)
                 pool.close()
                 pool.join()
     
@@ -315,9 +328,13 @@ class IndependentInference(Inference):
             print "Running " + str(len(self.p.parameter_set_seq)) + " simulations on all cores..."
 
             self.likelihood = pool.map(dev_func, self.p.parameter_set_seq)
-            self.likelihood = pool.map(log_likelihood_func, self.likelihood)
+            self.likelihood = map(log_likelihood_func, self.likelihood)
             pool.close()
             pool.join()
+        elif self.speed == 'single':
+            print "Running " + str(len(self.p.parameter_set_seq)) + " simulations..."
+            log_likelihood_func = partial(likelihood.ill, model=self.m, target_trace=self.target, noise_sigma=self.std)
+            self.likelihood = map(log_likelihood_func, self.p.parameter_set_seq)
         else:
             pool = Pool(multiprocessing.cpu_count() - 1)
             log_likelihood_func = partial(likelihood.ill, model=self.m, target_trace=self.target, noise_sigma=self.std)
@@ -366,22 +383,25 @@ class DependentInference(Inference):
                 log_likelihood_func = partial(likelihood.log_likelihood, inv_covmat=self.invcovmat)
 
                 self.likelihood = pool.map(dev_func, self.p.parameter_set_seq)
-                self.likelihood = pool.map(log_likelihood_func, self.likelihood)
                 self.likelihood = map(log_likelihood_func, self.likelihood)
                 pool.close()
                 pool.join()
         elif self.speed == "mid":
-            print "Simulation running..."
+            print "Running " + str(len(self.p.parameter_set_seq)) + " simulations..."
             pool = Pool(multiprocessing.cpu_count() - 1)
 
             dev_func = partial(likelihood.deviation, model_func=self.m, target_trace=self.target)
             log_likelihood_func = partial(likelihood.log_likelihood, inv_covmat=self.invcovmat)
 
             self.likelihood = pool.map(dev_func, self.p.parameter_set_seq)
-            self.likelihood = pool.map(log_likelihood_func, self.likelihood)
             self.likelihood = map(log_likelihood_func, self.likelihood)
             pool.close()
             pool.join()
+        elif self.speed == "single":
+            print "Running " + str(len(self.p.parameter_set_seq)) + " simulations..."
+            log_likelihood_func = partial(likelihood.ll, model=self.m, target_trace=self.target,
+                                          inv_covmat=self.invcovmat)
+            self.likelihood = map(log_likelihood_func, self.p.parameter_set_seq)
         else:
             pool = Pool(multiprocessing.cpu_count() - 1)
             log_likelihood_func = partial(likelihood.ll, model=self.m, target_trace=self.target,

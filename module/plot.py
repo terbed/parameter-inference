@@ -60,6 +60,7 @@ def fullplot(result):
                 ax[row, col].set_xlabel(result.p.params[i].name + ' ' + result.p.params[i].unit)
                 ax[row, col].plot(result.p.params[i].values, result.p.params[i].likelihood, marker='o', color="#ffc82e")
                 ax[row, col].axvline(result.p.params[i].value, color='#3acead', linewidth=0.8, alpha=1)
+                ax[row, col].axvline(result.p.params[i].max_l, color='#FF1493', linewidth=0.8, alpha=1, linestyle='dashed')
 
                 ax[row, col].tick_params(axis='y', which='both', left='off', right='on', labelleft='off',
                                          labelright='on')
@@ -75,7 +76,9 @@ def fullplot(result):
                 likelihood = result.likelihood
                 ax[row, col].grid()
                 ax[row, col].axvline(result.p.params[col].value, color='#3acead', linewidth=0.8, alpha=1)
+                ax[row, col].axvline(result.p.params[col].max_l, color='#FF1493', linewidth=0.8, alpha=1, linestyle='dashed')
                 ax[row, col].axhline(result.p.params[row].value, color='#3acead', linewidth=0.8, alpha=1)
+                ax[row, col].axhline(result.p.params[row].max_l, color='#FF1493', linewidth=0.8, alpha=1, linestyle='dashed')
 
                 # Marginalize if needed
                 if len(result.p.params) > 2:
@@ -122,6 +125,8 @@ def fullplot(result):
                 i = row
                 ax[i, i].grid()
                 ax[row, col].axvline(result.p.params[i].value, color='#3acead', linewidth=0.8, alpha=1)
+                ax[row, col].axvline(result.p.params[i].max_p, color='#FF1493', linewidth=0.8, alpha=1, linestyle='dashed')
+
                 ax[row, col].set_xlabel(result.p.params[i].name + ' ' + result.p.params[i].unit)
                 ax[row, col].plot(result.p.params[i].values, result.p.params[i].posterior, 'o', color="#FF5F2E",
                                   label="posterior")
@@ -148,7 +153,10 @@ def fullplot(result):
                 posterior = result.posterior
                 ax[row, col].grid()
                 ax[row, col].axvline(result.p.params[col].value, color='#3acead', linewidth=0.8, alpha=1)
+                ax[row, col].axvline(result.p.params[col].max_p, color='#FF1493', linewidth=0.8, alpha=1, linestyle='dashed')
                 ax[row, col].axhline(result.p.params[row].value, color='#3acead', linewidth=0.8, alpha=1)
+                ax[row, col].axhline(result.p.params[row].max_p, color='#FF1493', linewidth=0.8, alpha=1, linestyle='dashed')
+
                 # Marginalize if needed
                 if len(result.p.params) > 2:
                     for idx, item in enumerate(result.p.params):
@@ -299,7 +307,8 @@ def marginal_plot(param, path=''):
     tt = np.linspace(param.range_min, param.range_max, 2000)
     fitted = normal(tt, param.fitted_gauss[0][0], param.fitted_gauss[0][1])
     plt.plot(tt, fitted, color="#FF5F2E", label="fitted posterior")
-    plt.axvline(param.value, color='#34A52F', label = "true value", linestyle='dashed')
+    plt.axvline(param.value, color='#34A52F', label="true value", linestyle='dashed')
+    plt.axvline(param.max_p, color='#FF1493', label="max inferred", linestyle='dotted')
     plt.legend()
     filename = path + "/marginal/" + param.name + "_P"
     i = 0
@@ -315,6 +324,7 @@ def marginal_plot(param, path=''):
     plt.xlabel(param.name + ' ' + param.unit)
     plt.ylabel("p")
     plt.axvline(param.value, color='#34A52F', label="ture value", linestyle='dashed')
+    plt.axvline(param.max_l, color='#FF1493', label="max inferred", linestyle='dotted')
     plt.plot(param.values, param.likelihood, marker='o', color="#ffc82e", label="likelihood")
     plt.legend()
     filename = path + "/marginal/" + param.name + "_L"
