@@ -33,8 +33,8 @@ for item in duration:
     :return:  Statistics
     """
 
-    stim = np.loadtxt("/Users/Dani/TDK/parameter_estim/stim_protocol2/steps/%i/stim.txt" % item)
-    working_path = "/Users/Dani/TDK/parameter_estim/stim_protocol2/steps/%i" % item
+    stim = np.loadtxt("/home/szabolcs/parameter_inference/stim_protocol2_v3/steps/%i/stim.txt" % item)
+    working_path = "/home/szabolcs/parameter_inference/stim_protocol2_v3/steps/%i" % item
 
     # Do statistics for each parameter
     stat_list = []

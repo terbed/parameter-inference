@@ -4,9 +4,9 @@ from functools import partial
 
 
 def get_default_param(name):
-    Ra = RandomVariable(name='Ra', range_min=50., range_max=150., resolution=60, mean=100., sigma=20.)
-    gpas = RandomVariable(name='gpas', range_min=0.00005, range_max=0.00015, resolution=60, mean=0.0001, sigma=0.00002)
-    cm = RandomVariable(name='cm', range_min=0.5, range_max=1.5, resolution=60, mean=1., sigma=0.2)
+    Ra = RandomVariable(name='Ra', range_min=50., range_max=150., resolution=50, mean=100., sigma=20.)
+    gpas = RandomVariable(name='gpas', range_min=0.00005, range_max=0.00015, resolution=50, mean=0.0001, sigma=0.00002)
+    cm = RandomVariable(name='cm', range_min=0.5, range_max=1.5, resolution=50, mean=1., sigma=0.2)
     dict = {'Ra' : Ra, 'cm': cm, 'gpas': gpas}
 
     return dict[name]
@@ -91,5 +91,20 @@ def load_statistics(n, p_names, path, working_path):
 
 
 if __name__ == "__main__":
-    load_statistics(50, ["Ra", "cm", "gpas"], "/Users/Dani/TDK/parameter_estim/stim_protocol2/ramp/loglikelihood",
-                    "/Users/Dani/TDK/parameter_estim/stim_protocol2/ramp")
+    # load_statistics(50, ["Ra", "cm", "gpas"], "/Users/Dani/TDK/parameter_estim/stim_protocol2/ramp/loglikelihood",
+    #                "/Users/Dani/TDK/parameter_estim/stim_protocol2/ramp")
+
+    cm = np.loadtxt("/Users/Dani/TDK/parameter_estim/stim_protocol2/zap/100/loglikelihood/cm(0).txt", dtype=str)
+    gpas = np.loadtxt("/Users/Dani/TDK/parameter_estim/stim_protocol2/zap/100/loglikelihood/gpas(0).txt", dtype=str)
+    Ra = np.loadtxt("/Users/Dani/TDK/parameter_estim/stim_protocol2/zap/100/loglikelihood/Ra(0).txt", dtype=str)
+    ll = np.loadtxt("/Users/Dani/TDK/parameter_estim/stim_protocol2/zap/100/loglikelihood/loglikelihood(0).txt")
+
+    inf = load_inference(ll, "/Users/Dani/TDK/parameter_estim/stim_protocol2/zap/100", Ra, cm, gpas)
+    inf.run_evaluation()
+    print inf
+    from module.plot import fullplot, plot_joint
+
+    plot_joint(inf, inf.p.params[0], inf.p.params[1])
+    plot_joint(inf, inf.p.params[0], inf.p.params[2])
+    plot_joint(inf, inf.p.params[1], inf.p.params[2])
+    fullplot(inf)
