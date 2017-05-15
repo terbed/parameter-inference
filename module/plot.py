@@ -309,7 +309,7 @@ def marginal_plot(param, path=''):
     plt.plot(tt, fitted, color="#FF5F2E", label="fitted posterior")
     plt.axvline(param.value, color='#34A52F', label="true value", linestyle='dashed')
     plt.axvline(param.max_p, color='#FF1493', label="max inferred", linestyle='dotted')
-    plt.legend()
+    plt.legend(loc='best', framealpha=0.4)
     filename = path + "/marginal/" + param.name + "_P"
     i = 0
     while os.path.exists('{}({:d}).png'.format(filename, i)):
@@ -326,7 +326,7 @@ def marginal_plot(param, path=''):
     plt.axvline(param.value, color='#34A52F', label="ture value", linestyle='dashed')
     plt.axvline(param.max_l, color='#FF1493', label="max inferred", linestyle='dotted')
     plt.plot(param.values, param.likelihood, marker='o', color="#ffc82e", label="likelihood")
-    plt.legend()
+    plt.legend(loc='best', framealpha=0.4)
     filename = path + "/marginal/" + param.name + "_L"
     i = 0
     while os.path.exists('{}({:d}).png'.format(filename, i)):

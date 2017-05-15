@@ -7,6 +7,7 @@
 - (5) Repetition of (1) and (2)
 . (6) Repetition of (1), (2) and (5)
 - (7) Noise: 7[mV], resolution: 160
+- (8) Noise: 7[mV], resolution: 160, with broader range than in (7)
 
 ## Averaging data vs inference on each set
 With (3) and (4) we test the hypothesis: 
