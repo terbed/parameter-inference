@@ -93,4 +93,15 @@ def ill(param_set, model, target_trace, noise_sigma):
     return - np.sum(np.square(v)) / (2 * noise_sigma ** 2)
 
 
+def mill(param_set, model, target_traces, noise_std):
+    (_, v) = model(**param_set)
+    n = target_traces.shape[0]
+    dev = []
+    log_l = []
+    for idx in range(n):
+        dev.append(np.subtract(target_traces[idx, :], v))
+    for idx in range(n):
+        log_l.append(-np.sum(np.square(dev[idx])) / (2 * noise_std ** 2))
+
+    return log_l
 

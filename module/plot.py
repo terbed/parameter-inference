@@ -18,6 +18,7 @@ def check_directory(working_path):
 
 
 def save_file(X, path, name, header=''):
+    check_directory(path)
     i = 0
     while os.path.exists('{}({:d}).txt'.format(path + "/" + name, i)):
         i += 1
@@ -25,11 +26,13 @@ def save_file(X, path, name, header=''):
 
 
 def save_params(params, path):
+    check_directory(path)
     for item in params:
         i = 0
         while os.path.exists('{}({:d}).txt'.format(path + "/" + item.name, i)):
             i += 1
         np.savetxt('{}({:d}).txt'.format(path + "/" + item.name, i), item.init, fmt="%s")
+
 
 def fullplot(result):
     """

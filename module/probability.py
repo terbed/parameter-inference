@@ -190,7 +190,6 @@ class Inference:
         self.target = target_trace
         self.working_path = working_path
         self.check_directory(working_path)
-        self.check_directory(working_path + "/loglikelihood")
         self.save = save
         self.speed = speed
 
@@ -204,6 +203,9 @@ class Inference:
 
     # Method to override
     def run_sim(self):
+        pass
+
+    def run_moretrace_inf(self):
         pass
 
     def run_evaluation(self):
@@ -345,6 +347,27 @@ class IndependentInference(Inference):
             pool.join()
 
             print "log likelihood DONE!"
+
+    def run_moretrace_inf(self):
+        pool = Pool(multiprocessing.cpu_count() - 1)
+        log_likelihood_func = partial(likelihood.mill, model=self.m, target_traces=self.target, noise_std=self.std)
+        print "Running " + str(len(self.p.parameter_set_seq)) + " simulations on all cores..."
+
+        self.likelihood = pool.map(log_likelihood_func, self.p.parameter_set_seq)
+        pool.close()
+        pool.join()
+
+        print "log likelihood DONE!"
+
+        # Save result
+        n = self.target.shape[0]
+        self.likelihood = np.array(self.likelihood)
+        for idx in range(n):
+            plot.save_file(self.likelihood[:, idx], self.working_path + "/fixed_params", "loglikelihood",
+                           header=str(self.p.name) + str(self.p.shape))
+            plot.save_params(self.p.params, path=self.working_path + "/fixed_params")
+
+        print "Log likelihood data Saved!"
 
 
 class DependentInference(Inference):

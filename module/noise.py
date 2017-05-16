@@ -11,6 +11,26 @@ def white(sigma, v_vec, mu=0):
     return np.array(exp_v)
 
 
+def more_w_trace(sigma, v_vec, n):
+    """
+    This method is useful, when we run inference with fix parameters but more noise effect (synthetic data)
+    
+    :param sigma: White noise standard deviation
+    :param v_vec: Trace to be noised
+    :param n: Number of created noisy traces
+    :return: (n, len(v_vec)) dimension np.array
+    """
+
+    moretrace = []
+
+    for _ in range(n):
+        noise = np.random.normal(0, sigma, len(v_vec))
+        synthetic_data = np.add(v_vec, noise)
+        moretrace.append(synthetic_data)
+
+    return np.array(moretrace)
+
+
 def colored(D, lamb, dt, v_vec):
     """Returns the given array with colored noise as numpy array"""
     noise = []
