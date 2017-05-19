@@ -4,8 +4,8 @@ from module.probability import IndependentInference, ParameterSet, RandomVariabl
 from module.noise import more_w_trace
 from functools import partial
 
-hz = [10, 75, 150]
-duration = [10, 100, 200]
+hz = [1, 10, 100]
+duration = [3, 20, 200]
 
 p_names = ['Ra', 'cm', 'gpas']
 res = [60, 60, 60]
@@ -53,11 +53,12 @@ for i in range(10):
     for item in hz:
         print "\n\n---------------------------------------- Running %i Hz zap protocol" % item
 
-        stim = np.loadtxt("/Users/Dani/TDK/parameter_estim/stim_protocol2/zap/%i/stim.txt" % item)
-        working_path = "/Users/Dani/TDK/parameter_estim/stim_protocol2/combinig/zaps/%i(%i)" % (item,i)
+        stim = np.loadtxt("/home/szabolcs/parameter_inference/stim_protocol2_v5/zap/%i/stim.txt" % item)
+        working_path = "/home/szabolcs/parameter_inference/stim_protocol2_v5/combinig/zaps/%i(%i)" % (item,i)
 
         # Generate deterministic trace and create synthetic data with noise model
-        _, v = model(stype='custom', custom_stim=stim)
+        _, v = model(stype='custom', custom_stim=stim,
+                     Ra=current_mean['Ra'], gpas=current_mean['gpas'], cm=current_mean['cm'])
 
         # Generate n synthetic data (n noise realisation)
         data = more_w_trace(noise, v, n)
@@ -73,11 +74,12 @@ for i in range(10):
     for item in duration:
         print "\n\n---------------------------------------- Running %i ms impulse protocol" % item
 
-        stim = np.loadtxt("/Users/Dani/TDK/parameter_estim/stim_protocol2/steps/%i/stim.txt" % item)
-        working_path = "/Users/Dani/TDK/parameter_estim/stim_protocol2/combinig/steps/%i(%i)" % (item, i)
+        stim = np.loadtxt("/home/szabolcs/parameter_inference/stim_protocol2_v5/steps/%i/stim.txt" % item)
+        working_path = "/home/szabolcs/parameter_inference/stim_protocol2_v5/combinig/steps/%i(%i)" % (item, i)
 
         # Generate deterministic trace and create synthetic data with noise model
-        _, v = model(stype='custom', custom_stim=stim)
+        _, v = model(stype='custom', custom_stim=stim,
+                     Ra=current_mean['Ra'], gpas=current_mean['gpas'], cm=current_mean['cm'])
 
         # Generate n synthetic data (n noise realisation)
         data = more_w_trace(noise, v, n)

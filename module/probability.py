@@ -362,10 +362,11 @@ class IndependentInference(Inference):
         # Save result
         n = self.target.shape[0]
         self.likelihood = np.array(self.likelihood)
+
+        plot.save_params(self.p.params, path=self.working_path + "/fixed_params")
         for idx in range(n):
             plot.save_file(self.likelihood[:, idx], self.working_path + "/fixed_params", "loglikelihood",
                            header=str(self.p.name) + str(self.p.shape))
-            plot.save_params(self.p.params, path=self.working_path + "/fixed_params")
 
         print "Log likelihood data Saved!"
 
