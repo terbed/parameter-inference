@@ -1,0 +1,72 @@
+\begin{thebibliography}{10}
+
+\bibitem{amsalem2016neuron}
+Oren Amsalem, Werner Van~Geit, Eilif Muller, Henry Markram, and Idan Segev.
+\newblock From neuron biophysics to orientation selectivity in electrically
+  coupled networks of neocortical l2/3 large basket cells.
+\newblock {\em Cerebral Cortex}, page bhw166, 2016.
+
+\bibitem{azevedo1994laplace}
+Adriano Azevedo-Filho and Ross~D Shachter.
+\newblock Laplace's method approximations for probabilistic inferencein belief
+  networks with continuous variables.
+\newblock In {\em Proceedings of the Tenth international conference on
+  Uncertainty in artificial intelligence}, pages 28--36. Morgan Kaufmann
+  Publishers Inc., 1994.
+
+\bibitem{costa2013probabilistic}
+Rui~P Costa, P~Jesper Sj{\"o}str{\"o}m, and Mark~CW Van~Rossum.
+\newblock Probabilistic inference of short-term synaptic plasticity in
+  neocortical microcircuits.
+\newblock 2013.
+
+\bibitem{dayan2001theoretical}
+Peter Dayan and Laurence~F Abbott.
+\newblock {\em Theoretical neuroscience}, volume~10.
+\newblock Cambridge, MA: MIT Press, 2001.
+
+\bibitem{druckmann2007novel}
+Shaul Druckmann, Yoav Banitt, Albert~A Gidon, Felix Sch{\"u}rmann, Henry
+  Markram, and Idan Segev.
+\newblock A novel multiple objective optimization framework for constraining
+  conductance-based neuron models by experimental data.
+\newblock {\em Frontiers in neuroscience}, 1:1, 2007.
+
+\bibitem{eichner2011hands}
+Hubert Eichner and Alexander Borst.
+\newblock Hands-on parameter search for neural simulations by a
+  midi-controller.
+\newblock {\em PloS one}, 6(10):e27013, 2011.
+
+\bibitem{PhysRevA.38.5938}
+Ronald~F. Fox, Ian~R. Gatland, Rajarshi Roy, and Gautam Vemuri.
+\newblock Fast, accurate algorithm for numerical simulation of exponentially
+  correlated colored noise.
+\newblock {\em Phys. Rev. A}, 38:5938--5940, Dec 1988.
+
+\bibitem{friedrich2014flexible}
+P{\'e}ter Friedrich, Michael Vella, Attila~I Guly{\'a}s, Tam{\'a}s~F Freund,
+  and Szabolcs K{\'a}li.
+\newblock A flexible, interactive software tool for fitting the parameters of
+  neuronal models.
+\newblock {\em Frontiers in neuroinformatics}, 8:63, 2014.
+
+\bibitem{szoboszlay2016functional}
+Miklos Szoboszlay, Andrea L{\H{o}}rincz, Frederic Lanore, Koen Vervaeke,
+  R~Angus Silver, and Zoltan Nusser.
+\newblock Functional properties of dendritic gap junctions in cerebellar golgi
+  cells.
+\newblock {\em Neuron}, 90(5):1043--1056, 2016.
+
+\bibitem{van2007neurofitter}
+Werner Van~Geit, Pablo Achard, and Erik De~Schutter.
+\newblock Neurofitter: a parameter tuning package for a wide range of
+  electrophysiological neuron models.
+\newblock {\em BMC Neuroscience}, 8(2):1, 2007.
+
+\bibitem{van2008automated}
+Werner Van~Geit, Erik De~Schutter, and Pablo Achard.
+\newblock Automated neuron model optimization techniques: a review.
+\newblock {\em Biological cybernetics}, 99(4-5):241--251, 2008.
+
+\end{thebibliography}

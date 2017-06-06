@@ -1,0 +1,61 @@
+\documentclass[hidelinks, 12pt]{article}
+\usepackage{amsmath}
+\usepackage{listings}
+\usepackage{gensymb}
+\usepackage[magyar]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[a4paper, margin=3cm ]{geometry}
+\usepackage{graphicx}
+\usepackage{subfig}
+\usepackage{siunitx}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{booktabs}
+\usepackage{textcomp}
+\usepackage{color}
+\usepackage{hyperref}
+\hypersetup{colorlinks=false}
+
+\usepackage{placeins}
+\renewcommand{\baselinestretch}{1.13}
+\numberwithin{equation}{subsection}
+\numberwithin{figure}{subsection}
+\numberwithin{table}{subsection}
+
+\newcommand{\Lagr}{\mathcal{L}}
+\newcommand{\N}{\mathcal{N}}
+\newcommand{\M}{\mathcal{M}}
+\let\vaccent=\v % \vaccent mostantól \v
+\renewcommand{\v}[1]{\mathbf{#1}} %félkövér vektor
+\newcommand{\gv}[1]{\mbox{\boldmath$ #1 $}} % félkövér vektor görög betűvel
+\newcommand{\uv}[1]{\mathbf{\hat{#1}}} % félkövér egységvektor kalappal
+\newcommand{\abs}[1]{\left| #1 \right|} % abszolut érték
+\newcommand{\avg}[1]{\left< #1 \right>} % átlag
+\let\underdot=\d % a\underdot mostantól \d
+\renewcommand{\d}[2]{\frac{d #1}{d #2}} % derivált
+\newcommand{\dd}[2]{\frac{d^2 #1}{d #2^2}} % második derivált
+\newcommand{\pd}[2]{\frac{\partial #1}{\partial #2}} %parciális derivált
+\newcommand{\pdd}[2]{\frac{\partial^2 #1}{\partial #2^2}} % második parciális derivált
+\newcommand{\pddv}[3]{\frac{\partial^2 #1}{\partial #2 \partial #3}} % második vegyes parciális derivált
+\newcommand{\pdc}[3]{\left. \frac{\partial #1}{\partial #2} \right|_{#3}} % Termodinamikai parc. derivált
+\newcommand{\mpdc}[3]{\left. \frac{\partial^2 #1}{\partial #2^2} \right|_{#3}} %Második termodinamikai parc. derivált
+\newcommand{\mvpdc}[3]{\left.\left. \frac{\partial ^2 #1}{\partial #2 \partial #3}\right|_{#2}\right|_{#3}}
+\newcommand{\ket}[1]{\left| #1 \right>} % bra
+\newcommand{\bra}[1]{\left< #1 \right|} % ket
+\newcommand{\braket}[2]{\left< #1 \vphantom{#2} \right|
+	\left. #2 \vphantom{#1} \right>} % braket
+\newcommand{\matrixel}[3]{\left< #1 \vphantom{#2#3} \right| #2 \left| #3 \vphantom{#1#2} \right>} % Szendvics
+\newcommand{\grad}[1]{\gv{\nabla} #1} % gradiens
+\let\divsymb=\div % mostantól a \divsymb-> \div
+\renewcommand{\div}[1]{\gv{\nabla} \cdot #1} % divergencia
+\newcommand{\rot}[1]{\gv{\nabla}\times #1} % rotáció
+\newcommand{\cint}[4]{\int _#1^#2 #3 d\v{#4}} %felületi/görbementi integrál
+\newcommand{\vint}[4]{\int _#1^#2 #3 d^3\v{#4}}%térfogati integrál
+\newcommand{\crossp}[2]{\v{#1}\times\v{#2}}%keresztszorzat sima betűkkel
+\newcommand{\gcrossp}[2]{\gv{#1}\times\v{#2}}%keresztszorzat, az első komponens görög
+\newcommand{\levi}[1]{\varepsilon _{#1}}%Levi-Civita
+\newcommand{\kron}[1]{\delta _{#1}}%Kronecker delta
+\newcommand{\mmat}[1]{\underline{\underline{{#1}}}}%Mátrix
+\newcommand{\gmmat}[1]{\underline{\underline{{#1}}}}%Görög mátrix
+\newcommand{\szum}[2]{\sum \limits _{#1} ^{#2}} %Szumma határokkal
+\newcommand{\pois}[2]{\left\lbrace {#1},{#2}\right\rbrace} %Poisson-zárójel

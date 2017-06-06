@@ -1,0 +1,55 @@
+\contentsline {section}{\numberline {1}Bevezet\IeC {\'e}s}{5}{section.1}
+\contentsline {section}{\numberline {2}Idegsejtek modellez\IeC {\'e}se}{7}{section.2}
+\contentsline {subsection}{\numberline {2.1}Biol\IeC {\'o}giai alapok}{7}{subsection.2.1}
+\contentsline {paragraph}{sejtmembr\IeC {\'a}n}{7}{section*.4}
+\contentsline {paragraph}{ioncsatorn\IeC {\'a}k}{7}{section*.5}
+\contentsline {paragraph}{ion pump\IeC {\'a}k}{7}{section*.6}
+\contentsline {paragraph}{membr\IeC {\'a}npotenci\IeC {\'a}l}{7}{section*.7}
+\contentsline {subsection}{\numberline {2.2}Elektromos tulajdons\IeC {\'a}gok}{7}{subsection.2.2}
+\contentsline {paragraph}{axi\IeC {\'a}lis ellen\IeC {\'a}ll\IeC {\'a}s}{8}{section*.8}
+\contentsline {paragraph}{membr\IeC {\'a}n kapacit\IeC {\'a}s}{8}{section*.10}
+\contentsline {paragraph}{membr\IeC {\'a}n ellen\IeC {\'a}ll\IeC {\'a}s}{9}{section*.11}
+\contentsline {paragraph}{membr\IeC {\'a}n id\IeC {\H o}\IeC {\'a}lland\IeC {\'o}}{9}{section*.12}
+\contentsline {paragraph}{membr\IeC {\'a}n\IeC {\'a}ram}{9}{section*.13}
+\contentsline {subsection}{\numberline {2.3}Egykompartmentumos modell}{10}{subsection.2.3}
+\contentsline {subsection}{\numberline {2.4}T\IeC {\'e}rbelileg kiterjedt modellek}{10}{subsection.2.4}
+\contentsline {subsection}{\numberline {2.5}\textit {NEURON} idegsejt szimul\IeC {\'a}ci\IeC {\'o}s program}{11}{subsection.2.5}
+\contentsline {section}{\numberline {3}M\IeC {\'o}dszerek \IeC {\'e}s megval\IeC {\'o}s\IeC {\'\i }t\IeC {\'a}s}{14}{section.3}
+\contentsline {subsection}{\numberline {3.1}Eloszl\IeC {\'a}sbecsl\IeC {\'e}s Bayesi\IeC {\'a}nus formalizmussal}{14}{subsection.3.1}
+\contentsline {paragraph}{val\IeC {\'o}sz\IeC {\'\i }n\IeC {\H u}s\IeC {\'e}gi v\IeC {\'a}ltoz\IeC {\'o}k}{14}{section*.19}
+\contentsline {paragraph}{poszterior eloszl\IeC {\'a}s}{14}{section*.20}
+\contentsline {paragraph}{marginaliz\IeC {\'a}l\IeC {\'a}s}{14}{section*.21}
+\contentsline {paragraph}{numerikus implement\IeC {\'a}l\IeC {\'a}s}{15}{section*.22}
+\contentsline {subsection}{\numberline {3.2}Zajmodellek}{15}{subsection.3.2}
+\contentsline {subsubsection}{\numberline {3.2.1}Autokorrel\IeC {\'a}ci\IeC {\'o}s f\IeC {\"u}ggv\IeC {\'e}ny}{16}{subsubsection.3.2.1}
+\contentsline {subsubsection}{\numberline {3.2.2}Kovariancia m\IeC {\'a}trix}{16}{subsubsection.3.2.2}
+\contentsline {subsubsection}{\numberline {3.2.3}Feh\IeC {\'e}r f\IeC {\"u}ggetlen zaj}{18}{subsubsection.3.2.3}
+\contentsline {paragraph}{tulajdons\IeC {\'a}gai}{18}{section*.25}
+\contentsline {paragraph}{kovariancia m\IeC {\'a}trixa}{18}{section*.26}
+\contentsline {paragraph}{el\IeC {\H o}\IeC {\'a}ll\IeC {\'\i }t\IeC {\'a}sa}{18}{section*.27}
+\contentsline {subsubsection}{\numberline {3.2.4}Exponenci\IeC {\'a}lisan korrel\IeC {\'a}l\IeC {\'o} sz\IeC {\'\i }nes zaj}{18}{subsubsection.3.2.4}
+\contentsline {paragraph}{tulajdons\IeC {\'a}gai}{19}{section*.29}
+\contentsline {paragraph}{kovariancia m\IeC {\'a}trixa}{19}{section*.30}
+\contentsline {paragraph}{el\IeC {\H o}\IeC {\'a}ll\IeC {\'\i }t\IeC {\'a}sa}{20}{section*.31}
+\contentsline {subsection}{\numberline {3.3}Likelihood f\IeC {\"u}ggv\IeC {\'e}ny}{20}{subsection.3.3}
+\contentsline {subsubsection}{\numberline {3.3.1}Likelihood \IeC {\'e}rtelmez\IeC {\'e}se}{21}{subsubsection.3.3.1}
+\contentsline {subsubsection}{\numberline {3.3.2}Norm\IeC {\'a}l eloszl\IeC {\'a}sb\IeC {\'o}l likelihood}{21}{subsubsection.3.3.2}
+\contentsline {paragraph}{f\IeC {\"u}ggetlen eset}{22}{section*.33}
+\contentsline {subsubsection}{\numberline {3.3.3}Likelihood megkonstru\IeC {\'a}l\IeC {\'a}sa numerikusan}{22}{subsubsection.3.3.3}
+\contentsline {paragraph}{f\IeC {\"u}ggetlen eset}{23}{section*.34}
+\contentsline {paragraph}{\IeC {\'a}tal\IeC {\'a}nos eset}{23}{section*.35}
+\contentsline {paragraph}{poszterior megalkot\IeC {\'a}sa}{24}{section*.36}
+\contentsline {subsection}{\numberline {3.4}Technikai megval\IeC {\'o}s\IeC {\'\i }t\IeC {\'a}s}{25}{subsection.3.4}
+\contentsline {subsection}{\numberline {3.5}\IeC {\"O}sszegz\IeC {\'e}s}{27}{subsection.3.5}
+\contentsline {section}{\numberline {4}Eredm\IeC {\'e}nyek}{27}{section.4}
+\contentsline {subsection}{\numberline {4.1}Egykompartmentumos modell}{28}{subsection.4.1}
+\contentsline {subsubsection}{\numberline {4.1.1}Feh\IeC {\'e}r zaj}{29}{subsubsection.4.1.1}
+\contentsline {paragraph}{egy param\IeC {\'e}ter}{29}{section*.42}
+\contentsline {paragraph}{k\IeC {\'e}t param\IeC {\'e}ter}{29}{section*.43}
+\contentsline {subsubsection}{\numberline {4.1.2}Sz\IeC {\'\i }nes zaj}{29}{subsubsection.4.1.2}
+\contentsline {subsection}{\numberline {4.2}T\IeC {\'e}rbelileg kiterjedt modell: \textit {Stick and Ball}}{33}{subsection.4.2}
+\contentsline {subsubsection}{\numberline {4.2.1}Feh\IeC {\'e}r zaj}{33}{subsubsection.4.2.1}
+\contentsline {subsubsection}{\numberline {4.2.2}Sz\IeC {\'\i }nes zaj}{34}{subsubsection.4.2.2}
+\contentsline {subsection}{\numberline {4.3}K\IeC {\'\i }s\IeC {\'e}rleti protokollok inform\IeC {\'a}ci\IeC {\'o}tartalma}{36}{subsection.4.3}
+\contentsline {subsection}{\numberline {4.4}Inferencia val\IeC {\'o}di adatsoron}{38}{subsection.4.4}
+\contentsline {section}{\numberline {5}K\IeC {\"o}vetkeztet\IeC {\'e}sek}{42}{section.5}

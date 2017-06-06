@@ -1,0 +1,30 @@
+\BOOKMARK [1][-]{section.1}{Bevezet\351s}{}% 1
+\BOOKMARK [1][-]{section.2}{Idegsejtek modellez\351se}{}% 2
+\BOOKMARK [2][-]{subsection.2.1}{Biol\363giai alapok}{section.2}% 3
+\BOOKMARK [2][-]{subsection.2.2}{Elektromos tulajdons\341gok}{section.2}% 4
+\BOOKMARK [2][-]{subsection.2.3}{Egykompartmentumos modell}{section.2}% 5
+\BOOKMARK [2][-]{subsection.2.4}{T\351rbelileg kiterjedt modellek}{section.2}% 6
+\BOOKMARK [2][-]{subsection.2.5}{NEURON idegsejt szimul\341ci\363s program}{section.2}% 7
+\BOOKMARK [1][-]{section.3}{M\363dszerek \351s megval\363s\355t\341s}{}% 8
+\BOOKMARK [2][-]{subsection.3.1}{Eloszl\341sbecsl\351s Bayesi\341nus formalizmussal}{section.3}% 9
+\BOOKMARK [2][-]{subsection.3.2}{Zajmodellek}{section.3}% 10
+\BOOKMARK [3][-]{subsubsection.3.2.1}{Autokorrel\341ci\363s f\374ggv\351ny}{subsection.3.2}% 11
+\BOOKMARK [3][-]{subsubsection.3.2.2}{Kovariancia m\341trix}{subsection.3.2}% 12
+\BOOKMARK [3][-]{subsubsection.3.2.3}{Feh\351r f\374ggetlen zaj}{subsection.3.2}% 13
+\BOOKMARK [3][-]{subsubsection.3.2.4}{Exponenci\341lisan korrel\341l\363 sz\355nes zaj}{subsection.3.2}% 14
+\BOOKMARK [2][-]{subsection.3.3}{Likelihood f\374ggv\351ny}{section.3}% 15
+\BOOKMARK [3][-]{subsubsection.3.3.1}{Likelihood \351rtelmez\351se}{subsection.3.3}% 16
+\BOOKMARK [3][-]{subsubsection.3.3.2}{Norm\341l eloszl\341sb\363l likelihood}{subsection.3.3}% 17
+\BOOKMARK [3][-]{subsubsection.3.3.3}{Likelihood megkonstru\341l\341sa numerikusan}{subsection.3.3}% 18
+\BOOKMARK [2][-]{subsection.3.4}{Technikai megval\363s\355t\341s}{section.3}% 19
+\BOOKMARK [2][-]{subsection.3.5}{\326sszegz\351s}{section.3}% 20
+\BOOKMARK [1][-]{section.4}{Eredm\351nyek}{}% 21
+\BOOKMARK [2][-]{subsection.4.1}{Egykompartmentumos modell}{section.4}% 22
+\BOOKMARK [3][-]{subsubsection.4.1.1}{Feh\351r zaj}{subsection.4.1}% 23
+\BOOKMARK [3][-]{subsubsection.4.1.2}{Sz\355nes zaj}{subsection.4.1}% 24
+\BOOKMARK [2][-]{subsection.4.2}{T\351rbelileg kiterjedt modell: Stick and Ball}{section.4}% 25
+\BOOKMARK [3][-]{subsubsection.4.2.1}{Feh\351r zaj}{subsection.4.2}% 26
+\BOOKMARK [3][-]{subsubsection.4.2.2}{Sz\355nes zaj}{subsection.4.2}% 27
+\BOOKMARK [2][-]{subsection.4.3}{K\355s\351rleti protokollok inform\341ci\363tartalma}{section.4}% 28
+\BOOKMARK [2][-]{subsection.4.4}{Inferencia val\363di adatsoron}{section.4}% 29
+\BOOKMARK [1][-]{section.5}{K\366vetkeztet\351sek}{}% 30

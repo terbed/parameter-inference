@@ -1,0 +1,12 @@
+	E = exp(-lamb * dt)
+	e_0 = sqrt(-2 * D * lamb * log(m)) * cos(2 * pi * n)
+	noise.append(e_0)
+
+	for i in range(len(v_vec) - 1):
+		a, b = np.random.uniform(0.0, 1.0, 2)
+		h = sqrt(-2 * D * lamb * (1 - E ** 2) * log(a)) * cos(2 * pi * b)
+		e_next = e_0 * E + h
+		noise.append(e_next)
+		e_0 = e_next
+
+	return np.add(v_vec, noise)

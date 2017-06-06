@@ -114,9 +114,9 @@ def fullplot(result):
                 ax[row, col].set_axis_off()
 
     i = 0
-    while os.path.exists('{}({:d}).png'.format(result.working_path + "/fullplot_L", i)):
+    while os.path.exists('{}({:d}).pdf'.format(result.working_path + "/fullplot_L", i)):
         i += 1
-    plt.savefig('{}({:d}).png'.format(result.working_path + "/fullplot_L", i))
+    plt.savefig('{}({:d}).pdf'.format(result.working_path + "/fullplot_L", i))
 
     f, ax = plt.subplots(pnum, pnum, figsize=(14, 9))
     f.subplots_adjust(hspace=.001, wspace=.001)
@@ -191,9 +191,9 @@ def fullplot(result):
                 ax[row, col].set_axis_off()
 
     i = 0
-    while os.path.exists('{}({:d}).png'.format(result.working_path + "/fullplot_P", i)):
+    while os.path.exists('{}({:d}).pdf'.format(result.working_path + "/fullplot_P", i)):
         i += 1
-    plt.savefig('{}({:d}).png'.format(result.working_path + "/fullplot_P", i))
+    plt.savefig('{}({:d}).pdf'.format(result.working_path + "/fullplot_P", i))
 
 
 def plot_joint(result, param1, param2):
@@ -235,7 +235,7 @@ def plot_joint(result, param1, param2):
     ax = fig.gca(projection='3d')
     x, y = np.meshgrid(param2.values, param1.values)
     ax.plot_surface(x, y, likelihood, rstride=1, cstride=1, alpha=0.3, cmap=CM.rainbow)
-    ax.contour(x, y, likelihood, zdir='z', offset=0, cmap=CM.rainbow)
+    ax.contourf(x, y, likelihood, zdir='z', offset=0, cmap=CM.rainbow)
     ax.contourf(x, y, likelihood, zdir='x', offset=param2.range_min, cmap=CM.rainbow)
     ax.contourf(x, y, likelihood, zdir='y', offset=param1.range_max, cmap=CM.rainbow)
     ax.set_title("Joint likelihood")
@@ -243,16 +243,16 @@ def plot_joint(result, param1, param2):
     ax.set_ylabel(param1.name + ' ' + param1.unit)
     filename = path + '/L_' + param1.name + '-' + param2.name
     i = 0
-    while os.path.exists('{}({:d}).png'.format(filename, i)):
+    while os.path.exists('{}({:d}).pdf'.format(filename, i)):
         i += 1
-    plt.savefig('{}({:d}).png'.format(filename, i))
+    plt.savefig('{}({:d}).pdf'.format(filename, i))
 
     fig = plt.figure(figsize=(12, 8))
     ax = fig.gca(projection='3d')
     x, y = np.meshgrid(param2.values, param1.values)
     ax.plot_surface(x, y, posterior, rstride=1, cstride=1, alpha=0.3, cmap=CM.rainbow)
     # ax.plot_surface(x, y, result.p.joint_prior, rstride=1, cstride=1, alpha=0.3, cmap=CM.rainbow)
-    ax.contour(x, y, posterior, zdir='z', offset=0, cmap=CM.rainbow)
+    ax.contourf(x, y, posterior, zdir='z', offset=0, cmap=CM.rainbow)
     ax.contourf(x, y, posterior, zdir='x', offset=param2.range_min, cmap=CM.rainbow)
     ax.contourf(x, y, posterior, zdir='y', offset=param1.range_max, cmap=CM.rainbow)
     ax.set_title("Joint posterior")
@@ -260,9 +260,9 @@ def plot_joint(result, param1, param2):
     ax.set_ylabel(param1.name + ' ' + param1.unit)
     filename = path + '/P_' + param1.name + '-' + param2.name
     i = 0
-    while os.path.exists('{}({:d}).png'.format(filename, i)):
+    while os.path.exists('{}({:d}).pdf'.format(filename, i)):
         i += 1
-    plt.savefig('{}({:d}).png'.format(filename, i))
+    plt.savefig('{}({:d}).pdf'.format(filename, i))
 
 
 def plot3d(param1, param2, z, title='', path=''):
@@ -279,9 +279,9 @@ def plot3d(param1, param2, z, title='', path=''):
     filename = path + title + '_' + param1.name + str(param1.resolution) + '_' + \
                param2.name + str(param2.resolution) + '_'
     i = 0
-    while os.path.exists('{}({:d}).png'.format(filename, i)):
+    while os.path.exists('{}({:d}).pdf'.format(filename, i)):
         i += 1
-    plt.savefig('{}({:d}).png'.format(filename, i))
+    plt.savefig('{}({:d}).pdf'.format(filename, i))
 
 
 def marginal_plot(param, path=''):
@@ -315,14 +315,14 @@ def marginal_plot(param, path=''):
     plt.legend(loc='best', framealpha=0.4)
     filename = path + "/marginal/" + param.name + "_P"
     i = 0
-    while os.path.exists('{}({:d}).png'.format(filename, i)):
+    while os.path.exists('{}({:d}).pdf'.format(filename, i)):
         i += 1
-    plt.savefig('{}({:d}).png'.format(filename, i))
+    plt.savefig('{}({:d}).pdf'.format(filename, i))
     print "Plot done! File path: " + filename
 
     # Plot likelihood
     plt.figure(figsize=(12, 8))
-    plt.title(param.name + " likelihood distribution")
+    plt.title(param.name + " likelihood")
     plt.grid()
     plt.xlabel(param.name + ' ' + param.unit)
     plt.ylabel("p")
@@ -332,9 +332,9 @@ def marginal_plot(param, path=''):
     plt.legend(loc='best', framealpha=0.4)
     filename = path + "/marginal/" + param.name + "_L"
     i = 0
-    while os.path.exists('{}({:d}).png'.format(filename, i)):
+    while os.path.exists('{}({:d}).pdf'.format(filename, i)):
         i += 1
-    plt.savefig('{}({:d}).png'.format(filename, i))
+    plt.savefig('{}({:d}).pdf'.format(filename, i))
     print "Plot done! File path: " + filename
 
 
@@ -383,7 +383,7 @@ def plot_stat(stat, param, path='', bin=None):
                 (avrg_acc / 100) * post_max + (std_acc / 100) * post_max,
                 facecolor='b', alpha=0.1)
     plt.legend()
-    plt.savefig(path + "/illustration_" + param.name + ".png")
+    plt.savefig(path + "/illustration_" + param.name + ".pdf")
 
     # # Plot shape of posterior
     # max_p = normal(x, param.mean, avrg_sigma + std_sigma)
@@ -405,7 +405,7 @@ def plot_stat(stat, param, path='', bin=None):
     # plt.plot(x, prior, color='#2FA5A0', label="prior")
     #
     # plt.legend()
-    # plt.savefig(path + "/plook_"+param.name+".png")
+    # plt.savefig(path + "/plook_"+param.name+".pdf")
 
 
     # Plot histograms
@@ -419,7 +419,7 @@ def plot_stat(stat, param, path='', bin=None):
     plt.ylabel('Occurrence ')
     plt.grid(True)
     plt.hist(stat[:,2], bin, facecolor='#D44A4B', normed=False)
-    plt.savefig(path + "/histograms/rdeviation_" + param.name + ".png")
+    plt.savefig(path + "/histograms/rdeviation_" + param.name + ".pdf")
 
     plt.figure(figsize=(12, 8))
     plt.title("Accuracy | " + param.name)
@@ -427,7 +427,7 @@ def plot_stat(stat, param, path='', bin=None):
     plt.ylabel('Occurrence')
     plt.grid(True)
     plt.hist(stat[:, 3], bin, facecolor='#3BA9A8', normed=False)
-    plt.savefig(path + "/histograms/accuracy_" + param.name + ".png")
+    plt.savefig(path + "/histograms/accuracy_" + param.name + ".pdf")
 
     plt.figure(figsize=(12, 8))
     plt.title("Posterior how many times sharper than prior | " + param.name)
@@ -435,7 +435,7 @@ def plot_stat(stat, param, path='', bin=None):
     plt.ylabel('Occurrence')
     plt.grid(True)
     plt.hist(stat[:, 4], bin, facecolor='#4A4BD4', normed=False)
-    plt.savefig(path + "/histograms/pSharpness_" + param.name + ".png")
+    plt.savefig(path + "/histograms/pSharpness_" + param.name + ".pdf")
 
     plt.figure(figsize=(12, 8))
     plt.title("Posterior broadness relative to prior | " + param.name)
@@ -443,7 +443,7 @@ def plot_stat(stat, param, path='', bin=None):
     plt.ylabel('Occurrence')
     plt.grid(True)
     plt.hist(stat[:, 5], bin, facecolor='#d4d34a', normed=False)
-    plt.savefig(path + "/histograms/pBroadness_" + param.name + ".png")
+    plt.savefig(path + "/histograms/pBroadness_" + param.name + ".pdf")
 
     plt.figure(figsize=(12, 8))
     plt.title("Relative error of fitting | " + param.name)
@@ -451,7 +451,7 @@ def plot_stat(stat, param, path='', bin=None):
     plt.ylabel('Occurrence')
     plt.grid(True)
     plt.hist(stat[:, 1], bin, facecolor='#3ce1bb', normed=False)
-    plt.savefig(path + "/histograms/fiterr_" + param.name + ".png")
+    plt.savefig(path + "/histograms/fiterr_" + param.name + ".pdf")
 
     print "Stat plotted to: " + path
 
@@ -461,7 +461,7 @@ def plot_stat(stat, param, path='', bin=None):
     # plt.ylabel('Occurrence')
     # plt.grid(True)
     # plt.hist(stat[:, 1], bin, facecolor='#D44A4B', normed=False)
-    # plt.savefig(path + "/sigma_"+param.name+".png")
+    # plt.savefig(path + "/sigma_"+param.name+".pdf")
 
 if __name__ == '__main__':
     from module.probability import RandomVariable

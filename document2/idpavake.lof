@@ -1,0 +1,73 @@
+\contentsline {figure}{\numberline {2.2.1.}{\ignorespaces Axi\IeC {\'a}lis ellen\IeC {\'a}ll\IeC {\'a}s}}{8}{figure.caption.9}
+\contentsline {figure}{\numberline {2.3.1.}{\ignorespaces Egykompartmentumos modell}}{10}{figure.caption.14}
+\contentsline {figure}{\numberline {2.4.1.}{\ignorespaces T\IeC {\"o}bbkompartmentumos modell}}{12}{figure.caption.15}
+\contentsline {figure}{\numberline {2.5.1.}{\ignorespaces K\IeC {\'\i }s\IeC {\'e}rletb\IeC {\H o}l sz\IeC {\'a}rmaz\IeC {\'o} morfol\IeC {\'o}gia}}{12}{figure.caption.16}
+\contentsline {figure}{\numberline {2.5.2.}{\ignorespaces Idegsejt modell}}{13}{figure.caption.17}
+\contentsline {figure}{\numberline {2.5.3.}{\ignorespaces T\IeC {\"o}bbkompartmentumos modellez\IeC {\'e}s}}{13}{figure.caption.18}
+\contentsline {figure}{\numberline {3.2.1.}{\ignorespaces Zaj baseline}}{17}{figure.caption.23}
+\contentsline {figure}{\numberline {3.2.2.}{\ignorespaces Zaj autokorrel\IeC {\'a}ci\IeC {\'o}ja}}{17}{figure.caption.24}
+\contentsline {figure}{\numberline {3.2.3.}{\ignorespaces Feh\IeC {\'e}r zaj}}{19}{figure.caption.28}
+\contentsline {figure}{\numberline {3.2.4.}{\ignorespaces Sz\IeC {\'\i }nes zaj}}{20}{figure.caption.32}
+\contentsline {figure}{\numberline {3.3.1.}{\ignorespaces Margin\IeC {\'a}lis eloszl\IeC {\'a}s \IeC {\'e}s egy\IeC {\"u}ttes eloszl\IeC {\'a}s t\IeC {\'\i }pikus \IeC {\'a}br\IeC {\'a}i}}{24}{figure.caption.37}
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {Margin\IeC {\'a}lis eloszl\IeC {\'a}s}}}{24}{subfigure.1.1}
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {Egy\IeC {\"u}ttes eloszl\IeC {\'a}s}}}{24}{subfigure.1.2}
+\contentsline {figure}{\numberline {3.3.2.}{\ignorespaces Egy\IeC {\"u}ttes \IeC {\'e}s margin\IeC {\'a}lis eloszl\IeC {\'a}sokat \IeC {\"o}sszefoglal\IeC {\'o} \IeC {\'a}brat\IeC {\'\i }pus}}{25}{figure.caption.38}
+\contentsline {figure}{\numberline {3.4.1.}{\ignorespaces Egy futtat\IeC {\'a}s p\IeC {\'e}ldak\IeC {\'o}dja}}{26}{figure.caption.39}
+\contentsline {figure}{\numberline {3.5.1.}{\ignorespaces M\IeC {\'o}dszer s\IeC {\'e}m\IeC {\'a}ja}}{27}{figure.caption.40}
+\contentsline {figure}{\numberline {4.1.1.}{\ignorespaces Egykompartmentumos modell szeml\IeC {\'e}ltet\IeC {\'e}se}}{28}{figure.caption.41}
+\contentsline {figure}{\numberline {4.1.2.}{\ignorespaces Egy kompartmentum, egy param\IeC {\'e}ter, feh\IeC {\'e}r zaj eredm\IeC {\'e}ny \IeC {\'e}s \IeC {\'a}brat\IeC {\'\i }pus magyar\IeC {\'a}zat}}{30}{figure.caption.44}
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {Illusztr\IeC {\'a}ci\IeC {\'o}}}}{30}{subfigure.2.1}
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {\IeC {\'E}less\IeC {\'e}g}}}{30}{subfigure.2.2}
+\contentsline {subfigure}{\numberline {(c)}{\ignorespaces {Elt\IeC {\'e}r\IeC {\'e}s}}}{30}{subfigure.2.3}
+\contentsline {subfigure}{\numberline {(d)}{\ignorespaces {Pontoss\IeC {\'a}g $(p_{max}/p_{true}\cdot 100)$}}}{30}{subfigure.2.4}
+\contentsline {figure}{\numberline {4.1.3.}{\ignorespaces Egykompartmentumos modell feh\IeC {\'e}r zaj egy\IeC {\"u}ttes poszterior eloszl\IeC {\'a}sa}}{31}{figure.caption.45}
+\contentsline {figure}{\numberline {4.1.4.}{\ignorespaces Egy kompartmentum k\IeC {\'e}t param\IeC {\'e}ter, feh\IeC {\'e}r zaj eredm\IeC {\'e}ny}}{31}{figure.caption.46}
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {$cm$ param\IeC {\'e}ter}}}{31}{subfigure.4.1}
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {$g_{pas}$ param\IeC {\'e}ter}}}{31}{subfigure.4.2}
+\contentsline {figure}{\numberline {4.1.5.}{\ignorespaces Egykompartmentumos modell, sz\IeC {\'\i }nes zaj, egy\IeC {\"u}ttes poszterior eloszl\IeC {\'a}sa}}{32}{figure.caption.47}
+\contentsline {figure}{\numberline {4.1.6.}{\ignorespaces Egy kompartmentum, k\IeC {\'e}t param\IeC {\'e}ter, sz\IeC {\'\i }nes zaj eredm\IeC {\'e}nyek}}{32}{figure.caption.48}
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {$cm$ param\IeC {\'e}ter}}}{32}{subfigure.6.1}
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {$g_{pas}$ param\IeC {\'e}ter}}}{32}{subfigure.6.2}
+\contentsline {figure}{\numberline {4.2.1.}{\ignorespaces T\IeC {\"o}bbkompartmentumos modell szeml\IeC {\'e}ltet\IeC {\'e}se}}{33}{figure.caption.49}
+\contentsline {figure}{\numberline {4.2.2.}{\ignorespaces \textit {Stick and ball}, k\IeC {\'e}t param\IeC {\'e}ter, feh\IeC {\'e}r zaj egy\IeC {\"u}ttes eloszl\IeC {\'a}sai}}{34}{figure.caption.50}
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {egy\IeC {\"u}ttes likelihood}}}{34}{subfigure.2.1}
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {egy\IeC {\"u}ttes poszterior}}}{34}{subfigure.2.2}
+\contentsline {figure}{\numberline {4.2.3.}{\ignorespaces \textit {Stick and ball}, k\IeC {\'e}t param\IeC {\'e}ter, feh\IeC {\'e}r zaj eredm\IeC {\'e}ny}}{34}{figure.caption.51}
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {$R_a$ param\IeC {\'e}ter}}}{34}{subfigure.3.1}
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {$g_{pas}$ param\IeC {\'e}ter}}}{34}{subfigure.3.2}
+\contentsline {figure}{\numberline {4.2.4.}{\ignorespaces \textit {Stick and ball}, k\IeC {\'e}t param\IeC {\'e}ter, sz\IeC {\'\i }nes zaj egy\IeC {\"u}ttes eloszl\IeC {\'a}sai}}{35}{figure.caption.52}
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {egy\IeC {\"u}ttes likelihood}}}{35}{subfigure.4.1}
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {egy\IeC {\"u}ttes poszterior}}}{35}{subfigure.4.2}
+\contentsline {figure}{\numberline {4.2.5.}{\ignorespaces \textit {Stick and ball}, k\IeC {\'e}t param\IeC {\'e}ter, sz\IeC {\'\i }nes zaj eredm\IeC {\'e}ny}}{35}{figure.caption.53}
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {$R_a$ param\IeC {\'e}ter}}}{35}{subfigure.5.1}
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {$g_{pas}$ param\IeC {\'e}ter}}}{35}{subfigure.5.2}
+\contentsline {figure}{\numberline {4.3.1.}{\ignorespaces K\IeC {\"u}l\IeC {\"o}nb\IeC {\"o}z\IeC {\H o} protokollok \IeC {\'e}s inform\IeC {\'a}ci\IeC {\'o}tartalmuk}}{37}{figure.caption.55}
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {hossz\IeC {\'u} \IeC {\'a}ramimpulzusra}}}{37}{subfigure.1.1}
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {r\IeC {\"o}vid \IeC {\'a}ramimpulzusra}}}{37}{subfigure.1.2}
+\contentsline {subfigure}{\numberline {(c)}{\ignorespaces {hossz\IeC {\'u}-r\IeC {\"o}vid \IeC {\'a}ramimpulzusra}}}{37}{subfigure.1.3}
+\contentsline {subfigure}{\numberline {(d)}{\ignorespaces {$cm$ hossz\IeC {\'u} impulzusra}}}{37}{subfigure.1.4}
+\contentsline {subfigure}{\numberline {(e)}{\ignorespaces {$cm$ r\IeC {\"o}vid impulzusra}}}{37}{subfigure.1.5}
+\contentsline {subfigure}{\numberline {(f)}{\ignorespaces {$cm$ hossz\IeC {\'u}-r\IeC {\"o}vid impulzusra}}}{37}{subfigure.1.6}
+\contentsline {subfigure}{\numberline {(g)}{\ignorespaces {$g_{pas}$ hossz\IeC {\'u} impulzusra}}}{37}{subfigure.1.7}
+\contentsline {subfigure}{\numberline {(h)}{\ignorespaces {$g_{pas}$ r\IeC {\"o}vid impulzusra}}}{37}{subfigure.1.8}
+\contentsline {subfigure}{\numberline {(i)}{\ignorespaces {$g_{pas}$ hossz\IeC {\'u}-r\IeC {\"o}vid impulzusra}}}{37}{subfigure.1.9}
+\contentsline {figure}{\numberline {4.4.1.}{\ignorespaces Val\IeC {\'o}s passz\IeC {\'\i }v idegsejt \IeC {\'a}ramimpulzusokra adott fesz\IeC {\"u}lts\IeC {\'e}gv\IeC {\'a}lasza}}{38}{figure.caption.56}
+\contentsline {figure}{\numberline {4.4.2.}{\ignorespaces Illeszt\IeC {\'e}s az autokorrel\IeC {\'a}ci\IeC {\'o}s adatokra}}{39}{figure.caption.57}
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {$exp$ fit}}}{39}{subfigure.2.1}
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {$exp-gauss$ fit}}}{39}{subfigure.2.2}
+\contentsline {figure}{\numberline {4.4.3.}{\ignorespaces Val\IeC {\'o}s k\IeC {\'\i }s\IeC {\'e}rleti adatsoron v\IeC {\'e}gzett inferencia eredm\IeC {\'e}nyei}}{40}{figure.caption.58}
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {$R_a-cm$ likelihood}}}{40}{subfigure.3.1}
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {$R_a-g_{pas}$ likelihood}}}{40}{subfigure.3.2}
+\contentsline {subfigure}{\numberline {(c)}{\ignorespaces {$cm-g_{pas}$ likelihood}}}{40}{subfigure.3.3}
+\contentsline {subfigure}{\numberline {(d)}{\ignorespaces {$R_a$ likelihood}}}{40}{subfigure.3.4}
+\contentsline {subfigure}{\numberline {(e)}{\ignorespaces {$cm$ likelihood}}}{40}{subfigure.3.5}
+\contentsline {subfigure}{\numberline {(f)}{\ignorespaces {$g_{pas}$ likelihood}}}{40}{subfigure.3.6}
+\contentsline {subfigure}{\numberline {(g)}{\ignorespaces {$R_a-cm$ poszterior}}}{40}{subfigure.3.7}
+\contentsline {subfigure}{\numberline {(h)}{\ignorespaces {$R_a-g_{pas}$ poszterior}}}{40}{subfigure.3.8}
+\contentsline {subfigure}{\numberline {(i)}{\ignorespaces {$cm-g_{pas}$ poszterior}}}{40}{subfigure.3.9}
+\contentsline {subfigure}{\numberline {(j)}{\ignorespaces {$R_a$ poszterior}}}{40}{subfigure.3.10}
+\contentsline {subfigure}{\numberline {(k)}{\ignorespaces {$cm$ poszterior}}}{40}{subfigure.3.11}
+\contentsline {subfigure}{\numberline {(l)}{\ignorespaces {$g_{pas}$ poszterior}}}{40}{subfigure.3.12}
+\contentsline {figure}{\numberline {4.4.4.}{\ignorespaces Val\IeC {\'o}s k\IeC {\'\i }s\IeC {\'e}rleti adatsoron v\IeC {\'e}gzett inferencia \IeC {\"o}sszefoglal\IeC {\'o} \IeC {\'a}br\IeC {\'a}ja}}{41}{figure.caption.59}
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {Likelihood eredm\IeC {\'e}nyek}}}{41}{subfigure.4.1}
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {Poszterior eloszl\IeC {\'a}s}}}{41}{subfigure.4.2}

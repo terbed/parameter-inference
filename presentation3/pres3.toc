@@ -1,0 +1,3 @@
+\select@language {magyar} \beamer@endinputifotherversion {3.36pt}
+\select@language {magyar} \beamer@sectionintoc {1}{Protokollok inform\IeC {\'a}ci\IeC {\'o}tartalma}{3}{0}{1}
+\select@language {magyar} \beamer@sectionintoc {2}{Ism\IeC {\'e}tl\IeC {\'e}sek \IeC {\'e}s kombin\IeC {\'a}ci\IeC {\'o}k vizsg\IeC {\'a}lata}{11}{0}{2}
