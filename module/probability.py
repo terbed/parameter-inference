@@ -4,6 +4,7 @@ import multiprocessing
 from multiprocessing import Pool
 from functools import partial
 import likelihood
+from module.trace import analyse, kl_test
 import plot
 import os
 
@@ -195,6 +196,7 @@ class Inference:
 
         self.likelihood = []
         self.posterior = []
+        self.KL = 0.
 
     @staticmethod
     def check_directory(working_path):
@@ -229,6 +231,7 @@ class Inference:
     def __create_posterior(self):
         self.posterior = np.multiply(self.likelihood, self.p.joint_prior)
         self.posterior /= np.sum(self.posterior) * self.p.joint_step
+        self.KL = kl_test(self.posterior.flat, self.p.joint_prior.flat, self.p.joint_step)
 
     def __max_probability(self):
         max_l = self.p.parameter_set_seq[np.argmax(self.likelihood)]
@@ -254,6 +257,7 @@ class Inference:
     def __save_result(self):
         plot.save_file(self.likelihood, self.working_path + "/loglikelihood", "loglikelihood", header=str(self.p.name) + str(self.p.shape))
         plot.save_params(self.p.params, path=self.working_path + "/loglikelihood")
+        plot.save_file(self.target, self.working_path + "/loglikelihood", "target_trace")
         print "loglikelihood.txt data Saved!"
 
     def __str__(self):
@@ -265,7 +269,6 @@ class Inference:
         """
         :return:  (param1_stat, param2_stat, ... , paramn_stat)
         """
-        from module.trace import analyse
         print "\n Running analysation..."
 
         # Do some analysis on results
@@ -367,6 +370,8 @@ class IndependentInference(Inference):
         for idx in range(n):
             plot.save_file(self.likelihood[:, idx], self.working_path + "/fixed_params", "loglikelihood",
                            header=str(self.p.name) + str(self.p.shape))
+            plot.save_file(self.target[:, idx], self.working_path + "/fixed_params", "target_trace")
+
 
         print "Log likelihood data Saved!"
 

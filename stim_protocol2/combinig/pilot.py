@@ -8,60 +8,48 @@ hz = [1, 10, 100]
 duration = [3, 20, 200]
 
 p_names = ['Ra', 'cm', 'gpas']
-res = [60, 60, 60]
+p_res = [60, 60, 60]  # Parameters resolution
+p_range = [[40, 160], [0.4, 1.6], [0.00004, 0.00016]]  # Fixed range, but "true value" may change!
+p_mean = [150., 1., 0.0001]  # Fixed prior mean
+p_std = [20., 2., 0.00002]  # Fixed prior std
+
 noise = 7.
-n = 30
+noise_rep = 30
 model = stick_and_ball
 
-Ra = RandomVariable(name='Ra', range_min=50., range_max=150., resolution=60, mean=100., sigma=20.)
-gpas = RandomVariable(name='gpas', range_min=0.00005, range_max=0.00015, resolution=60, mean=0.0001, sigma=0.00002)
-cm = RandomVariable(name='cm', range_min=0.5, range_max=1.5, resolution=60, mean=1., sigma=0.2)
+# Set up random seed
+np.random.seed(42)
 
-# Load fixed parameters: list of parameters to be inferred
-fixed_params = [Ra, cm, gpas]
 
 for i in range(10):
-    # Set up mean and range for a cycle of simulation
-    current_mean = {}
-    current_minrange = []
-    current_maxrange = []
 
-    for item in fixed_params:
-        if item.name == 'Ra':
-            mean = np.random.normal(item.mean, item.sigma / 2.)
-            current_mean['Ra'] = mean
-            current_minrange.append(mean - item.offset)
-            current_maxrange.append(mean + item.offset)
-        else:
-            mean = np.random.normal(item.mean, item.sigma)
-            current_mean[item.name] = mean
-            current_minrange.append(mean - item.offset)
-            current_maxrange.append(mean + item.offset)
+    # Set up "true" value for this cycle
+    current_value = {}
 
-    # Biopysicsal parameters can't be negative
-    for idx, item in enumerate(current_minrange):
-        if item <= 0.:
-            current_minrange[idx] = 0.000001
+    for i in range(len(p_names)):
+        val = np.random.normal(p_mean[i], p_std[i])
+        current_value[p_names[i]] = val
 
     # Set up parameters for one cycle
     current_params = []
     for idx, item in enumerate(p_names):
-        current_params.append(RandomVariable(item, range_min=current_minrange[idx], range_max=current_maxrange[idx],
-                                             resolution=res[idx], mean=current_mean[item],
-                                             sigma=fixed_params[idx].sigma))
+        current_params.append(RandomVariable(name=item, range_min=p_range[idx][0], range_max=p_range[idx][1],
+                                            resolution=p_res[idx], value=current_value[item],
+                                            sigma=p_std[idx], mean=p_mean[idx]))
 
     for item in hz:
         print "\n\n---------------------------------------- Running %i Hz zap protocol" % item
 
+        # Stimulus path
         stim = np.loadtxt("/home/szabolcs/parameter_inference/stim_protocol2_v5/zap/%i/stim.txt" % item)
         working_path = "/home/szabolcs/parameter_inference/stim_protocol2_v5/combinig/zaps/%i(%i)" % (item,i)
 
         # Generate deterministic trace and create synthetic data with noise model
         _, v = model(stype='custom', custom_stim=stim,
-                     Ra=current_mean['Ra'], gpas=current_mean['gpas'], cm=current_mean['cm'])
+                     Ra=current_value['Ra'], gpas=current_value['gpas'], cm=current_value['cm'])
 
-        # Generate n synthetic data (n noise realisation)
-        data = more_w_trace(noise, v, n)
+        # Generate noise_rep synthetic data (noise_rep portion noise realisation)
+        data = more_w_trace(noise, v, noise_rep)
 
         pset = ParameterSet(*current_params)
 
@@ -74,15 +62,16 @@ for i in range(10):
     for item in duration:
         print "\n\n---------------------------------------- Running %i ms impulse protocol" % item
 
+        # Stimulus path
         stim = np.loadtxt("/home/szabolcs/parameter_inference/stim_protocol2_v5/steps/%i/stim.txt" % item)
         working_path = "/home/szabolcs/parameter_inference/stim_protocol2_v5/combinig/steps/%i(%i)" % (item, i)
 
         # Generate deterministic trace and create synthetic data with noise model
         _, v = model(stype='custom', custom_stim=stim,
-                     Ra=current_mean['Ra'], gpas=current_mean['gpas'], cm=current_mean['cm'])
+                     Ra=current_value['Ra'], gpas=current_value['gpas'], cm=current_value['cm'])
 
         # Generate n synthetic data (n noise realisation)
-        data = more_w_trace(noise, v, n)
+        data = more_w_trace(noise, v, noise_rep)
 
         pset = ParameterSet(*current_params)
 

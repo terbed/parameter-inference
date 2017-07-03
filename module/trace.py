@@ -174,6 +174,8 @@ def kl_test(posterior, prior, step, eps=0.0001):
     :return: KL divergence of the two given distribution
     """
 
+    print "Before: " + str(len(prior))
+
     # Clip the too low values
     i = 0  # count deleted indexes
     for idx, item in enumerate(prior):
@@ -181,6 +183,8 @@ def kl_test(posterior, prior, step, eps=0.0001):
             prior = np.delete(prior, idx - i, axis=None)
             posterior = np.delete(posterior, idx - i, axis=None)
             i += 1
+
+    print "After: " + str(len(prior))
 
     # KL-divergence
     kdl = 0
