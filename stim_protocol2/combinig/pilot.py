@@ -8,7 +8,7 @@ hz = [1, 10, 100]
 duration = [3, 20, 200]
 
 p_names = ['Ra', 'cm', 'gpas']
-p_res = [60, 60, 60]  # Parameters resolution
+p_res = [10, 10, 10]  # Parameters resolution
 p_range = [[40, 160], [0.4, 1.6], [0.00004, 0.00016]]  # Fixed range, but "true value" may change!
 p_mean = [150., 1., 0.0001]  # Fixed prior mean
 p_std = [20., 2., 0.00002]  # Fixed prior std
@@ -26,9 +26,9 @@ for i in range(10):
     # Set up "true" value for this cycle
     current_value = {}
 
-    for i in range(len(p_names)):
-        val = np.random.normal(p_mean[i], p_std[i])
-        current_value[p_names[i]] = val
+    for j in range(len(p_names)):
+        val = np.random.normal(p_mean[j], p_std[j])
+        current_value[p_names[j]] = val
 
     # Set up parameters for one cycle
     current_params = []
@@ -41,8 +41,8 @@ for i in range(10):
         print "\n\n---------------------------------------- Running %i Hz zap protocol" % item
 
         # Stimulus path
-        stim = np.loadtxt("/home/szabolcs/parameter_inference/stim_protocol2_v5/zap/%i/stim.txt" % item)
-        working_path = "/home/szabolcs/parameter_inference/stim_protocol2_v5/combinig/zaps/%i(%i)" % (item,i)
+        stim = np.loadtxt("/Users/Dani/TDK/parameter_estim/stim_protocol2/zap/%i/stim.txt" % item)
+        working_path = "/Users/Dani/TDK/parameter_estim/stim_protocol2/debug/zaps/%i(%i)" % (item,i)
 
         # Generate deterministic trace and create synthetic data with noise model
         _, v = model(stype='custom', custom_stim=stim,
@@ -63,8 +63,8 @@ for i in range(10):
         print "\n\n---------------------------------------- Running %i ms impulse protocol" % item
 
         # Stimulus path
-        stim = np.loadtxt("/home/szabolcs/parameter_inference/stim_protocol2_v5/steps/%i/stim.txt" % item)
-        working_path = "/home/szabolcs/parameter_inference/stim_protocol2_v5/combinig/steps/%i(%i)" % (item, i)
+        stim = np.loadtxt("/Users/Dani/TDK/parameter_estim/stim_protocol2/steps/%i/stim.txt" % item)
+        working_path = "/Users/Dani/TDK/parameter_estim/stim_protocol2/debug//steps/%i(%i)" % (item, i)
 
         # Generate deterministic trace and create synthetic data with noise model
         _, v = model(stype='custom', custom_stim=stim,
