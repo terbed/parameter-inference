@@ -1,5 +1,5 @@
 import numpy as np
-
+from matplotlib import pyplot as plt
 
 def independent_1d(simulation_func, x_values, y, sigma, target_trace):
     """Returns the one dimensional likelihood function for the INDEPENDENT observation as a numpy array
@@ -102,6 +102,7 @@ def mill(param_set, model, target_traces, noise_std):
         dev.append(np.subtract(target_traces[idx, :], v))
     for idx in range(n):
         log_l.append(-np.sum(np.square(dev[idx])) / (2 * noise_std ** 2))
+
 
     return log_l
 

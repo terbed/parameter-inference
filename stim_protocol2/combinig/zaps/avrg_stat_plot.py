@@ -13,6 +13,8 @@ Ra_b = np.loadtxt("/Users/Dani/TDK/parameter_estim/stim_protocol2/combinig/zaps/
 Ra_rd = np.loadtxt("/Users/Dani/TDK/parameter_estim/stim_protocol2/combinig/zaps/Ra_rdiff.txt")
 Ra_s = np.loadtxt("/Users/Dani/TDK/parameter_estim/stim_protocol2/combinig/zaps/Ra_sharpness.txt")
 
+KL = np.loadtxt("/Users/Dani/TDK/parameter_estim/stim_protocol2/combinig/zaps/KL.txt")
+
 cm_avrg_b = np.average(cm_b[:, 1:], axis=1)
 cm_std_b = np.std(cm_b[:, 1:], axis=1)
 cm_avrg_s = np.average(cm_s[:, 1:], axis=1)
@@ -27,6 +29,19 @@ Ra_avrg_b = np.average(Ra_b[:, 1:], axis=1)
 Ra_std_b = np.std(Ra_b[:, 1:], axis=1)
 Ra_avrg_s = np.average(Ra_s[:, 1:], axis=1)
 Ra_std_s = np.std(Ra_s[:, 1:], axis=1)
+
+KL_avrg = np.average(KL[:, 1:], axis=1)
+KL_std = np.std(KL[:, 1:], axis=1)
+
+plt.figure(figsize=(12,7))
+plt.title("Averaged Kullback Lieber divergence relative to the prior")
+plt.xlabel("Frequency [Hz]")
+plt.ylabel("KL information gain")
+plt.plot(KL[:,0], KL_avrg, marker='o')
+plt.errorbar(KL[:,0], KL_avrg, yerr=KL_std, linestyle='None')
+plt.grid()
+plt.legend(loc='best')
+plt.savefig("KL_information_gain.png")
 
 plt.figure(figsize=(12,7))
 plt.title("Averaged sharpness for each paramter")

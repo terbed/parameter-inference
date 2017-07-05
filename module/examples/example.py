@@ -6,7 +6,7 @@ from module.plot import plot_joint, fullplot
 noise = 7.
 
 # 1.) Parameters to infer
-cm = RandomVariable(name= 'cm', range_min=0.5, range_max=1.5, resolution=60, mean=1.2, sigma=0.2, value=1.)
+cm = RandomVariable(name='cm', range_min=0.5, range_max=1.5, resolution=60, mean=1.2, sigma=0.2, value=1.)
 gpas = RandomVariable(name='gpas', range_min=0.00005, range_max=0.00015, resolution=60, mean=0.00008, sigma=0.00002, value=0.0001)
 # Ra = RandomVariable(name='Ra', range_min=50., range_max=150., resolution=60, mean=100., sigma=20.)
 
@@ -28,7 +28,7 @@ if __name__ == "__main__":
 # 6.) Run evaluation
 inf.run_evaluation()
 
-print inf.KL
+print "KL divergence test: %f" % inf.KL
 
 # 7.) Plot solution
 print inf

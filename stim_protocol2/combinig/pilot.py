@@ -11,7 +11,7 @@ p_names = ['Ra', 'cm', 'gpas']
 p_res = [10, 10, 10]  # Parameters resolution
 p_range = [[40, 160], [0.4, 1.6], [0.00004, 0.00016]]  # Fixed range, but "true value" may change!
 p_mean = [150., 1., 0.0001]  # Fixed prior mean
-p_std = [20., 2., 0.00002]  # Fixed prior std
+p_std = [20., 0.2, 0.00002]  # Fixed prior std
 
 noise = 7.
 noise_rep = 30
@@ -22,13 +22,14 @@ np.random.seed(42)
 
 
 for i in range(10):
-
+    print "\n\n--- SIMULATION FOR %ith FIXED PARAMETER ---" % (i+1)
     # Set up "true" value for this cycle
-    current_value = {}
+    current_value = {}                                          
 
     for j in range(len(p_names)):
         val = np.random.normal(p_mean[j], p_std[j])
         current_value[p_names[j]] = val
+
 
     # Set up parameters for one cycle
     current_params = []
@@ -42,7 +43,7 @@ for i in range(10):
 
         # Stimulus path
         stim = np.loadtxt("/Users/Dani/TDK/parameter_estim/stim_protocol2/zap/%i/stim.txt" % item)
-        working_path = "/Users/Dani/TDK/parameter_estim/stim_protocol2/debug/zaps/%i(%i)" % (item,i)
+        working_path = "/Users/Dani/TDK/parameter_estim/stim_protocol2/zaps/%i(%i)" % (item,i)
 
         # Generate deterministic trace and create synthetic data with noise model
         _, v = model(stype='custom', custom_stim=stim,
@@ -64,7 +65,7 @@ for i in range(10):
 
         # Stimulus path
         stim = np.loadtxt("/Users/Dani/TDK/parameter_estim/stim_protocol2/steps/%i/stim.txt" % item)
-        working_path = "/Users/Dani/TDK/parameter_estim/stim_protocol2/debug//steps/%i(%i)" % (item, i)
+        working_path = "/Users/Dani/TDK/parameter_estim/stim_protocol2/steps/%i(%i)" % (item, i)
 
         # Generate deterministic trace and create synthetic data with noise model
         _, v = model(stype='custom', custom_stim=stim,

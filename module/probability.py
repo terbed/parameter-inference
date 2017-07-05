@@ -26,7 +26,7 @@ class RandomVariable:
         :param value: the true value (optional) if not given, than value=mean
         :param p_sampling: parameter sampling method: uniform: 'u' or prior: 'p' (sampled from prior distribution)
         """
-        self.init = [name, str(range_min), str(range_max), str(resolution), str(mean), str(sigma)]
+        self.init = [name, str(range_min), str(range_max), str(resolution), str(mean), str(sigma), str(value)]
         self.name = name
         self.unit = self.get_unit()
         self.value = value
@@ -252,7 +252,7 @@ class Inference:
     def __fit_posterior(self):
         from module.trace import fit_normal
         for item in self.p.params:
-            item.fitted_gauss = fit_normal(item.values, item.posterior, item.mean, item.sigma)
+            item.fitted_gauss = fit_normal(item.values, item.posterior, item.value, item.sigma)
 
     def __save_result(self):
         plot.save_file(self.likelihood, self.working_path + "/loglikelihood", "loglikelihood", header=str(self.p.name) + str(self.p.shape))

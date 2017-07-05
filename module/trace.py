@@ -98,16 +98,18 @@ def fit_normal(x, y, *p_init):
 
 def analyse(param, p_opt):
     # Create high resolution (prior and) posterior from fitted function
-    x = np.linspace(param.range_min, param.range_max, 5000)
+    x = np.linspace(param.range_min, param.range_max, 3000)
     prior = normal(x, param.mean, param.sigma)
     posterior = normal(x, p_opt[0][0], p_opt[0][1])
+    # Ensure that posterior is in range:
+    xp = np.linspace(p_opt[0][0] - 2*p_opt[0][1], p_opt[0][0] + 2*p_opt[0][1], 3000)
 
     # Do some statistics
     true_idx = (np.abs(x - param.value)).argmin()
 
-    sharper = sharpness(x, prior) / sharpness(x, posterior)
-    broadness = sharpness(x, posterior) / sharpness(x, prior) * 100
-    rdiff = (p_opt[0][0] - param.value) / param.value * 100
+    sharper = sharpness(x, prior) / sharpness(xp, posterior)
+    broadness = sharpness(xp, posterior) / sharpness(x, prior) * 100
+    rdiff = (param.value - p_opt[0][0]) / param.value * 100
     accuracy = posterior[true_idx] / np.amax(posterior) * 100
 
     # The relative sigma + mean error
@@ -163,7 +165,7 @@ def stat(param):
     return abs(p_opt[1]), diff, accuracy, sharper, p_err[1], broader
 
 
-def kl_test(posterior, prior, step, eps=0.0001):
+def kl_test(posterior, prior, step, eps=0.00001):
     """
     Kullback-Leiber test for (numerically continuous) probability distributions.
 
@@ -174,22 +176,20 @@ def kl_test(posterior, prior, step, eps=0.0001):
     :return: KL divergence of the two given distribution
     """
 
-    print "Before: " + str(len(prior))
+    pi = []
+    post = []
 
     # Clip the too low values
-    i = 0  # count deleted indexes
     for idx, item in enumerate(prior):
-        if item < eps:
-            prior = np.delete(prior, idx - i, axis=None)
-            posterior = np.delete(posterior, idx - i, axis=None)
-            i += 1
+        if item > eps and posterior[idx] > eps:
+            pi.append(item)
+            post.append(posterior[idx])
 
-    print "After: " + str(len(prior))
 
     # KL-divergence
-    kdl = 0
-    for i, p in enumerate(posterior):
-        kdl += p * np.log(p / prior[i])*step
+    kdl = 0.
+    for i, p in enumerate(post):
+        kdl += p * np.log(p / pi[i])*step
 
     return kdl
 

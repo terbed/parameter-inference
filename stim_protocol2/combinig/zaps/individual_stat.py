@@ -18,6 +18,8 @@ result_Ra_d = np.empty((len(duration), p_num+1))
 result_cm_d = np.empty((len(duration), p_num+1))
 result_gpas_d = np.empty((len(duration), p_num+1))
 
+KL = np.empty((len(duration), p_num+1))
+
 for idx, dur in enumerate(hz):
     result_Ra[idx, 0] = dur # Set up first col
     result_cm[idx, 0] = dur
@@ -28,6 +30,8 @@ for idx, dur in enumerate(hz):
     result_Ra_d[idx, 0] = dur
     result_cm_d[idx, 0] = dur
     result_gpas_d[idx, 0] = dur
+    KL[idx, 0] = dur
+
     for n in range(p_num):
         l = np.loadtxt("/Users/Dani/TDK/parameter_estim/stim_protocol2/combinig/zaps/%i(%i)/loglikelihood.txt"
                        % (dur, n))
@@ -53,6 +57,7 @@ for idx, dur in enumerate(hz):
         result_Ra_d[idx, n+1] = stat[0][2]
         result_cm_d[idx, n + 1] = stat[1][2]
         result_gpas_d[idx, n + 1] = stat[2][2]
+        KL[idx, n+1] = inf.KL
 
 np.savetxt("/Users/Dani/TDK/parameter_estim/stim_protocol2/combinig/zaps/Ra_sharpness.txt", result_Ra)
 np.savetxt("/Users/Dani/TDK/parameter_estim/stim_protocol2/combinig/zaps/Ra_broadness.txt", result_Ra_b)
@@ -63,3 +68,4 @@ np.savetxt("/Users/Dani/TDK/parameter_estim/stim_protocol2/combinig/zaps/gpas_br
 np.savetxt("/Users/Dani/TDK/parameter_estim/stim_protocol2/combinig/zaps/Ra_rdiff.txt", result_Ra_d)
 np.savetxt("/Users/Dani/TDK/parameter_estim/stim_protocol2/combinig/zaps/cm_rdiff.txt", result_cm_d)
 np.savetxt("/Users/Dani/TDK/parameter_estim/stim_protocol2/combinig/zaps/gpas_rdiff.txt", result_gpas_d)
+np.savetxt("/Users/Dani/TDK/parameter_estim/stim_protocol2/combinig/zaps/KL.txt", result_gpas_d)

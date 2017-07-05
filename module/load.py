@@ -24,7 +24,8 @@ def load_inference(loglikelihood, working_path, *param_data):
     p = []
     for item in param_data:
         p.append(
-            RandomVariable(item[0], float(item[1]), float(item[2]), float(item[3]), float(item[4]), float(item[5])))
+            RandomVariable(name=item[0], range_min=float(item[1]), range_max=float(item[2]), resolution=float(item[3]),
+                           mean=float(item[4]), sigma=float(item[5]), value=float(item[6])))
 
     pset = ParameterSet(*p)
     inf = Inference(model=None, target_trace=None, parameter_set=pset, working_path=working_path, save=False)
