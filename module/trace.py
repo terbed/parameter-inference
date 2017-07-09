@@ -8,6 +8,7 @@ from scipy.interpolate import interp1d
 from scipy.optimize import curve_fit
 from module.prior import normal_val, normal
 
+
 def interpolate(x, y):
     """
     Cubic interpolation for the given symmetric distribution and test the resolution
@@ -97,6 +98,13 @@ def fit_normal(x, y, *p_init):
 
 
 def analyse(param, p_opt):
+    """
+    This function analyses the marginal posterior for the given parameter
+    :param param: RandomVariable object after inference
+    :param p_opt: The initial values for normal distribution fitting to posterior data
+    :return: (fitted_sigma, fit_err, relative_deviation, acc, sharper, broader) tuple
+    """
+
     # Create high resolution (prior and) posterior from fitted function
     x = np.linspace(param.range_min, param.range_max, 3000)
     prior = normal(x, param.mean, param.sigma)

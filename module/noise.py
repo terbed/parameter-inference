@@ -11,22 +11,49 @@ def white(sigma, v_vec, mu=0):
     return np.array(exp_v)
 
 
-def more_w_trace(sigma, v_vec, n):
+def sampling_from_prior(p_set, num):
     """
-    This method is useful, when we run inference with fix parameters but more noise effect (synthetic data)
+    :param p_set: ParameterSet object
+    :param num: Number of sampled items
+    :return: A list with num dict elements: [{}, {}, ...]
+    """
+    tmp = []
+
+    for i in range(num):
+        sampled_set = {}
+        for param in p_set.params:
+            val = np.random.normal(param.mean, param.sigma)
+            sampled_set[param.name] = val
+        tmp.append(sampled_set)
+        sampled_set = {}
+
+    return tmp
+
+
+def more_w_trace(sigma, model, params, rep):
+    """
+    Creates synthetic traces for given parameters and given noise effect repetition.
     
     :param sigma: White noise standard deviation
-    :param v_vec: Trace to be noised
-    :param n: Number of created noisy traces
-    :return: (n, len(v_vec)) dimension np.array
+    :param rep: Number of created noisy traces for a single fixed parameter
+    :param params: Fixed parameters. Generate synthetic data with these parameters. Type: [{},{},...]
+    :return: (num_of_paramset, num_of_rep, trace_len) shaped np.array
+    [param1, param2,...] -> [[trace,trace,trace,...], [trace, trace, tracce,...],...] where trace is the sythetic data
     """
 
     moretrace = []
 
-    for _ in range(n):
-        noise = np.random.normal(0, sigma, len(v_vec))
-        synthetic_data = np.add(v_vec, noise)
-        moretrace.append(synthetic_data)
+    for item in params:
+        current_param = []
+        _, v = model(**item)
+
+        for _ in range(rep):
+            noise = np.random.normal(0, sigma, len(v))
+            synthetic_data = np.add(v, noise)
+            current_param.append(synthetic_data)
+
+        moretrace.append(current_param)
+        current_param = []
 
     return np.array(moretrace)
 

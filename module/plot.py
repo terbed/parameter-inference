@@ -31,7 +31,7 @@ def save_params(params, path):
         i = 0
         while os.path.exists('{}({:d}).txt'.format(path + "/" + item.name, i)):
             i += 1
-        np.savetxt('{}({:d}).txt'.format(path + "/" + item.name, i), item.init, fmt="%s",
+        np.savetxt('{}({:d}).txt'.format(path + "/" + item.name, i), item.get_init(), fmt="%s",
                    header="name, range_min, range_max, resolution, prior_mean, prior_std, true_value")
 
 

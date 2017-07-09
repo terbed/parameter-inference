@@ -94,15 +94,29 @@ def ill(param_set, model, target_trace, noise_sigma):
 
 
 def mill(param_set, model, target_traces, noise_std):
+    """
+    Evaluate more than one target trace at one simulation
+    :param param_set: 
+    :param model: 
+    :param target_traces: 
+    :param noise_std: 
+    :return: (fixed_param_num, noise_repetition_num) shaped list: [ [...], [...], [...],...]
+    """
+
     (_, v) = model(**param_set)
-    n = target_traces.shape[0]
+    pnum = target_traces.shape[0]
+    rep = target_traces.shape[1]
+
     dev = []
     log_l = []
-    for idx in range(n):
-        dev.append(np.subtract(target_traces[idx, :], v))
-    for idx in range(n):
-        log_l.append(-np.sum(np.square(dev[idx])) / (2 * noise_std ** 2))
 
+    for j in range(pnum):
+        current_param = []
+        for idx in range(rep):
+            dev = np.subtract(target_traces[j, idx, :], v)
+            current_param.append(-np.sum(np.square(dev)) / (2 * noise_std ** 2))
+        log_l.append(current_param)
+        current_param = []
 
     return log_l
 

@@ -26,16 +26,18 @@ class RandomVariable:
         :param value: the true value (optional) if not given, than value=mean
         :param p_sampling: parameter sampling method: uniform: 'u' or prior: 'p' (sampled from prior distribution)
         """
-        self.init = [name, str(range_min), str(range_max), str(resolution), str(mean), str(sigma), str(value)]
+
         self.name = name
         self.unit = self.get_unit()
+        self.mean = mean
         self.value = value
+        if self.value is None:
+            self.value = self.mean
         self.range_min = range_min
         self.range_max = range_max
         self.offset = self.get_offset()
         self.resolution = resolution
         self.sampling_type = p_sampling
-        self.mean = mean
         self.sigma = sigma
         self.step = np.abs(range_max-range_min)/resolution
         self.values = self.__get_values()
@@ -55,6 +57,10 @@ class RandomVariable:
     def get_unit(self):
         database = {'Ra': '[ohm cm]', 'cm': '[uF/cm^2]', 'gpas': '[uS/cm^2]'}
         return database[self.name]
+
+    def get_init(self):
+        return [self.name, str(self.range_min), str(self.range_max),
+                str(self.resolution), str(self.mean), str(self.sigma), str(self.value)]
 
     # The typical range around mean fo parameter
     def get_offset(self):
@@ -267,7 +273,7 @@ class Inference:
 
     def analyse_result(self):
         """
-        :return:  (param1_stat, param2_stat, ... , paramn_stat)
+        :return: (fitted_sigma, fit_err, relative_deviation, acc, sharper, broader) tuple
         """
         print "\n Running analysation..."
 
@@ -289,6 +295,11 @@ class IndependentInference(Inference):
         self.std = noise_std
 
     def run_sim(self):
+        """
+        Run Single simulation
+        :return: 
+        """
+
         if self.speed == "min":
             if self.p.isBatch:
                 pool = Pool(multiprocessing.cpu_count() - 1)
@@ -350,29 +361,6 @@ class IndependentInference(Inference):
             pool.join()
 
             print "log likelihood DONE!"
-
-    def run_moretrace_inf(self):
-        pool = Pool(multiprocessing.cpu_count() - 1)
-        log_likelihood_func = partial(likelihood.mill, model=self.m, target_traces=self.target, noise_std=self.std)
-        print "Running " + str(len(self.p.parameter_set_seq)) + " simulations on all cores..."
-
-        self.likelihood = pool.map(log_likelihood_func, self.p.parameter_set_seq)
-        pool.close()
-        pool.join()
-
-        print "log likelihood DONE!"
-
-        # Save result
-        n = self.target.shape[0]
-        self.likelihood = np.array(self.likelihood)
-
-        plot.save_params(self.p.params, path=self.working_path + "/fixed_params")
-        for idx in range(n):
-            plot.save_file(self.likelihood[:, idx], self.working_path + "/fixed_params", "loglikelihood",
-                           header=str(self.p.name) + str(self.p.shape))
-            plot.save_file(self.target[idx, :], self.working_path + "/fixed_params", "target_trace")
-
-        print "Log likelihood data Saved!"
 
 
 class DependentInference(Inference):

@@ -4,9 +4,9 @@ from functools import partial
 
 
 def get_default_param(name):
-    Ra = RandomVariable(name='Ra', range_min=50., range_max=150., resolution=40, mean=100., sigma=20.)
-    gpas = RandomVariable(name='gpas', range_min=0.00005, range_max=0.00015, resolution=40, mean=0.0001, sigma=0.00002)
-    cm = RandomVariable(name='cm', range_min=0.5, range_max=1.5, resolution=40, mean=1., sigma=0.2)
+    Ra = RandomVariable(name='Ra', range_min=50., range_max=150., resolution=10, mean=100., sigma=20.)
+    gpas = RandomVariable(name='gpas', range_min=0.00005, range_max=0.00015, resolution=10, mean=0.0001, sigma=0.00002)
+    cm = RandomVariable(name='cm', range_min=0.5, range_max=1.5, resolution=10, mean=1., sigma=0.2)
     dict = {'Ra' : Ra, 'cm': cm, 'gpas': gpas}
 
     return dict[name]
@@ -18,7 +18,7 @@ def load_inference(loglikelihood, working_path, *param_data):
 
     :param loglikelihood: loglikelihood data of inference
     :param working_path: Where to print the results
-    :param param_data: List containing: [name, range_min, range_max, resolution, mean, sigma]
+    :param param_data: List containing: [name, range_min, range_max, resolution, mean, sigma, value]
     :return: inference object ready to evaluate
     """
     p = []
