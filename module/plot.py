@@ -17,24 +17,6 @@ def check_directory(working_path):
         os.makedirs(working_path)
 
 
-def save_file(X, path, name, header=''):
-    check_directory(path)
-    i = 0
-    while os.path.exists('{}({:d}).txt'.format(path + "/" + name, i)):
-        i += 1
-    np.savetxt('{}({:d}).txt'.format(path + "/" + name, i), X, header=header, delimiter='\t')
-
-
-def save_params(params, path):
-    check_directory(path)
-    for item in params:
-        i = 0
-        while os.path.exists('{}({:d}).txt'.format(path + "/" + item.name, i)):
-            i += 1
-        np.savetxt('{}({:d}).txt'.format(path + "/" + item.name, i), item.get_init(), fmt="%s",
-                   header="name, range_min, range_max, resolution, prior_mean, prior_std, true_value")
-
-
 def fullplot(result):
     """
 
@@ -364,7 +346,6 @@ def plot_stat(stat, param, path='', bin=None):
 
     posterior = normal(x, param.mean, avrg_sigma)
     post_max = np.amax(posterior)
-
 
     plt.figure(figsize=(12, 8))
     plt.title('rdiff(g): %.0f%%, acc(b): %.2f%%, gain: (%.2f pm %.2f), broad: (%.1f%% pm %.1f%%) |' % (

@@ -6,6 +6,7 @@ from functools import partial
 import likelihood
 from module.trace import analyse, kl_test
 import plot
+from save_load import save_file, save_params
 import os
 
 
@@ -261,9 +262,9 @@ class Inference:
             item.fitted_gauss = fit_normal(item.values, item.posterior, item.value, item.sigma)
 
     def __save_result(self):
-        plot.save_file(self.likelihood, self.working_path + "/loglikelihood", "loglikelihood", header=str(self.p.name) + str(self.p.shape))
-        plot.save_params(self.p.params, path=self.working_path + "/loglikelihood")
-        plot.save_file(self.target, self.working_path + "/loglikelihood", "target_trace")
+        save_file(self.likelihood, self.working_path + "/loglikelihood", "loglikelihood", header=str(self.p.name) + str(self.p.shape))
+        save_params(self.p.params, path=self.working_path + "/loglikelihood")
+        save_file(self.target, self.working_path + "/loglikelihood", "target_trace")
         print "loglikelihood.txt data Saved!"
 
     def __str__(self):
