@@ -4,9 +4,11 @@ import multiprocessing
 from multiprocessing import Pool
 from functools import partial
 import likelihood
+from module.save_load import save_zipped_pickle, save_to_txt, load_zipped_pickle, load_parameter_set, save_file
+from module.analyze import Analyse
 
 
-def protocol_test(model, target_traces, noise_std, param_set, fixed_params, working_path):
+def run_protocol_simulations(model, target_traces, noise_std, param_set, fixed_params, working_path, save_txt=False):
     """
     Run multiple simulation. Use more_w_trace method to generate synthetic data!
     :param model: model function
@@ -25,25 +27,203 @@ def protocol_test(model, target_traces, noise_std, param_set, fixed_params, work
     print "Running " + str(len(param_set.parameter_set_seq)) + " simulations on all cores..."
 
     log_likelihood = pool.map(log_likelihood_func, param_set.parameter_set_seq)
+    log_likelihood = np.array(log_likelihood)
     pool.close()
     pool.join()
 
     print "log likelihood DONE!"
 
     # Save result
-    pnum = target_traces.shape[0]
-    rep = target_traces.shape[1]
-    log_likelihood = np.array(log_likelihood)
+    if save_txt:
+        save_to_txt(target_traces, log_likelihood, fixed_params, param_set, working_path)
 
-    for j in range(pnum):
-        # Set up Fixed Params value
-        for param in param_set.params:
-            param.value = fixed_params[j][param.name]
-        # Save parameter setups for later analysis
-        plot.save_params(param_set.params, path=working_path + "/fixed_params(%i)" % j)
-        for idx in range(rep):
-            plot.save_file(log_likelihood[:, j, idx], working_path + "/fixed_params(%i)" % j, "loglikelihood",
-                           header=str(param_set.name) + str(param_set.shape))
-            plot.save_file(target_traces[j, idx, :], working_path + "/fixed_params(%i)" % j, "target_trace")
+    param_init = []
+    for param in param_set.params:
+        param_init.append(param.get_init())
 
-    print "Log likelihood data Saved!"
+    for idx, item in enumerate(fixed_params):
+        for param in param_init:  # Set up fixed param to parameter true value
+            param[6] = item[param[0]]
+
+        data = {'params_init': param_init, 'target_traces': target_traces[idx, :, :],
+                'log_likelihood': log_likelihood[:, idx, :]}
+        save_zipped_pickle(data, working_path)
+
+    print "Data SAVED!"
+
+
+def plot_single_results(path, numfp, which):
+    """
+    :param path: Working directory where the .gz result files can be found (for given protocol)
+    :param numfp: number of fixed parameters (number of files in the directory)
+    :param: which: a number under the number of repetition (number of loglikelihoods in the .gz files), which one will be plotted
+    :return: Plot inference result for each parameter -- the selected one (which)
+    """
+
+    for i in range(numfp):
+        print "\n\n%i th parameter:" % i
+        data = load_zipped_pickle(path, filename="fixed_params(%i).gz" % i)
+        p_set = load_parameter_set(data["params_init"])
+
+        res = Analyse(data["log_likelihood"][:, which], p_set, path+"/single_plots")
+        print res
+
+
+def plot_combined_results(path, numfp):
+    for i in range(numfp):
+        print "\n\n%i th parameter:" % i
+        data = load_zipped_pickle(path, filename="loglikelihood(%i).gz" % i)
+        p_set = load_parameter_set(data["params_init"])
+
+        res = Analyse(data["log_likelihood"], p_set, path+"/combined_plots")
+        print res
+
+
+def mult_likelihood(path, numfp, num_mult):
+    """
+    Create added loglikelihood data
+    :param path: Working directory where the .gz result files can be found (for given protocol)
+    :param numfp: number of fixed parameters (number of files in the directory)
+    :param num_mult: Number of likelihoods to be multiplied
+    :return: Added loglikelihoods for each parameter and params_init pickelled (saved in path directory in .gz files)
+    """
+
+    for i in range(numfp):
+        data = load_zipped_pickle(path, "fixed_params(%i).gz" % i)
+        loglikelihood = data["log_likelihood"][:, 0]
+
+        for j in range(num_mult-1):
+            loglikelihood += data["log_likelihood"][:, j+1]
+
+        d = {"params_init": data["params_init"], "log_likelihood": loglikelihood}
+        save_zipped_pickle(d, path, "loglikelihood")
+
+    print "Adding loglikelihoods DONE!"
+
+
+def combine_likelihood(path_list, numfp, num_mult_single, out_path):
+    """
+    Create combined likelihoods
+    :param path_list: Working directory where the .gz result files can be found for each protocol to combine
+    :param numfp: number of fixed parameters (number of files in the directory)
+    :param num_mult_single: number of likelihoods from one protocol (in path_list) to be multiplied
+    :param out_path: Combined protocol likelihood .gz files will be saved in this directory
+    :return: Combined protocol likelihood .gz files with params_init data in the out_path directory
+    """
+
+    for i in range(numfp):
+        data = load_zipped_pickle(path_list[0], "fixed_params(%i).gz" % i)
+        loglikelihood = data["log_likelihood"][:, 0]
+        for idx, path in enumerate(path_list):
+            if idx == 0:
+                for j in range(num_mult_single - 1):
+                    loglikelihood += data["log_likelihood"][:, j + 1]
+            else:
+                data = load_zipped_pickle(path_list[idx], "fixed_params(%i).gz" % i)
+                for j in range(num_mult_single):
+                    loglikelihood += data["log_likelihood"][:, j]
+
+        d = {"params_init": data["params_init"], "log_likelihood": loglikelihood}
+        save_zipped_pickle(d, out_path, "loglikelihood")
+
+    print "Combining likelihoods DONE!"
+
+
+def protocol_comparison(path_list, numfp, inferred_params, out_path):
+    """
+    This function compare the combined protocol results.
+    :param path_list: Path for the protocols to be compared -- and where the combined loglikelihood(x).txt files can be found
+    :param numfp: Number of fixed params -- the number of loglikelihood.txt files in the path 
+    :param inferred_params: For example: ["Ra","cm","gpas"]
+    :param out_path: The result will be saved in this directory
+    :return: .txt file each contains sharpness, broadness and KL statistics for each protocol
+    """
+    from matplotlib import pyplot as plt
+    m = 0
+
+    KL = []  # [[],[],...] for each protocol -> [[broadness, KL],[broadness, KL],...] for each fp
+    broadness = np.empty((len(path_list), numfp, len(inferred_params)))
+    for idx, path in enumerate(path_list):
+        tmp = []
+        for j in range(numfp):
+            data = load_zipped_pickle(path, "loglikelihood(%i).gz" % j)
+            p_set = load_parameter_set(data["params_init"])
+            res = Analyse(data["log_likelihood"], p_set, path)
+
+            if res.get_broadness() is not None:
+                for k in range(len(inferred_params)):
+                    broadness[idx, j-m, k] = res.get_broadness()[k]
+            else:
+                m += 1
+
+            tmp.append(res.KL)
+        KL.append(tmp)
+
+    broadness = np.array(broadness)
+    KL = np.array(KL)
+
+    # Plot KL result for each protocol
+    plt.figure(figsize=(12,7))
+    plt.title("Kullback Lieber Divergence test result for each protocol and fixed parameters")
+    plt.xlabel("Protocol types")
+    plt.ylabel("KL test")
+    for i in range(numfp):
+        plt.plot(range(len(path_list)), KL[:, i], marker='x')
+    plt.grid()
+    plt.savefig(out_path+"/KL_test.pdf")
+
+    # Plot each fixed param result in one plot for each parameter:
+    for idx, param in enumerate(inferred_params):
+        plt.figure(figsize=(12,7))
+        plt.title(param + " results for each fixed parameter")
+        plt.xlabel("Protocol types")
+        plt.ylabel("Broadness")
+        for i in range(numfp-m):
+            plt.plot(range(len(path_list)), broadness[:, i, idx], marker='x')
+        plt.grid()
+        plt.savefig(out_path+"/%s_broadness.pdf" % param)
+
+    # Create fixed parameter averaged plot
+    avrg_KL = np.average(KL, axis=1)
+    avrg_broad = broadness[:, 0, :]
+    for i in range(numfp-m-1):
+        avrg_broad += broadness[:, i+1, :]
+    avrg_broad = np.divide(avrg_broad, numfp-m)
+    print avrg_broad.shape
+
+    plt.figure(figsize=(12,7))
+    plt.title("Averaged Kullback Lieber Divergence test result for each protocol")
+    plt.xlabel("Protocol types")
+    plt.ylabel("KL test")
+    plt.plot(range(len(path_list)), avrg_KL)
+    plt.grid()
+    plt.savefig(out_path+"/averaged_KL_test.pdf")
+
+    plt.figure(figsize=(12, 7))
+    plt.xlabel("Protocol types")
+    plt.ylabel("Broadness")
+    plt.title("Averaged results for each parameter")
+    for idx, param in enumerate(inferred_params):
+        plt.plot(range(len(path_list)), avrg_broad[:, idx], label=param)
+    plt.legend(loc="best")
+    plt.grid()
+    plt.savefig(out_path+"/average_broadness.pdf")
+
+
+if __name__ == "__main__":
+    # plot_single_results("/Users/Dani/TDK/parameter_estim/stim_protocol2/combining3/steps/3", 10, 7)
+    #mult_likelihood("/Users/Dani/TDK/parameter_estim/stim_protocol2/combining3/zaps/100", 10, 30)
+    path_list = ["/Users/Dani/TDK/parameter_estim/stim_protocol2/combining3/steps/3",
+              "/Users/Dani/TDK/parameter_estim/stim_protocol2/combining3/steps/20",
+              "/Users/Dani/TDK/parameter_estim/stim_protocol2/combining3/steps/200",
+              "/Users/Dani/TDK/parameter_estim/stim_protocol2/combining3/steps/300",
+              "/Users/Dani/TDK/parameter_estim/stim_protocol2/combining3/zaps/1",
+              "/Users/Dani/TDK/parameter_estim/stim_protocol2/combining3/zaps/10",
+              "/Users/Dani/TDK/parameter_estim/stim_protocol2/combining3/zaps/100",
+              "/Users/Dani/TDK/parameter_estim/stim_protocol2/combining3/zaps/200"]
+
+    # combine_likelihood(path_list, numfp=10, num_mult_single=10,
+    #                    out_path="/Users/Dani/TDK/parameter_estim/stim_protocol2/combining3/zaps/200")
+
+    #protocol_comparison(path_list, 10, ['Ra', 'cm', 'gpas'], "/Users/Dani/TDK/parameter_estim/stim_protocol2/combining3")
+    plot_combined_results("/Users/Dani/TDK/parameter_estim/stim_protocol2/combining3/zaps/100", 10)

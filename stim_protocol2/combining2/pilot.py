@@ -3,7 +3,7 @@ from module.simulation import stick_and_ball
 from module.probability import ParameterSet, RandomVariable
 from module.noise import more_w_trace, sampling_from_prior
 from functools import partial
-from protocol_test import run_protocol_test
+from protocol_test import run_protocol_simulations
 import time
 
 startTime = time.time()
@@ -42,7 +42,7 @@ for item in hz:
 
     # Stimulus path
     stim = np.loadtxt("/Users/Dani/TDK/parameter_estim/stim_protocol2/zap/%i/stim.txt" % item)
-    working_path = "/Users/Dani/TDK/parameter_estim/stim_protocol2/combining3/zaps/%i" % item
+    working_path = "/Users/Dani/TDK/parameter_estim/stim_protocol2/combining2/zaps/%i" % item
 
     modell = partial(model, stype='custom', custom_stim=stim)
 
@@ -50,15 +50,15 @@ for item in hz:
     target_traces = more_w_trace(sigma=noise_std, model=modell, params=fixed_params, rep=noise_rep)
 
     if __name__ == '__main__':
-        run_protocol_test(model=modell, target_traces=target_traces, noise_std=noise_std, param_set=prior_set,
-                          fixed_params=fixed_params, working_path=working_path)
+        run_protocol_simulations(model=modell, target_traces=target_traces, noise_std=noise_std, param_set=prior_set,
+                                 fixed_params=fixed_params, working_path=working_path)
 
 for item in duration:
     print "\n\n---------------------------------------- Running %i ms impulse protocol" % item
 
     # Stimulus path
     stim = np.loadtxt("/Users/Dani/TDK/parameter_estim/stim_protocol2/steps/%i/stim.txt" % item)
-    working_path = "/Users/Dani/TDK/parameter_estim/stim_protocol2/combining3/steps/%i" % item
+    working_path = "/Users/Dani/TDK/parameter_estim/stim_protocol2/combining2/steps/%i" % item
 
     modell = partial(model, stype='custom', custom_stim=stim)
 
@@ -66,8 +66,8 @@ for item in duration:
     target_traces = more_w_trace(sigma=noise_std, model=modell, params=fixed_params, rep=noise_rep)
 
     if __name__ == '__main__':
-        run_protocol_test(model=modell, target_traces=target_traces, noise_std=noise_std, param_set=prior_set,
-                          fixed_params=fixed_params, working_path=working_path)
+        run_protocol_simulations(model=modell, target_traces=target_traces, noise_std=noise_std, param_set=prior_set,
+                                 fixed_params=fixed_params, working_path=working_path)
 
 runningTime = (time.time()-startTime)/60
 print "\n\nThe script was running for %f minutes" % runningTime

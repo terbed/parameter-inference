@@ -1,5 +1,6 @@
 import numpy as np
-from probability import RandomVariable, Inference, ParameterSet, IndependentInference
+from module.probability import RandomVariable, Inference, ParameterSet
+from module.analyze import Analyse
 from functools import partial
 from module.simulation import get_default_param
 
@@ -20,11 +21,10 @@ def load_inference(loglikelihood, working_path, *param_data):
                            mean=float(item[4]), sigma=float(item[5]), value=float(item[6])))
 
     pset = ParameterSet(*p)
-    inf = Inference(model=None, target_trace=None, parameter_set=pset, working_path=working_path, save=False)
-    inf.likelihood = loglikelihood
+    res = Analyse(loglikelihood, pset, working_path)
     print "Previous inference data result loaded!"
 
-    return inf
+    return res
 
 
 def load_statistics(n, p_names, path, working_path):
