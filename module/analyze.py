@@ -89,6 +89,16 @@ class Analyse:
                "(fitted_sigma, fit_err, relative_deviation, acc, sharper, broader)\n" + str(self.analyse_result())\
                + "\n KLD: " + str(self.KL)
 
+    def marginal_plot(self):
+        # Plot marginals
+        for item in self.p.params:
+            plot.marginal_plot(item, path=self.working_path)
+
+    def joint_plot(self):
+        # Plot joints
+        for item in self.p.margin_ax:
+            plot.plot_joint(self, self.p.params[item[0]], self.p.params[item[1]])
+
     def analyse_result(self):
         """
         :return: (fitted_sigma, fit_err, relative_deviation, acc, sharper, broader) tuple for each parameter

@@ -109,14 +109,23 @@ def analyse(param, p_opt):
     x = np.linspace(param.range_min, param.range_max, 3000)
     prior = normal(x, param.mean, param.sigma)
     posterior = normal(x, p_opt[0][0], p_opt[0][1])
-    # Ensure that posterior is in range:
-    xp = np.linspace(p_opt[0][0] - 2*p_opt[0][1], p_opt[0][0] + 2*p_opt[0][1], 3000)
+    # Ensure that posterior is in range: -> Wrong solutions! It changes the shaprness value!!!
+    # xp = np.linspace(p_opt[0][0] - 2*p_opt[0][1], p_opt[0][0] + 2*p_opt[0][1], 3000)
+
+    # from matplotlib import pyplot as plt
+    # plt.close()
+    # plt.title(param.name)
+    # plt.plot(x, prior, label="prior: %.3e" % sharpness(x,prior))
+    # plt.plot(x, posterior, label="posterior: %.3e" % sharpness(x, posterior))
+    # plt.plot(x, posterior)
+    # plt.legend(loc="best")
+    # plt.show()
 
     # Do some statistics
     true_idx = (np.abs(x - param.value)).argmin()
 
-    sharper = sharpness(x, prior) / sharpness(xp, posterior)
-    broadness = sharpness(xp, posterior) / sharpness(x, prior) * 100
+    sharper = sharpness(x, prior) / sharpness(x, posterior)
+    broadness = sharpness(x, posterior) / sharpness(x, prior) * 100
     rdiff = (param.value - p_opt[0][0]) / param.value * 100
     accuracy = posterior[true_idx] / np.amax(posterior) * 100
 

@@ -172,7 +172,7 @@ def fullplot(result):
                                              labelright='off')
             elif row == 0 and col == pnum-1:
                 ax[row, col].set_axis_off()
-                text = "\n\nKLD: %.3f" % result.KL
+                text = "\n\n\nKLD: %.3f" % result.KL
                 for idx, param in enumerate(result.p.params):
                     text += "\n\n" + param.name
                     text += "\nbroadness: %.2f" % result.get_broadness()[idx]
