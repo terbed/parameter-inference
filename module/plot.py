@@ -170,6 +170,18 @@ def fullplot(result):
                 if col == 0:
                     ax[row, col].tick_params(axis='y', which='both', left='on', right='off', labelleft='on',
                                              labelright='off')
+            elif row == 0 and col == pnum-1:
+                ax[row, col].set_axis_off()
+                text = "\n\nKLD: %.3f" % result.KL
+                for idx, param in enumerate(result.p.params):
+                    text += "\n\n" + param.name
+                    text += "\nbroadness: %.2f" % result.get_broadness()[idx]
+                    text += "\nsharpness: %.2f" % result.analyse_result()[idx][4]
+                    text += "\nrdiff: %.2f" % result.analyse_result()[idx][2]
+                    text += "\nfitted sigma: %.2e" % result.analyse_result()[idx][0]
+                    text += "\nrelative fit err: %.2f" % result.analyse_result()[idx][1]
+                ax[row, col].text(0.5, 0.5, text, horizontalalignment='center',
+                                  verticalalignment='center')
             else:
                 ax[row, col].set_axis_off()
 

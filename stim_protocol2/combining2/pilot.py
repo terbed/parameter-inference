@@ -3,7 +3,7 @@ from module.simulation import stick_and_ball
 from module.probability import ParameterSet, RandomVariable
 from module.noise import more_w_trace, sampling_from_prior
 from functools import partial
-from protocol_test import run_protocol_simulations
+from module.protocol_test import run_protocol_simulations
 import time
 
 startTime = time.time()

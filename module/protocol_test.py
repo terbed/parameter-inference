@@ -76,7 +76,10 @@ def plot_combined_results(path, numfp):
         p_set = load_parameter_set(data["params_init"])
 
         res = Analyse(data["log_likelihood"], p_set, path+"/combined_plots")
-        print res
+        if res.get_broadness() is not None:
+            print res
+        else:
+            print "--- Couldn't fit posterior to data!!! ---"
 
 
 def mult_likelihood(path, numfp, num_mult):
@@ -195,7 +198,7 @@ def protocol_comparison(path_list, numfp, inferred_params, out_path):
     plt.title("Averaged Kullback Lieber Divergence test result for each protocol")
     plt.xlabel("Protocol types")
     plt.ylabel("KL test")
-    plt.plot(range(len(path_list)), avrg_KL)
+    plt.plot(range(len(path_list)), avrg_KL, marker='x')
     plt.grid()
     plt.savefig(out_path+"/averaged_KL_test.pdf")
 
@@ -204,7 +207,7 @@ def protocol_comparison(path_list, numfp, inferred_params, out_path):
     plt.ylabel("Broadness")
     plt.title("Averaged results for each parameter")
     for idx, param in enumerate(inferred_params):
-        plt.plot(range(len(path_list)), avrg_broad[:, idx], label=param)
+        plt.plot(range(len(path_list)), avrg_broad[:, idx], marker='x', label=param)
     plt.legend(loc="best")
     plt.grid()
     plt.savefig(out_path+"/average_broadness.pdf")
