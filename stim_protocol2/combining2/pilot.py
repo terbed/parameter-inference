@@ -22,6 +22,8 @@ noise_rep = 30  # How many repetition while params are fixed
 fixed_param_num = 10  # The number of fixed parameters sampled from prior
 model = stick_and_ball
 
+batch_size = 30000
+
 # Set up random seed
 np.random.seed(42)
 
@@ -32,6 +34,8 @@ for idx, item in enumerate(p_names):
                                        resolution=p_res[idx], sigma=p_std[idx], mean=p_mean[idx]))
 
 prior_set = ParameterSet(*prior_params)
+prior_set.batch_len = batch_size
+prior_set.isBatch = True
 
 # Create fixed params sampled from prior
 fixed_params = sampling_from_prior(prior_set, fixed_param_num)

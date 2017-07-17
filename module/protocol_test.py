@@ -4,8 +4,15 @@ import multiprocessing
 from multiprocessing import Pool
 from functools import partial
 import likelihood
-from module.save_load import save_zipped_pickle, save_to_txt, load_zipped_pickle, load_parameter_set, save_file
+from module.save_load import save_zipped_pickle, save_to_txt, load_zipped_pickle, load_parameter_set, save_file, \
+    extend_zipped_pickle
 from module.analyze import Analyse
+import os
+
+
+def check_directory(working_path):
+    if not os.path.exists(working_path):
+        os.makedirs(working_path)
 
 
 def run_protocol_simulations(model, target_traces, noise_std, param_set, fixed_params, working_path, save_txt=False):
@@ -20,36 +27,76 @@ def run_protocol_simulations(model, target_traces, noise_std, param_set, fixed_p
     :return: Saves loglikelihood data into working directory
     """
 
+    check_directory(working_path)
+
     log_likelihood = []
 
     pool = Pool(multiprocessing.cpu_count() - 1)
     log_likelihood_func = partial(likelihood.mill, model=model, target_traces=target_traces, noise_std=noise_std)
-    print "Running " + str(len(param_set.parameter_set_seq)) + " simulations on all cores..."
 
-    log_likelihood = pool.map(log_likelihood_func, param_set.parameter_set_seq)
-    log_likelihood = np.array(log_likelihood)
-    pool.close()
-    pool.join()
+    if param_set.isBatch is False:
+        print "Running " + str(len(param_set.parameter_set_seq)) + " simulations on all cores..."
 
-    print "log likelihood DONE!"
+        log_likelihood = pool.map(log_likelihood_func, param_set.parameter_set_seq)
+        log_likelihood = np.array(log_likelihood)
+        pool.close()
+        pool.join()
 
-    # Save result
-    if save_txt:
-        save_to_txt(target_traces, log_likelihood, fixed_params, param_set, working_path)
+        print "log likelihood DONE!"
 
-    param_init = []
-    for param in param_set.params:
-        param_init.append(param.get_init())
+        # Save result
+        if save_txt:
+            save_to_txt(target_traces, log_likelihood, fixed_params, param_set, working_path)
 
-    for idx, item in enumerate(fixed_params):
-        for param in param_init:  # Set up fixed param to parameter true value
-            param[6] = item[param[0]]
+        param_init = []
+        for param in param_set.params:
+            param_init.append(param.get_init())
 
-        data = {'params_init': param_init, 'target_traces': target_traces[idx, :, :],
-                'log_likelihood': log_likelihood[:, idx, :]}
-        save_zipped_pickle(data, working_path)
+        for idx, item in enumerate(fixed_params):
+            for param in param_init:  # Set up fixed param to parameter true value
+                param[6] = item[param[0]]
 
-    print "Data SAVED!"
+            data = {'params_init': param_init, 'target_traces': target_traces[idx, :, :],
+                    'log_likelihood': log_likelihood[:, idx, :]}
+            save_zipped_pickle(data, working_path)
+
+        print "Data SAVED!"
+    else:
+        for idx, batch in enumerate(param_set.parameter_set_batch_list):
+            print str(idx) + ' batch of work is done out of ' \
+                  + str(len(param_set.parameter_set_batch_list))
+
+            batch_likelihood = pool.map(log_likelihood_func, batch)
+            batch_likelihood = np.array(batch_likelihood)
+
+            # Save batch
+            if idx != len(param_set.parameter_set_batch_list)-1:
+                for i in range(len(fixed_params)):
+                    with open(working_path + "/fixed_params(%i).txt" % i, "ab") as f:
+                        np.savetxt(f, batch_likelihood[:, i, :])
+            else:
+                for i in range(len(fixed_params)):
+                    with open(working_path + "/fixed_params(%i).txt" % i, "ab") as f:
+                        np.savetxt(f, batch_likelihood[:, i, :])
+
+                param_init = []
+                for param in param_set.params:
+                    param_init.append(param.get_init())
+
+                for i, item in enumerate(fixed_params):
+                    for param in param_init:  # Set up fixed param to parameter true value
+                        param[6] = item[param[0]]
+
+                for i, item in enumerate(fixed_params):
+                    l = np.loadtxt(working_path + "/fixed_params(%i).txt" % i)
+                    os.remove(working_path + "/fixed_params(%i).txt" % i)
+                    data = {'params_init': param_init, 'target_traces': target_traces[idx, :, :],
+                            'log_likelihood': l}
+                    save_zipped_pickle(data, working_path)
+
+        pool.close()
+        pool.join()
+        print "log_likelihood: Done!"
 
 
 def plot_single_results(path, numfp, which):
@@ -192,7 +239,6 @@ def protocol_comparison(path_list, numfp, inferred_params, out_path):
     for i in range(numfp-m-1):
         avrg_broad += broadness[:, i+1, :]
     avrg_broad = np.divide(avrg_broad, numfp-m)
-    print avrg_broad.shape
 
     plt.figure(figsize=(12,7))
     plt.title("Averaged Kullback Lieber Divergence test result for each protocol")

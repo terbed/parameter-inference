@@ -79,6 +79,12 @@ def save_zipped_pickle(obj, path, filename="fixed_params", protocol=-1):
         cPickle.dump(obj, f, protocol)
 
 
+def extend_zipped_pickle(obj, path, filename, protocol=-1):
+    check_directory(path)
+    with gzip.open('{}.gz'.format(path + '/' + filename), 'wb') as f:
+        cPickle.dump(obj, f, protocol)
+
+
 def unzip(path, filename):
     d = filename.split('.')
     check_directory(path + "/" + d[0])
@@ -99,5 +105,4 @@ def load_zipped_pickle(path, filename):
         loaded_object = cPickle.load(f)
         return loaded_object
 
-if __name__ == "__main__":
-    unzip("/Users/Dani/TDK/parameter_estim/stim_protocol2/debug/steps/3", "fixed_params(0).gz")
+#if __name__ == "__main__":

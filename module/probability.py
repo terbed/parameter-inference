@@ -91,8 +91,9 @@ class ParameterSet:
         self.margin_ax = self.get_margin_ax()
         self.margin_step = self.get_margin_step()
         self.isBatch = False
-        self.batch_len = 1000
+        self.batch_len = 30000
         if len(self.parameter_set_seq) >= self.batch_len*2:
+            print "Creating batches for flawless simulations..."
             self.isBatch = True
             self.parameter_set_batch_list = []
             self.create_batch()

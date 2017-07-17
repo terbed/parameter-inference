@@ -175,11 +175,12 @@ def fullplot(result):
                 text = "\n\n\nKLD: %.3f" % result.KL
                 for idx, param in enumerate(result.p.params):
                     text += "\n\n" + param.name
-                    text += "\nbroadness: %.2f" % result.get_broadness()[idx]
+                    text += "\nbroadness: %.2f %%" % result.get_broadness()[idx]
                     text += "\nsharpness: %.2f" % result.analyse_result()[idx][4]
-                    text += "\nrdiff: %.2f" % result.analyse_result()[idx][2]
+                    text += "\nrdiff: %.2f %%" % result.analyse_result()[idx][2]
+                    text += "\naccuracy: %.2f %%" % result.analyse_result()[idx][3]
                     text += "\nfitted sigma: %.2e" % result.analyse_result()[idx][0]
-                    text += "\nrelative fit err: %.2f" % result.analyse_result()[idx][1]
+                    text += "\nrelative fit err: %.2f %%" % result.analyse_result()[idx][1]
                 ax[row, col].text(0.5, 0.5, text, horizontalalignment='center',
                                   verticalalignment='center')
             else:
