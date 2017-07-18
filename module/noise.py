@@ -30,6 +30,26 @@ def sampling_from_prior(p_set, num):
     return tmp
 
 
+def rep_traces(v, sigma, rep):
+    """
+    This method creates rep number synthetic data whit sigma std white noise
+
+    :param v: Deterministic trace
+    :param sigma: noise std
+    :param rep: number of repetition
+    :return: rep piece synthetic data
+    """
+
+    rep_trace = []
+
+    for _ in range(rep):
+        noise = np.random.normal(0, sigma, len(v))
+        synthetic_data = np.add(v, noise)
+        rep_trace.append(synthetic_data)
+
+    return np.array(rep_trace)
+
+
 def more_w_trace(sigma, model, params, rep):
     """
     Creates synthetic traces for given parameters and given noise effect repetition.

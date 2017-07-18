@@ -95,7 +95,9 @@ def ill(param_set, model, target_trace, noise_sigma):
 
 def mill(param_set, model, target_traces, noise_std):
     """
-    Evaluate more than one target trace at one simulation
+    MultiIndependentLogLikelihood
+
+    Evaluate more than one target trace at one simulation: for repetition and fixed_params
     :param param_set: 
     :param model: 
     :param target_traces: 
@@ -107,7 +109,6 @@ def mill(param_set, model, target_traces, noise_std):
     pnum = target_traces.shape[0]
     rep = target_traces.shape[1]
 
-    dev = []
     log_l = []
 
     for j in range(pnum):
@@ -120,3 +121,26 @@ def mill(param_set, model, target_traces, noise_std):
 
     return log_l
 
+
+def rill(param_set, model, target_traces, noise_std):
+    """
+    RepetitionIndependentLogLikelihood
+
+    Evaluate more than one target trace at one simulation: only repetition
+    :param param_set:
+    :param model:
+    :param target_traces:
+    :param noise_std:
+    :return:
+    """
+
+    (_, v) = model(**param_set)
+    rep = target_traces.shape[0]
+
+    log_l = []
+
+    for idx in range(rep):
+        dev = np.subtract(target_traces[idx, :], v)
+        log_l.append(-np.sum(np.square(dev)) / (2 * noise_std ** 2))
+
+    return log_l
