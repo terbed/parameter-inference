@@ -36,6 +36,7 @@ for idx, item in enumerate(p_names):
 prior_set = ParameterSet(*prior_params)
 prior_set.batch_len = batch_size
 prior_set.isBatch = True
+prior_set.create_batch()
 
 # Create fixed params sampled from prior
 fixed_params = sampling_from_prior(prior_set, fixed_param_num)
