@@ -12,9 +12,9 @@ def check_directory(working_path):
 def save_file(X, path, name, header=''):
     check_directory(path)
     i = 0
-    while os.path.exists('{}({:d}).txt'.format(path + "/" + name, i)):
+    while os.path.exists('{}({:d}).npy.gz'.format(path + "/" + name, i)):
         i += 1
-    np.savetxt('{}({:d}).txt'.format(path + "/" + name, i), X, header=header, delimiter='\t')
+    np.savetxt('{}({:d}).npy.gz'.format(path + "/" + name, i), X, header=header, delimiter='\t')
 
 
 def save_params(params, path):
@@ -60,6 +60,7 @@ def save_to_txt(target_traces, log_likelihood, fixed_params, param_set, working_
         # Set up Fixed Params value
         for param in param_set.params:
             param.value = fixed_params[j][param.name]
+
         # Save parameter setups for later analysis
         save_params(param_set.params, path=working_path + "/fixed_params(%i)" % j)
         for idx in range(rep):

@@ -19,7 +19,6 @@ def check_directory(working_path):
 
 def fullplot(result):
     """
-
     :param result: Inference object after computed results
     :return: Plots a joint and marginal full plot
     """

@@ -5,9 +5,10 @@ from multiprocessing import Pool
 from functools import partial
 import likelihood
 from module.save_load import save_zipped_pickle, save_to_txt, load_zipped_pickle, load_parameter_set, save_file, \
-    extend_zipped_pickle
+    extend_zipped_pickle, save_params
 from module.analyze import Analyse
 import os
+import tables as tb
 
 
 def check_directory(working_path):
@@ -15,46 +16,46 @@ def check_directory(working_path):
         os.makedirs(working_path)
 
 
-def run_prot_sim(model, target_traces, noise_std, param_set, working_path):
-    """
-    Run multiple simulation. Use more_w_trace method to generate synthetic data!
-    In this the likelihood values are evaluated for repetitions.
+# def run_prot_sim(model, target_traces, noise_std, param_set, working_path):
+#     """
+#     Run multiple simulation. Use rep_traces method to generate synthetic data!
+#     In this the likelihood values are evaluated for repetitions.
+#
+#     :param model: model function
+#     :param target_traces: more_w_trace output
+#     :param noise_std: Used noise standard deviation while generating sythetic data
+#     :param param_set: ParameterSet object
+#     :param working_path: working directory path
+#     :return: Saves loglikelihood data into working directory
+#     """
+#
+#     check_directory(working_path)
+#
+#     log_likelihood = []
+#
+#     pool = Pool(multiprocessing.cpu_count() - 1)
+#     log_likelihood_func = partial(likelihood.rill, model=model, target_traces=target_traces, noise_std=noise_std)
+#
+#     print "Running " + str(len(param_set.parameter_set_seq)) + " simulations on all cores..."
+#
+#     log_likelihood = pool.map(log_likelihood_func, param_set.parameter_set_seq)
+#     log_likelihood = np.array(log_likelihood)
+#     pool.close()
+#     pool.join()
+#
+#     print "log likelihood DONE!"
+#
+#     param_init = []
+#     for param in param_set.params:
+#         param_init.append(param.get_init())
+#
+#     data = {'params_init': param_init, 'target_traces': target_traces, 'log_likelihood': log_likelihood}
+#     save_zipped_pickle(data, working_path)
+#
+#     print "Data SAVED!"
 
-    :param model: model function
-    :param target_traces: more_w_trace output
-    :param noise_std: Used noise standard deviation while generating sythetic data
-    :param param_set: ParameterSet object
-    :param working_path: working directory path
-    :return: Saves loglikelihood data into working directory
-    """
 
-    check_directory(working_path)
-
-    log_likelihood = []
-
-    pool = Pool(multiprocessing.cpu_count() - 1)
-    log_likelihood_func = partial(likelihood.rill, model=model, target_traces=target_traces, noise_std=noise_std)
-
-    print "Running " + str(len(param_set.parameter_set_seq)) + " simulations on all cores..."
-
-    log_likelihood = pool.map(log_likelihood_func, param_set.parameter_set_seq)
-    log_likelihood = np.array(log_likelihood)
-    pool.close()
-    pool.join()
-
-    print "log likelihood DONE!"
-
-    param_init = []
-    for param in param_set.params:
-        param_init.append(param.get_init())
-
-    data = {'params_init': param_init, 'target_traces': target_traces, 'log_likelihood': log_likelihood}
-    save_zipped_pickle(data, working_path)
-
-    print "Data SAVED!"
-
-
-def run_protocol_simulations(model, target_traces, noise_std, param_set, fixed_params, working_path, save_txt=False):
+def run_protocol_simulations(model, target_traces, noise_std, param_set, working_path):
     """
     Run multiple simulation. Use more_w_trace method to generate synthetic data!
     In this the likelihood values are evaluated both for fixed params and repetition.
@@ -69,11 +70,18 @@ def run_protocol_simulations(model, target_traces, noise_std, param_set, fixed_p
     """
 
     check_directory(working_path)
-
-    log_likelihood = []
+    fpnum = target_traces.shape[0]
+    rep = target_traces.shape[1]
 
     pool = Pool(multiprocessing.cpu_count() - 1)
     log_likelihood_func = partial(likelihood.mill, model=model, target_traces=target_traces, noise_std=noise_std)
+
+    # Set up compressing settings
+    filters = tb.Filters(complevel=6, complib='lzo')
+
+    for idx in range(fpnum):
+        save_file(target_traces[idx, :, :], working_path + "/target_traces", "tts",
+                  header= "For given fixed parameter %i rep (row)" % rep)
 
     if param_set.isBatch is False:
         print "Running " + str(len(param_set.parameter_set_seq)) + " simulations on all cores..."
@@ -85,24 +93,36 @@ def run_protocol_simulations(model, target_traces, noise_std, param_set, fixed_p
 
         print "log likelihood DONE!"
 
-        # Save result
-        if save_txt:
-            save_to_txt(target_traces, log_likelihood, fixed_params, param_set, working_path)
-
-        param_init = []
-        for param in param_set.params:
-            param_init.append(param.get_init())
-
-        for idx, item in enumerate(fixed_params):
-            for param in param_init:  # Set up fixed param to parameter true value
-                param[6] = item[param[0]]
-
-            data = {'params_init': param_init, 'target_traces': target_traces[idx, :, :],
-                    'log_likelihood': log_likelihood[:, idx, :]}
-            save_zipped_pickle(data, working_path)
+        # Save parameter initializer data
+        for idx in range(fpnum):
+            # Save traces log_likelihoods
+            database = tb.open_file(filename=working_path + "/ll%i.hdf5" % idx, mode="w")
+            database.create_carray(database.root, "ll",
+                                   atom=tb.Atom.from_dtype(log_likelihood.dtype),
+                                   title="loglikelihoods for %ith fixed params" % idx,
+                                   shape=(log_likelihood.shape[0], log_likelihood.shape[2]), filters=filters,
+                                   obj=log_likelihood[:, idx, :])
+            database.flush()
+            print "Data saved to disk"
+            print database
+            database.close()
 
         print "Data SAVED!"
     else:
+        store = []
+        lol = np.empty(shape=(2,2), dtype=np.float64)
+        for idx in range(fpnum):
+            # Create database for loglikelihoods
+            database = tb.open_file(filename= working_path + "/ll%i.hdf5" % idx, mode="w")
+            lldbs = database.create_earray(database.root, "ll",
+                                           atom=tb.Atom.from_dtype(lol.dtype),
+                                           title="loglikelihoods for %ith fixed params" % idx,
+                                           shape=(0, rep),
+                                           filters=filters,
+                                           expectedrows=len(param_set.parameter_set_seq))
+            store.append((lldbs, database))
+        del lol
+
         for idx, batch in enumerate(param_set.parameter_set_batch_list):
             print str(idx) + ' batch of work is done out of ' \
                   + str(len(param_set.parameter_set_batch_list))
@@ -111,49 +131,44 @@ def run_protocol_simulations(model, target_traces, noise_std, param_set, fixed_p
             batch_likelihood = np.array(batch_likelihood)
 
             # Save batch
-            if idx != len(param_set.parameter_set_batch_list)-1:
-                for i in range(len(fixed_params)):
-                    with open(working_path + "/fixed_params(%i).txt" % i, "ab") as f:
-                        np.savetxt(f, batch_likelihood[:, i, :])
-            else:
-                for i in range(len(fixed_params)):
-                    with open(working_path + "/fixed_params(%i).txt" % i, "ab") as f:
-                        np.savetxt(f, batch_likelihood[:, i, :])
+            for i, item in enumerate(store):
+                # Save traces for fixed params
+                item[0].append(batch_likelihood[:, i, :])
+                item[1].flush()
 
-                param_init = []
-                for param in param_set.params:
-                    param_init.append(param.get_init())
+        print "Data saved to disk"
 
-                for i, item in enumerate(fixed_params):
-                    for param in param_init:  # Set up fixed param to parameter true value
-                        param[6] = item[param[0]]
-
-                for i, item in enumerate(fixed_params):
-                    l = np.loadtxt(working_path + "/fixed_params(%i).txt" % i)
-                    os.remove(working_path + "/fixed_params(%i).txt" % i)
-                    data = {'params_init': param_init, 'target_traces': target_traces[idx, :, :],
-                            'log_likelihood': l}
-                    save_zipped_pickle(data, working_path)
+        for item in store:
+            item[1].close()
 
         pool.close()
         pool.join()
         print "log_likelihood: Done!"
 
 
-def plot_single_results(path, numfp, which):
+def plot_single_results(path, numfp, which, dbs):
     """
-    :param path: Working directory where the .gz result files can be found (for given protocol)
-    :param numfp: number of fixed parameters (number of files in the directory)
-    :param: which: a number under the number of repetition (number of loglikelihoods in the .gz files), which one will be plotted
+    :param path: Working directory where the .hdf5 result file can be found (for given protocol)
+    :param numfp: number of fixed parameters
+    :param: which: a number under the number of repetition, which one will be plotted
+    :param: dbs: parameter initializer hdf5 database object
     :return: Plot inference result for each parameter -- the selected one (which)
     """
 
+    plist = []
+    for idx in range(dbs.root.params_init.shape[0]):
+        plist.append(dbs.root.params_init[idx, :])
+
+    p_set = load_parameter_set(plist)
+
     for i in range(numfp):
         print "\n\n%i th parameter:" % i
-        data = load_zipped_pickle(path, filename="fixed_params(%i).gz" % i)
-        p_set = load_parameter_set(data["params_init"])
+        lldbs = tb.open_file(path + "/ll%i.hdf5", mode="r")
 
-        res = Analyse(data["log_likelihood"][:, which], p_set, path+"/single_plots")
+        for idx, param in enumerate(p_set.params):
+            param.value = dbs.root.fixed_params[i, idx]
+
+        res = Analyse(lldbs.root.ll[:, which], p_set, path+"/single_plots")
         print res
 
 
