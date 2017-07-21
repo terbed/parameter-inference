@@ -119,7 +119,7 @@ class Analyse:
         """
         :return: broader value for each parameter
         """
-        print "\n Running analysis on inference result..."
+        print "\n get_broadness()..."
 
         # Do some analysis on results
         info = []

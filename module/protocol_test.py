@@ -81,7 +81,7 @@ def run_protocol_simulations(model, target_traces, noise_std, param_set, working
 
     for idx in range(fpnum):
         save_file(target_traces[idx, :, :], working_path + "/target_traces", "tts",
-                  header= "For given fixed parameter %i rep (row)" % rep)
+                  header="For given fixed parameter %i rep (row)" % rep)
 
     if param_set.isBatch is False:
         print "Running " + str(len(param_set.parameter_set_seq)) + " simulations on all cores..."
@@ -110,10 +110,10 @@ def run_protocol_simulations(model, target_traces, noise_std, param_set, working
         print "Data SAVED!"
     else:
         store = []
-        lol = np.empty(shape=(2,2), dtype=np.float64)
+        lol = np.empty(shape=(2, 2), dtype=np.float64)
         for idx in range(fpnum):
             # Create database for loglikelihoods
-            database = tb.open_file(filename= working_path + "/ll%i.hdf5" % idx, mode="w")
+            database = tb.open_file(filename=working_path + "/ll%i.hdf5" % idx, mode="w")
             lldbs = database.create_earray(database.root, "ll",
                                            atom=tb.Atom.from_dtype(lol.dtype),
                                            title="loglikelihoods for %ith fixed params" % idx,
@@ -154,7 +154,7 @@ def plot_single_results(path, numfp, which, dbs):
     :param: dbs: parameter initializer hdf5 database object
     :return: Plot inference result for each parameter -- the selected one (which)
     """
-
+    print "\n\n ------------------- Plot single result: %s" % path
     plist = []
     for idx in range(dbs.root.params_init.shape[0]):
         plist.append(dbs.root.params_init[idx, :])
@@ -162,23 +162,37 @@ def plot_single_results(path, numfp, which, dbs):
     p_set = load_parameter_set(plist)
 
     for i in range(numfp):
-        print "\n\n%i th parameter:" % i
-        lldbs = tb.open_file(path + "/ll%i.hdf5", mode="r")
+        print "\n\n%i th parameter: --------------------------" % i
+        lldbs = tb.open_file(path + "/ll%i.hdf5" % i, mode="r")
 
         for idx, param in enumerate(p_set.params):
             param.value = dbs.root.fixed_params[i, idx]
 
-        res = Analyse(lldbs.root.ll[:, which], p_set, path+"/single_plots")
+        res = Analyse(lldbs.root.ll[:, which], p_set, path + "/single_plots")
         print res
+        lldbs.close()
 
 
-def plot_combined_results(path, numfp):
+
+def plot_combined_results(path, numfp, dbs):
+    print "\n\n ------------------- Plot combined result: %s" % path
+    plist = []
+    for idx in range(dbs.root.params_init.shape[0]):
+        plist.append(dbs.root.params_init[idx, :])
+
+    p_set = load_parameter_set(plist)
+
     for i in range(numfp):
-        print "\n\n%i th parameter:" % i
-        data = load_zipped_pickle(path, filename="loglikelihood(%i).gz" % i)
-        p_set = load_parameter_set(data["params_init"])
+        print "\n\n%i th parameter: ---------------------" % i
 
-        res = Analyse(data["log_likelihood"], p_set, path+"/combined_plots")
+        for idx, param in enumerate(p_set.params):
+            param.value = dbs.root.fixed_params[i, idx]
+
+        data = tb.open_file(path + "/llc%i.hdf5" % i, mode="r")
+
+        res = Analyse(data.root.ll[:], p_set, path + "/combined_plots")
+        data.close()
+
         if res.get_broadness() is not None:
             print res
         else:
@@ -193,16 +207,22 @@ def mult_likelihood(path, numfp, num_mult):
     :param num_mult: Number of likelihoods to be multiplied
     :return: Added loglikelihoods for each parameter and params_init pickelled (saved in path directory in .gz files)
     """
-
+    print "\n\n------ Adding loglikelihoods: %s ---------" % path
+    filters = tb.Filters(complevel=6, complib='lzo')
     for i in range(numfp):
-        data = load_zipped_pickle(path, "fixed_params(%i).gz" % i)
-        loglikelihood = data["log_likelihood"][:, 0]
+        print "%i is done out of %i" % (i, numfp)
+        data = tb.open_file(path + "/ll%i.hdf5" % i, mode="r")
+        loglikelihood = data.root.ll[:, 0]
 
-        for j in range(num_mult-1):
-            loglikelihood += data["log_likelihood"][:, j+1]
+        for j in range(num_mult - 1):
+            loglikelihood += data.root.ll[:, j + 1]
 
-        d = {"params_init": data["params_init"], "log_likelihood": loglikelihood}
-        save_zipped_pickle(d, path, "loglikelihood")
+        data.close()
+
+        store = tb.open_file(path + "/llc%i.hdf5" % i, mode="w")
+        store.create_carray(store.root, "ll", atom=tb.Atom.from_dtype(loglikelihood.dtype),
+                            shape=loglikelihood.shape, title="Added loglikelihoods", filters=filters, obj=loglikelihood)
+        store.close()
 
     print "Adding loglikelihoods DONE!"
 
@@ -216,49 +236,67 @@ def combine_likelihood(path_list, numfp, num_mult_single, out_path):
     :param out_path: Combined protocol likelihood .gz files will be saved in this directory
     :return: Combined protocol likelihood .gz files with params_init data in the out_path directory
     """
+    filters = tb.Filters(complevel=6, complib='lzo')
+    check_directory(out_path)
+    print "\n\n-------------- Combining likelihoods from more protocols -----------------"
 
     for i in range(numfp):
-        data = load_zipped_pickle(path_list[0], "fixed_params(%i).gz" % i)
-        loglikelihood = data["log_likelihood"][:, 0]
+        data = tb.open_file(path_list[0] + "/ll%i.hdf5" % i, mode="r")
+        loglikelihood = data.root.ll[:, 0]
         for idx, path in enumerate(path_list):
             if idx == 0:
                 for j in range(num_mult_single - 1):
-                    loglikelihood += data["log_likelihood"][:, j + 1]
+                    loglikelihood += data.root.ll[:, j + 1]
             else:
-                data = load_zipped_pickle(path_list[idx], "fixed_params(%i).gz" % i)
+                data.close()
+                data = tb.open_file(path_list[idx] + "/ll%i.hdf5" % i, mode="r")
                 for j in range(num_mult_single):
-                    loglikelihood += data["log_likelihood"][:, j]
+                    loglikelihood += data.root.ll[:, j]
+                data.close()
 
-        d = {"params_init": data["params_init"], "log_likelihood": loglikelihood}
-        save_zipped_pickle(d, out_path, "loglikelihood")
+        store = tb.open_file(out_path + "/llc%i.hdf5" % i, mode="w")
+        store.create_carray(store.root, name="ll", atom=tb.Atom.from_dtype(loglikelihood.dtype),
+                            shape=loglikelihood.shape, title="Combined loglikelihood from more protocol",
+                            filters=filters, obj=loglikelihood)
+        print store
+        store.close()
 
     print "Combining likelihoods DONE!"
 
 
-def protocol_comparison(path_list, numfp, inferred_params, out_path):
+def protocol_comparison(path_list, numfp, inferred_params, out_path, dbs):
     """
     This function compare the combined protocol results.
     :param path_list: Path for the protocols to be compared -- and where the combined loglikelihood(x).txt files can be found
     :param numfp: Number of fixed params -- the number of loglikelihood.txt files in the path 
     :param inferred_params: For example: ["Ra","cm","gpas"]
     :param out_path: The result will be saved in this directory
+    :param dbs: paramsetup.hdf5 database object
     :return: .txt file each contains sharpness, broadness and KL statistics for each protocol
     """
     from matplotlib import pyplot as plt
     m = 0
+
+    plist = []
+    for idx in range(dbs.root.params_init.shape[0]):
+        plist.append(dbs.root.params_init[idx, :])
+
+    p_set = load_parameter_set(plist)
 
     KL = []  # [[],[],...] for each protocol -> [[broadness, KL],[broadness, KL],...] for each fp
     broadness = np.empty((len(path_list), numfp, len(inferred_params)))
     for idx, path in enumerate(path_list):
         tmp = []
         for j in range(numfp):
-            data = load_zipped_pickle(path, "loglikelihood(%i).gz" % j)
-            p_set = load_parameter_set(data["params_init"])
-            res = Analyse(data["log_likelihood"], p_set, path)
+            data = tb.open_file(path + "/llc%i.hdf5" % j, mode="r")
+            for l, param in enumerate(p_set.params):
+                param.value = dbs.root.fixed_params[j, l]
+            res = Analyse(data.root.ll, p_set, path)
+            data.close()
 
             if res.get_broadness() is not None:
                 for k in range(len(inferred_params)):
-                    broadness[idx, j-m, k] = res.get_broadness()[k]
+                    broadness[idx, j - m, k] = res.get_broadness()[k]
             else:
                 m += 1
 
@@ -269,40 +307,40 @@ def protocol_comparison(path_list, numfp, inferred_params, out_path):
     KL = np.array(KL)
 
     # Plot KL result for each protocol
-    plt.figure(figsize=(12,7))
+    plt.figure(figsize=(12, 7))
     plt.title("Kullback Lieber Divergence test result for each protocol and fixed parameters")
     plt.xlabel("Protocol types")
     plt.ylabel("KL test")
     for i in range(numfp):
         plt.plot(range(len(path_list)), KL[:, i], marker='x')
     plt.grid()
-    plt.savefig(out_path+"/KL_test.pdf")
+    plt.savefig(out_path + "/KL_test.pdf")
 
     # Plot each fixed param result in one plot for each parameter:
     for idx, param in enumerate(inferred_params):
-        plt.figure(figsize=(12,7))
+        plt.figure(figsize=(12, 7))
         plt.title(param + " results for each fixed parameter")
         plt.xlabel("Protocol types")
         plt.ylabel("Broadness")
-        for i in range(numfp-m):
+        for i in range(numfp - m):
             plt.plot(range(len(path_list)), broadness[:, i, idx], marker='x')
         plt.grid()
-        plt.savefig(out_path+"/%s_broadness.pdf" % param)
+        plt.savefig(out_path + "/%s_broadness.pdf" % param)
 
     # Create fixed parameter averaged plot
     avrg_KL = np.average(KL, axis=1)
     avrg_broad = broadness[:, 0, :]
-    for i in range(numfp-m-1):
-        avrg_broad += broadness[:, i+1, :]
-    avrg_broad = np.divide(avrg_broad, numfp-m)
+    for i in range(numfp - m - 1):
+        avrg_broad += broadness[:, i + 1, :]
+    avrg_broad = np.divide(avrg_broad, numfp - m)
 
-    plt.figure(figsize=(12,7))
+    plt.figure(figsize=(12, 7))
     plt.title("Averaged Kullback Lieber Divergence test result for each protocol")
     plt.xlabel("Protocol types")
     plt.ylabel("KL test")
     plt.plot(range(len(path_list)), avrg_KL, marker='x')
     plt.grid()
-    plt.savefig(out_path+"/averaged_KL_test.pdf")
+    plt.savefig(out_path + "/averaged_KL_test.pdf")
 
     plt.figure(figsize=(12, 7))
     plt.xlabel("Protocol types")
@@ -312,23 +350,38 @@ def protocol_comparison(path_list, numfp, inferred_params, out_path):
         plt.plot(range(len(path_list)), avrg_broad[:, idx], marker='x', label=param)
     plt.legend(loc="best")
     plt.grid()
-    plt.savefig(out_path+"/average_broadness.pdf")
+    plt.savefig(out_path + "/average_broadness.pdf")
 
 
 if __name__ == "__main__":
-    # plot_single_results("/Users/Dani/TDK/parameter_estim/stim_protocol2/combining3/steps/3", 10, 7)
-    #mult_likelihood("/Users/Dani/TDK/parameter_estim/stim_protocol2/combining3/zaps/100", 10, 30)
+    pinit = tb.open_file("/Users/Dani/TDK/parameter_estim/stim_protocol2/combining3/paramsetup.hdf5", mode="r")
+    # plot_single_results("/Users/Dani/TDK/parameter_estim/stim_protocol2/combining3/steps/3", 10, 7, pinit)
+    # mult_likelihood("/Users/Dani/TDK/parameter_estim/stim_protocol2/combining3/steps/200", 10, 30)
+    # mult_likelihood("/Users/Dani/TDK/parameter_estim/stim_protocol2/combining3/steps/20", 10, 30)
+    # mult_likelihood("/Users/Dani/TDK/parameter_estim/stim_protocol2/combining3/steps/3", 10, 30)
+    # mult_likelihood("/Users/Dani/TDK/parameter_estim/stim_protocol2/combining3/zaps/1", 10, 30)
+    # mult_likelihood("/Users/Dani/TDK/parameter_estim/stim_protocol2/combining3/zaps/10", 10, 30)
+    # mult_likelihood("/Users/Dani/TDK/parameter_estim/stim_protocol2/combining3/zaps/100", 10, 30)
+
+    steps_list = ["/Users/Dani/TDK/parameter_estim/stim_protocol2/combining3/steps/3",
+                  "/Users/Dani/TDK/parameter_estim/stim_protocol2/combining3/steps/20",
+                  "/Users/Dani/TDK/parameter_estim/stim_protocol2/combining3/steps/200"]
+    zaps_list = ["/Users/Dani/TDK/parameter_estim/stim_protocol2/combining3/zaps/1",
+                 "/Users/Dani/TDK/parameter_estim/stim_protocol2/combining3/zaps/10",
+                 "/Users/Dani/TDK/parameter_estim/stim_protocol2/combining3/zaps/100"]
+
+    # combine_likelihood(zaps_list, numfp=10, num_mult_single=10,
+    #                    out_path="/Users/Dani/TDK/parameter_estim/stim_protocol2/combining3/zaps/comb")
+
     path_list = ["/Users/Dani/TDK/parameter_estim/stim_protocol2/combining3/steps/3",
-              "/Users/Dani/TDK/parameter_estim/stim_protocol2/combining3/steps/20",
-              "/Users/Dani/TDK/parameter_estim/stim_protocol2/combining3/steps/200",
-              "/Users/Dani/TDK/parameter_estim/stim_protocol2/combining3/steps/300",
-              "/Users/Dani/TDK/parameter_estim/stim_protocol2/combining3/zaps/1",
-              "/Users/Dani/TDK/parameter_estim/stim_protocol2/combining3/zaps/10",
-              "/Users/Dani/TDK/parameter_estim/stim_protocol2/combining3/zaps/100",
-              "/Users/Dani/TDK/parameter_estim/stim_protocol2/combining3/zaps/200"]
+                 "/Users/Dani/TDK/parameter_estim/stim_protocol2/combining3/steps/20",
+                 "/Users/Dani/TDK/parameter_estim/stim_protocol2/combining3/steps/200",
+                 "/Users/Dani/TDK/parameter_estim/stim_protocol2/combining3/steps/comb",
+                 "/Users/Dani/TDK/parameter_estim/stim_protocol2/combining3/zaps/1",
+                 "/Users/Dani/TDK/parameter_estim/stim_protocol2/combining3/zaps/10",
+                 "/Users/Dani/TDK/parameter_estim/stim_protocol2/combining3/zaps/100",
+                 "/Users/Dani/TDK/parameter_estim/stim_protocol2/combining3/zaps/comb"]
 
-    # combine_likelihood(path_list, numfp=10, num_mult_single=10,
-    #                    out_path="/Users/Dani/TDK/parameter_estim/stim_protocol2/combining3/zaps/200")
-
-    #protocol_comparison(path_list, 10, ['Ra', 'cm', 'gpas'], "/Users/Dani/TDK/parameter_estim/stim_protocol2/combining3")
-    plot_combined_results("/Users/Dani/TDK/parameter_estim/stim_protocol2/combining3/zaps/100", 10)
+    protocol_comparison(path_list, 10, ['Ra', 'cm', 'gpas'], "/Users/Dani/TDK/parameter_estim/stim_protocol2/combining3", pinit)
+    pinit.close()
+    # plot_combined_results("/Users/Dani/TDK/parameter_estim/stim_protocol2/combining3/zaps/100", 10)
