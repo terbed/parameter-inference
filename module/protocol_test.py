@@ -16,43 +16,51 @@ def check_directory(working_path):
         os.makedirs(working_path)
 
 
-# def run_prot_sim(model, target_traces, noise_std, param_set, working_path):
-#     """
-#     Run multiple simulation. Use rep_traces method to generate synthetic data!
-#     In this the likelihood values are evaluated for repetitions.
-#
-#     :param model: model function
-#     :param target_traces: more_w_trace output
-#     :param noise_std: Used noise standard deviation while generating sythetic data
-#     :param param_set: ParameterSet object
-#     :param working_path: working directory path
-#     :return: Saves loglikelihood data into working directory
-#     """
-#
-#     check_directory(working_path)
-#
-#     log_likelihood = []
-#
-#     pool = Pool(multiprocessing.cpu_count() - 1)
-#     log_likelihood_func = partial(likelihood.rill, model=model, target_traces=target_traces, noise_std=noise_std)
-#
-#     print "Running " + str(len(param_set.parameter_set_seq)) + " simulations on all cores..."
-#
-#     log_likelihood = pool.map(log_likelihood_func, param_set.parameter_set_seq)
-#     log_likelihood = np.array(log_likelihood)
-#     pool.close()
-#     pool.join()
-#
-#     print "log likelihood DONE!"
-#
-#     param_init = []
-#     for param in param_set.params:
-#         param_init.append(param.get_init())
-#
-#     data = {'params_init': param_init, 'target_traces': target_traces, 'log_likelihood': log_likelihood}
-#     save_zipped_pickle(data, working_path)
-#
-#     print "Data SAVED!"
+def run_prot_sim(model, target_traces, noise_std, param_set, working_path):
+    """
+    Run multiple simulation. Use rep_traces method to generate synthetic data!
+    In this the likelihood values are evaluated for repetitions.
+
+    :param model: model function
+    :param target_traces: more_w_trace output
+    :param noise_std: Used noise standard deviation while generating sythetic data
+    :param param_set: ParameterSet object
+    :param working_path: working directory path
+    :return: Saves loglikelihood data into working directory
+    """
+
+    check_directory(working_path)
+    rep = target_traces.shape[0]
+    filters = tb.Filters(complevel=6, complib='lzo')
+
+    # Save zipped target traces
+    save_file(target_traces, working_path + "/target_traces", "tts",
+              header="For given fixed parameter %i rep (row)" % rep)
+
+    pool = Pool(multiprocessing.cpu_count() - 1)
+    log_likelihood_func = partial(likelihood.rill, model=model, target_traces=target_traces, noise_std=noise_std)
+
+    print "Running " + str(len(param_set.parameter_set_seq)) + " simulations on all cores..."
+
+    log_likelihood = pool.map(log_likelihood_func, param_set.parameter_set_seq)
+    log_likelihood = np.array(log_likelihood)
+    pool.close()
+    pool.join()
+
+    print "log likelihood DONE!"
+
+    i = 0
+    name = '{}{:d}.hdf5'.format(working_path + "/ll", i)
+    while os.path.exists(name):
+        i += 1
+    database = tb.open_file(filename=name, mode="w")
+    database.create_carray(database.root, "ll",
+                           atom=tb.Atom.from_dtype(log_likelihood.dtype),
+                           title="loglikelihoods for given fixed params",
+                           shape=log_likelihood.shape, filters=filters,
+                           obj=log_likelihood)
+
+    print "Data SAVED!"
 
 
 def run_protocol_simulations(model, target_traces, noise_std, param_set, working_path):

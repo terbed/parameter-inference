@@ -17,6 +17,7 @@ p_range = [[40, 160], [0.4, 1.6], [0.00004, 0.00016]]  # Fixed range, but "true 
 p_mean = [100., 1., 0.0001]  # Fixed prior mean
 p_std = [20., 0.2, 0.00002]  # Fixed prior std
 
+
 noise_std = 7.
 noise_rep = 30  # How many repetition while params are fixed
 fixed_param_num = 10  # The number of fixed parameters sampled from prior
@@ -48,7 +49,7 @@ for idx, current_params in enumerate(fixed_params):
 
         # Stimulus path
         stim = np.loadtxt("/Users/Dani/TDK/parameter_estim/stim_protocol2/zap/%i/stim.txt" % item)
-        working_path = "/Users/Dani/TDK/parameter_estim/stim_protocol2/combining3/zaps/%i" % item
+        working_path = "/Users/Dani/TDK/parameter_estim/stim_protocol2/debug/zaps/%i" % item
 
         modell = partial(model, stype='custom', custom_stim=stim)
 
@@ -66,7 +67,7 @@ for idx, current_params in enumerate(fixed_params):
 
         # Stimulus path
         stim = np.loadtxt("/Users/Dani/TDK/parameter_estim/stim_protocol2/steps/%i/stim.txt" % item)
-        working_path = "/Users/Dani/TDK/parameter_estim/stim_protocol2/combining3/steps/%i" % item
+        working_path = "/Users/Dani/TDK/parameter_estim/stim_protocol2/debug/steps/%i" % item
 
         modell = partial(model, stype='custom', custom_stim=stim)
 
