@@ -182,7 +182,7 @@ def stat(param):
     return abs(p_opt[1]), diff, accuracy, sharper, p_err[1], broader
 
 
-def kl_test(posterior, prior, step, eps=0.00001):
+def kl_test(posterior, prior, step, eps=0.000001):
     """
     Kullback-Leiber test for (numerically continuous) probability distributions.
 

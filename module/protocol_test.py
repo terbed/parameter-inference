@@ -362,34 +362,34 @@ def protocol_comparison(path_list, numfp, inferred_params, out_path, dbs):
 
 
 if __name__ == "__main__":
-    pinit = tb.open_file("/Users/Dani/TDK/parameter_estim/stim_protocol2/combining3/paramsetup.hdf5", mode="r")
-    # plot_single_results("/Users/Dani/TDK/parameter_estim/stim_protocol2/combining3/steps/3", 10, 7, pinit)
-    # mult_likelihood("/Users/Dani/TDK/parameter_estim/stim_protocol2/combining3/steps/200", 10, 30)
-    # mult_likelihood("/Users/Dani/TDK/parameter_estim/stim_protocol2/combining3/steps/20", 10, 30)
-    # mult_likelihood("/Users/Dani/TDK/parameter_estim/stim_protocol2/combining3/steps/3", 10, 30)
-    # mult_likelihood("/Users/Dani/TDK/parameter_estim/stim_protocol2/combining3/zaps/1", 10, 30)
-    # mult_likelihood("/Users/Dani/TDK/parameter_estim/stim_protocol2/combining3/zaps/10", 10, 30)
-    # mult_likelihood("/Users/Dani/TDK/parameter_estim/stim_protocol2/combining3/zaps/100", 10, 30)
+    pinit = tb.open_file("/Users/Dani/TDK/parameter_estim/stim_protocol2/combining4/paramsetup.hdf5", mode="r")
+    # plot_single_results("/Users/Dani/TDK/parameter_estim/stim_protocol2/combining4/steps/3", 10, 7, pinit)
+    # mult_likelihood("/Users/Dani/TDK/parameter_estim/stim_protocol2/combining4/steps/200", 10, 30)
+    # mult_likelihood("/Users/Dani/TDK/parameter_estim/stim_protocol2/combining4/steps/20", 10, 30)
+    # mult_likelihood("/Users/Dani/TDK/parameter_estim/stim_protocol2/combining4/steps/3", 10, 30)
+    # mult_likelihood("/Users/Dani/TDK/parameter_estim/stim_protocol2/combining4/zaps/1", 10, 30)
+    # mult_likelihood("/Users/Dani/TDK/parameter_estim/stim_protocol2/combining4/zaps/10", 10, 30)
+    # mult_likelihood("/Users/Dani/TDK/parameter_estim/stim_protocol2/combining4/zaps/100", 10, 30)
 
-    steps_list = ["/Users/Dani/TDK/parameter_estim/stim_protocol2/combining3/steps/3",
-                  "/Users/Dani/TDK/parameter_estim/stim_protocol2/combining3/steps/20",
-                  "/Users/Dani/TDK/parameter_estim/stim_protocol2/combining3/steps/200"]
-    zaps_list = ["/Users/Dani/TDK/parameter_estim/stim_protocol2/combining3/zaps/1",
-                 "/Users/Dani/TDK/parameter_estim/stim_protocol2/combining3/zaps/10",
-                 "/Users/Dani/TDK/parameter_estim/stim_protocol2/combining3/zaps/100"]
+    steps_list = ["/Users/Dani/TDK/parameter_estim/stim_protocol2/combining4/steps/3",
+                  "/Users/Dani/TDK/parameter_estim/stim_protocol2/combining4/steps/20",
+                  "/Users/Dani/TDK/parameter_estim/stim_protocol2/combining4/steps/200"]
+    zaps_list = ["/Users/Dani/TDK/parameter_estim/stim_protocol2/combining4/zaps/1",
+                 "/Users/Dani/TDK/parameter_estim/stim_protocol2/combining4/zaps/10",
+                 "/Users/Dani/TDK/parameter_estim/stim_protocol2/combining4/zaps/100"]
 
     # combine_likelihood(zaps_list, numfp=10, num_mult_single=10,
-    #                    out_path="/Users/Dani/TDK/parameter_estim/stim_protocol2/combining3/zaps/comb")
+    #                    out_path="/Users/Dani/TDK/parameter_estim/stim_protocol2/combining4/zaps/comb")
 
-    path_list = ["/Users/Dani/TDK/parameter_estim/stim_protocol2/combining3/steps/3",
-                 "/Users/Dani/TDK/parameter_estim/stim_protocol2/combining3/steps/20",
-                 "/Users/Dani/TDK/parameter_estim/stim_protocol2/combining3/steps/200",
-                 "/Users/Dani/TDK/parameter_estim/stim_protocol2/combining3/steps/comb",
-                 "/Users/Dani/TDK/parameter_estim/stim_protocol2/combining3/zaps/1",
-                 "/Users/Dani/TDK/parameter_estim/stim_protocol2/combining3/zaps/10",
-                 "/Users/Dani/TDK/parameter_estim/stim_protocol2/combining3/zaps/100",
-                 "/Users/Dani/TDK/parameter_estim/stim_protocol2/combining3/zaps/comb"]
+    path_list = ["/Users/Dani/TDK/parameter_estim/stim_protocol2/combining4/steps/3",
+                 "/Users/Dani/TDK/parameter_estim/stim_protocol2/combining4/steps/20",
+                 "/Users/Dani/TDK/parameter_estim/stim_protocol2/combining4/steps/200",
+                 "/Users/Dani/TDK/parameter_estim/stim_protocol2/combining4/steps/comb",
+                 "/Users/Dani/TDK/parameter_estim/stim_protocol2/combining4/zaps/1",
+                 "/Users/Dani/TDK/parameter_estim/stim_protocol2/combining4/zaps/10",
+                 "/Users/Dani/TDK/parameter_estim/stim_protocol2/combining4/zaps/100",
+                 "/Users/Dani/TDK/parameter_estim/stim_protocol2/combining4/zaps/comb"]
 
-    protocol_comparison(path_list, 10, ['Ra', 'cm', 'gpas'], "/Users/Dani/TDK/parameter_estim/stim_protocol2/combining3", pinit)
+    protocol_comparison(path_list, 10, ['Ra', 'cm', 'gpas'], "/Users/Dani/TDK/parameter_estim/stim_protocol2/combining4", pinit)
     pinit.close()
-    # plot_combined_results("/Users/Dani/TDK/parameter_estim/stim_protocol2/combining3/zaps/100", 10)
+    # plot_combined_results("/Users/Dani/TDK/parameter_estim/stim_protocol2/combining4/zaps/100", 10)
