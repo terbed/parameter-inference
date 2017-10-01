@@ -1,4 +1,5 @@
 import numpy as np
+from neuron import h, gui
 from module.simulation import real_morphology_model
 from module.probability import ParameterSet, RandomVariable
 from module.noise import more_w_trace, sampling_from_prior
@@ -51,7 +52,7 @@ fixed_params = sampling_from_prior(prior_set, fixed_param_num)
 
 # Save parameter informations
 # Create database for data
-database = tb.open_file("/Users/Dani/TDK/parameter_estim/stim_protocol2/combining3/paramsetup.hdf5", mode="w")
+database = tb.open_file("/Users/Dani/TDK/parameter_estim/stim_protocol2/combining4/paramsetup.hdf5", mode="w")
 
 # Save param initialization
 param_init = []
@@ -86,7 +87,7 @@ for item in hz:
 
     # Stimulus path
     stim = np.loadtxt("/Users/Dani/TDK/parameter_estim/stim_protocol2/zap/%i/stim.txt" % item)
-    working_path = "/Users/Dani/TDK/parameter_estim/stim_protocol2/combining3/zaps/%i" % item
+    working_path = "/Users/Dani/TDK/parameter_estim/stim_protocol2/combining4/zaps/%i" % item
 
     modell = partial(model, stim=stim)
 
@@ -102,9 +103,9 @@ for item in duration:
 
     # Stimulus path
     stim = np.loadtxt("/Users/Dani/TDK/parameter_estim/stim_protocol2/steps/%i/stim.txt" % item)
-    working_path = "/Users/Dani/TDK/parameter_estim/stim_protocol2/combining3/steps/%i" % item
+    working_path = "/Users/Dani/TDK/parameter_estim/stim_protocol2/combining4/steps/%i" % item
 
-    modell = partial(model, stype='custom', custom_stim=stim)
+    modell = partial(model, stim=stim)
 
     # Generate synthetic data for each fixed params and given repetition
     target_traces = more_w_trace(sigma=noise_std, model=modell, params=fixed_params, rep=noise_rep)

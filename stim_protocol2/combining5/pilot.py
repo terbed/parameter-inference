@@ -105,7 +105,7 @@ for item in duration:
     stim = np.loadtxt("/Users/Dani/TDK/parameter_estim/stim_protocol2/steps/%i/stim.txt" % item)
     working_path = "/Users/Dani/TDK/parameter_estim/stim_protocol2/combining5/steps/%i" % item
 
-    modell = partial(model, stype='custom', custom_stim=stim)
+    modell = partial(model, stim=stim)
 
     # Generate synthetic data for each fixed params and given repetition
     target_traces = more_w_trace(sigma=noise_std, model=modell, params=fixed_params, rep=noise_rep)
