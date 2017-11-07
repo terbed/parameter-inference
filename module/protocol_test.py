@@ -154,6 +154,98 @@ def run_protocol_simulations(model, target_traces, noise_std, param_set, working
         print "log_likelihood: Done!"
 
 
+def run_protocol_simulations_c(model, target_traces, inv_covmat, param_set, working_path):
+    """
+    Run multiple simulation. Use more_c_trace method to generate synthetic data!
+    In this the likelihood values are evaluated both for fixed params and repetition.
+
+    :param model: model function
+    :param target_traces: more_w_trace output
+    :param inv_covmat:
+    :param param_set: ParameterSet obejct
+    :param fixed_params: Used parameters to generate target_traces. Type: [{},{},...]
+    :param working_path: working directory path
+    :return: Saves loglikelihood data into working directory
+    """
+
+    check_directory(working_path)
+    fpnum = target_traces.shape[0]
+    rep = target_traces.shape[1]
+
+    pool = Pool(multiprocessing.cpu_count() - 1)
+    log_likelihood_func = partial(likelihood.mdll, model=model, target_traces=target_traces, inv_covmat=inv_covmat)
+
+    # Set up compressing settings
+    filters = tb.Filters(complevel=6, complib='lzo')
+
+    for idx in range(fpnum):
+        save_file(target_traces[idx, :, :], working_path + "/target_traces", "tts",
+                  header="For given fixed parameter %i rep (row)" % rep)
+
+    if param_set.isBatch is False:
+        print "Running " + str(len(param_set.parameter_set_seq)) + " simulations on all cores..."
+
+        log_likelihood = pool.map(log_likelihood_func, param_set.parameter_set_seq)
+        log_likelihood = np.array(log_likelihood)
+        pool.close()
+        pool.join()
+
+        print "log likelihood DONE!"
+
+        # Save parameter initializer data
+        for idx in range(fpnum):
+            # Save traces log_likelihoods
+            database = tb.open_file(filename=working_path + "/ll%i.hdf5" % idx, mode="w")
+            database.create_carray(database.root, "ll",
+                                   atom=tb.Atom.from_dtype(log_likelihood.dtype),
+                                   title="loglikelihoods for %ith fixed params" % idx,
+                                   shape=(log_likelihood.shape[0], log_likelihood.shape[2]), filters=filters,
+                                   obj=log_likelihood[:, idx, :])
+            database.flush()
+            print "Data saved to disk"
+            print database
+            database.close()
+
+        print "Data SAVED!"
+    else:
+        store = []
+        lol = np.empty(shape=(2, 2), dtype=np.float64)
+        for idx in range(fpnum):
+            # Create database for loglikelihoods
+            database = tb.open_file(filename=working_path + "/ll%i.hdf5" % idx, mode="w")
+            lldbs = database.create_earray(database.root, "ll",
+                                           atom=tb.Atom.from_dtype(lol.dtype),
+                                           title="loglikelihoods for %ith fixed params" % idx,
+                                           shape=(0, rep),
+                                           filters=filters,
+                                           expectedrows=len(param_set.parameter_set_seq))
+            store.append((lldbs, database))
+        del lol
+
+        for idx, batch in enumerate(param_set.parameter_set_batch_list):
+            print str(idx) + ' batch of work is done out of ' \
+                  + str(len(param_set.parameter_set_batch_list))
+
+            batch_likelihood = pool.map(log_likelihood_func, batch)
+            batch_likelihood = np.array(batch_likelihood)
+
+            # Save batch
+            for i, item in enumerate(store):
+                # Save traces for fixed params
+                item[0].append(batch_likelihood[:, i, :])
+                item[1].flush()
+
+        print "Data saved to disk"
+
+        for item in store:
+            item[1].close()
+
+        pool.close()
+        pool.join()
+        print "log_likelihood: Done!"
+
+
+
 def plot_single_results(path, numfp, which, dbs):
     """
     :param path: Working directory where the .hdf5 result file can be found (for given protocol)

@@ -122,6 +122,34 @@ def mill(param_set, model, target_traces, noise_std):
     return log_l
 
 
+def mdll(param_set, model, target_traces, inv_covmat):
+    """
+    Multi Dependent LogLikelihood
+
+    :param param_set:
+    :param model:
+    :param target_traces:
+    :param inv_covmat:
+    :return:
+    """
+
+    (_, v) = model(**param_set)
+    pnum = target_traces.shape[0]
+    rep = target_traces.shape[1]
+
+    log_l = []
+
+    for j in range(pnum):
+        current_param = []
+        for idx in range(rep):
+            dev = np.subtract(target_traces[j, idx, :], v)
+            current_param.append(- 1/2 * np.inner(v, inv_covmat.dot(v)))
+        log_l.append(current_param)
+        current_param = []
+
+    return log_l
+
+
 def rill(param_set, model, target_traces, noise_std):
     """
     RepetitionIndependentLogLikelihood

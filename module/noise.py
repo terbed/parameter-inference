@@ -79,7 +79,7 @@ def more_w_trace(sigma, model, params, rep):
 
 
 def colored(D, lamb, dt, v_vec):
-    """Returns the given array with colored noise as numpy array"""
+    """Returns the given array with added colored noise as numpy array"""
     noise = []
     n, m = np.random.uniform(0.0, 1.0, 2)
     E = exp(-lamb * dt)
@@ -94,6 +94,34 @@ def colored(D, lamb, dt, v_vec):
         e_0 = e_next
 
     return np.add(v_vec, noise)
+
+
+def more_c_trace(D, lamb, dt, model, params, rep):
+    """
+
+    :param D:
+    :param lamb:
+    :param dt:
+    :param model:
+    :param params:
+    :return:
+    """
+
+    moretrace = []
+
+    for item in params:
+        current_param = []
+        _, v = model(**item)
+
+        for _ in range(rep):
+            current_param.append(colored(D, lamb, dt, v))
+
+        moretrace.append(current_param)
+        current_param = []
+
+    return np.array(moretrace)
+
+
 
 
 # Colored noise with generators and list comprehension ----------------------------------------------------------
