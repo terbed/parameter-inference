@@ -15,11 +15,11 @@ startTime = time.time()
 hz = [1, 10, 100]
 duration = [3, 20, 200]
 
-p_names = ['Ra', 'cm', 'gpas']
-p_res = [40, 40, 40]  # Parameters resolution
-p_range = [[40, 160], [0.4, 1.6], [0.00004, 0.00016]]  # Fixed range, but "true value" may change!
-p_mean = [100., 1., 0.0001]  # Fixed prior mean
-p_std = [20., 0.2, 0.00002]  # Fixed prior std
+p_names = ['Ra', 'gpas']
+p_res = [101, 101]  # Parameters resolution
+p_range = [[40, 160], [0.00004, 0.00016]]  # Fixed range, but "true value" may change!
+p_mean = [100., 0.0001]  # Fixed prior mean
+p_std = [20., 0.00002]  # Fixed prior std
 
 noise_D = 21.6767
 noise_lamb = 0.011289
@@ -104,8 +104,8 @@ for item in hz:
     print "\n\n---------------------------------------- Running %i Hz zap protocol" % item
 
     # Stimulus path
-    stim = np.loadtxt("/Users/Dani/TDK/parameter_estim/stim_protocol2/zap/%i/stim.txt" % item)
-    working_path = "/Users/Dani/TDK/parameter_estim/stim_protocol2/combining_colored/zaps/%i" % item
+    stim = np.loadtxt("/Users/Dani/TDK/parameter_estim/stim_protocol2/stimulus/sin/%i/stim.txt" % item)
+    working_path = "/Users/Dani/TDK/parameter_estim/stim_protocol2/combining_colored/sins/%i" % item
 
     modell = partial(model, stim=stim)
 
@@ -121,7 +121,7 @@ for item in duration:
     print "\n\n---------------------------------------- Running %i ms impulse protocol" % item
 
     # Stimulus path
-    stim = np.loadtxt("/Users/Dani/TDK/parameter_estim/stim_protocol2/steps/%i/stim.txt" % item)
+    stim = np.loadtxt("/Users/Dani/TDK/parameter_estim/stim_protocol2/stimulus/step/%i/stim.txt" % item)
     working_path = "/Users/Dani/TDK/parameter_estim/stim_protocol2/combining_colored/steps/%i" % item
 
     modell = partial(model, stim=stim)
