@@ -261,7 +261,7 @@ def exp_model(Ra=157.3621, gpas=0.000403860792, cm=7.849480, dt=0.1):
     return t, v
 
 
-def real_morphology_model(stim, gpas, Ra=100., cm=1., dt=0.1):
+def real_morphology_model(stim, gpas=0.0001, Ra=100., cm=1., dt=0.1):
     # -- Biophysics --
     # Sec parameters and conductance
     for sec in h.allsec():
@@ -310,7 +310,7 @@ def real_morphology_model(stim, gpas, Ra=100., cm=1., dt=0.1):
     return t, v
 
 
-def real_morphology_model_dend(stim, gpas, Ra=100., cm=1., dt=0.1):
+def real_morphology_model_dend(stim, gpas=0.0001, Ra=100., cm=1., dt=0.1):
     # -- Biophysics --
     # Sec parameters and conductance
     for sec in h.allsec():
@@ -387,10 +387,10 @@ if __name__ == "__main__":
     #     stim.append(0.2*np.sin(2*np.pi*f*t))
 
     for i, t in enumerate(tv):
-        if t < 10:
+        if t < 50:
             stim.append(0.)
         elif t<= 410:
-            stim.append(0.0001)
+            stim.append(0.01)
         else:
             stim.append(0.)
 
