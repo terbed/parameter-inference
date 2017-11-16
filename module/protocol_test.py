@@ -273,7 +273,6 @@ def plot_single_results(path, numfp, which, dbs):
         lldbs.close()
 
 
-
 def plot_combined_results(path, numfp, dbs):
     print "\n\n ------------------- Plot combined result: %s" % path
     plist = []
@@ -385,6 +384,8 @@ def protocol_comparison(path_list, numfp, inferred_params, out_path, dbs):
 
     KL = []  # [[],[],...] for each protocol -> [[broadness, KL],[broadness, KL],...] for each fp
     broadness = np.empty((len(path_list), numfp, len(inferred_params)))
+    print "\n\n broadness sarpness: " + str(broadness.shape)
+
     for idx, path in enumerate(path_list):
         tmp = []
         for j in range(numfp):
@@ -394,11 +395,8 @@ def protocol_comparison(path_list, numfp, inferred_params, out_path, dbs):
             res = Analyse(data.root.ll, p_set, path)
             data.close()
 
-            if res.get_broadness() is not None:
-                for k in range(len(inferred_params)):
-                    broadness[idx, j - m, k] = res.get_broadness()[k]
-            else:
-                m += 1
+            # for k in range(len(inferred_params)):
+            broadness[idx, j, :] = res.get_broadness()
 
             tmp.append(res.KL)
         KL.append(tmp)

@@ -128,6 +128,6 @@ class Analyse:
                 info.append(analyse(item, item.fitted_gauss)[5])
             else:
                 print "--- Cannot fit normal to posterior!!! ---"
-                return None
+                return info.append(100.)
 
         return info

@@ -74,11 +74,13 @@ def sharpness(x, y):
             full_dev += np.abs(x[right_idx] - x[left_idx])
         except ValueError:
             print "ValueError in sharpness checking!"
-            from matplotlib import pyplot as plt
-            plt.figure()
-            plt.title("Fitted posterior")
-            plt.plot(x,y)
-            plt.show()
+            # from matplotlib import pyplot as plt
+            # plt.figure()
+            # plt.title("Fitted posterior")
+            # plt.plot(x,y)
+            # plt.show()
+            # raw_input("Press Enter to continue...")
+            return None
 
     return full_dev / 50.
 
@@ -124,8 +126,14 @@ def analyse(param, p_opt):
     # Do some statistics
     true_idx = (np.abs(x - param.value)).argmin()
 
-    sharper = sharpness(x, prior) / sharpness(x, posterior)
-    broadness = sharpness(x, posterior) / sharpness(x, prior) * 100
+    # Handle the case when fitted gauss go out of range
+    if sharpness(x, posterior) == None:
+        sharper = 1
+        broadness = 100
+    else:
+        sharper = sharpness(x, prior) / sharpness(x, posterior)
+        broadness = sharpness(x, posterior) / sharpness(x, prior) * 100
+
     rdiff = (param.value - p_opt[0][0]) / param.value * 100
     accuracy = posterior[true_idx] / np.amax(posterior) * 100
 
