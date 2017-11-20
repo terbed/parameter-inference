@@ -245,7 +245,6 @@ def run_protocol_simulations_c(model, target_traces, inv_covmat, param_set, work
         print "log_likelihood: Done!"
 
 
-
 def plot_single_results(path, numfp, which, dbs):
     """
     :param path: Working directory where the .hdf5 result file can be found (for given protocol)

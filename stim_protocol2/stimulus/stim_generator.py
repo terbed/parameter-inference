@@ -2,7 +2,7 @@ import numpy as np
 from matplotlib import pyplot
 from simulation import real_morphology_model
 from neuron import h
-from noise import colored
+from noise import colored, white
 from matplotlib import pyplot as plt
 
 
@@ -47,10 +47,11 @@ h('forall {nseg = int((L/(0.1*lambda_f(100))+.9)/2)*2 + 1}')  # If Ra_max = 105 
 
 for item in step:
     stim = get_step(tv, 100, item)
-    np.savetxt("/Users/Dani/TDK/parameter_estim/stim_protocol2/stimulus/step/%i/stim.txt" % item, stim)
+    # np.savetxt("/Users/Dani/TDK/parameter_estim/stim_protocol2/stimulus/step/%i/stim.txt" % item, stim)
 
     t, v = real_morphology_model(stim=stim)
-    v = colored(21.6767, 0.011289, 0.1, v)
+    vc = colored(21.6767, 0.011289, 0.1, v)
+    vw = white(0.48, v)
 
     plt.figure(figsize=(12,7))
     plt.title("Stimulus")
@@ -65,6 +66,8 @@ for item in step:
     plt.xlabel("Time [ms]")
     plt.ylabel("Voltage [mV]")
     plt.plot(t, v)
+    plt.plot(t, vw, alpha=0.5)
+    plt.plot(t, vc)
     plt.savefig("/Users/Dani/TDK/parameter_estim/stim_protocol2/stimulus/step/%i/resp.png" % item)
     plt.show()
 
@@ -73,7 +76,8 @@ for item in sin:
     np.savetxt("/Users/Dani/TDK/parameter_estim/stim_protocol2/stimulus/sin/%i/stim.txt" % item, stim)
 
     t, v = real_morphology_model(stim=stim)
-    v = colored(21.6767, 0.011289, 0.1, v)
+    vc = colored(21.6767, 0.011289, 0.1, v)
+    vw = white(0.5, v)
 
     plt.figure(figsize=(12, 7))
     plt.title("Stimulus")
@@ -88,6 +92,8 @@ for item in sin:
     plt.xlabel("Time [ms]")
     plt.ylabel("Voltage [mV]")
     plt.plot(t, v)
+    plt.plot(t, vw, alpha=0.5)
+    plt.plot(t, vc)
     plt.savefig("/Users/Dani/TDK/parameter_estim/stim_protocol2/stimulus/sin/%i/resp.png" % item)
     plt.show()
 
