@@ -48,7 +48,7 @@ for i in range(num_of_iter):
     # Set up range in a way that the true parameter value will be in the middle
     Ra_start = current_Ra - 50
     Ra_end = current_Ra + 50
-    # TODO create log-normal prior distribution for Ra
+
     if Ra_start < 0:  # ValueError: Ra must be > 0.
         Ra_start = 1
 
@@ -72,7 +72,7 @@ for i in range(num_of_iter):
     if stat(Ra) is not str:
         Ra_stat[i, 0], Ra_stat[i, 1], Ra_stat[i, 2], Ra_stat[i, 3], Ra_stat[4] = stat(Ra)
     else:
-        # TODO expection handling inside!
+
         print "\n WARNING!!! OUT OF RANGE!!!  You should delete the simulation data lines with no results! (0 values)\n"
     if stat(gpas) is not str:
         gpas_stat[i, 0], gpas_stat[i, 1], gpas_stat[i, 2], gpas_stat[i, 3], gpas_stat[4] = stat(gpas)

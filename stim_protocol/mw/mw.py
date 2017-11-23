@@ -42,7 +42,7 @@ for i in range(num_of_iter):
     # Set up range in a way that the true parameter value will be in the middle
     Ra_start = current_Ra - 50
     Ra_end = current_Ra + 50
-    # TODO crate log-normal prior distribution for Ra
+
     if Ra_start < 0:  # ValueError: Ra must be > 0.
         Ra_start = 1
 

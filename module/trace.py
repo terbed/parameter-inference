@@ -73,7 +73,8 @@ def sharpness(x, y):
             right_idx = len(y[:max_idx]) + (np.abs(y[max_idx:] - value)).argmin()
             full_dev += np.abs(x[right_idx] - x[left_idx])
         except ValueError:
-            print "ValueError in sharpness checking!"
+            print "WARNING: ValueError in sharpness checking! The fitted normal distribution might be out of range!!!"
+            raw_input("Press a key to continue the program...")
             # from matplotlib import pyplot as plt
             # plt.figure()
             # plt.title("Fitted posterior")
@@ -93,7 +94,8 @@ def fit_normal(x, y, *p_init):
     except (ValueError, RuntimeError) as err:
         # ValueError: array must not contain infs or NaNs
         # RuntimeError: Optimal parameters not found: Number of calls to function has reached maxfev = 600.
-        print "Something went wrong fitting gauss to data...\n"
+        print "WARNING: Something went wrong fitting gauss to data...\n"
+        raw_input("Press a key to continue the program...")
         print(err)
         print(err.args)
         return ([None, None], [None, None])
