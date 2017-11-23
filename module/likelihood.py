@@ -116,6 +116,7 @@ def mill(param_set, model, target_traces, noise_std):
         for idx in range(rep):
             dev = np.subtract(target_traces[j, idx, :], v)
             current_param.append(-np.sum(np.square(dev)) / (2 * noise_std ** 2))
+
         log_l.append(current_param)
         current_param = []
 
@@ -143,7 +144,7 @@ def mdll(param_set, model, target_traces, inv_covmat):
         current_param = []
         for idx in range(rep):
             dev = np.subtract(target_traces[j, idx, :], v)
-            current_param.append(- 1/2 * np.inner(v, inv_covmat.dot(v)))
+            current_param.append(- 1/2 * np.inner(dev, inv_covmat.dot(dev)))
         log_l.append(current_param)
         current_param = []
 
