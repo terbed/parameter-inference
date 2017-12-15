@@ -96,6 +96,41 @@ def colored(D, lamb, dt, v_vec):
     return np.add(v_vec, noise)
 
 
+def colored_from_covmat(covmat, v_vec):
+    from numpy.linalg import cholesky
+
+    n = np.random.normal(size=len(v_vec))
+
+    noise = np.dot(cholesky(covmat), noise)
+
+    return np.add(v_vec, noise)
+
+
+def more_c_trace_from_covmat(covmat, model, params, rep):
+    """
+    :param D:
+    :param lamb:
+    :param dt:
+    :param model:
+    :param params:
+    :return:
+    """
+
+    moretrace = []
+
+    for item in params:
+        current_param = []
+        _, v = model(**item)
+
+        for _ in range(rep):
+            current_param.append(colored_from_covmat(covmat, v))
+
+        moretrace.append(current_param)
+        current_param = []
+
+    return np.array(moretrace)
+
+
 def more_c_trace(D, lamb, dt, model, params, rep):
     """
 
