@@ -9,3 +9,5 @@ for i = 1:len
         covmt(i,j) = D * lamb * exp(-lamb * abs(t1 - t2));
     end
 end
+
+end

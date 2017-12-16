@@ -2,7 +2,7 @@ import numpy as np
 from neuron import h, gui
 from module.simulation import real_morphology_model
 from module.probability import ParameterSet, RandomVariable
-from module.noise import more_c_trace, sampling_from_prior
+from module.noise import more_trace_from_covmat, sampling_from_prior, inv_cov_mat
 from functools import partial
 from module.protocol_test import run_protocol_simulations_c
 import tables as tb
@@ -23,6 +23,16 @@ p_std = [20., 0.00002]  # Fixed prior std
 
 noise_D = 21.6767
 noise_lamb = 0.011289
+
+
+def aut_corr_func(x):
+    return noise_lamb*noise_D*np.exp(-noise_lamb*np.abs(x))
+
+dt = 0.1
+dur_len = 5002
+dur = dur_len*dt
+t_vec = np.linspace(0,dur, dur_len)
+
 noise_rep = 30  # How many repetition while params are fixed
 fixed_param_num = 10  # The number of fixed parameters sampled from prior
 model = real_morphology_model
@@ -39,7 +49,7 @@ batch_size = 30000                 # Set it to "None" to compute the whole param
 # Set up random seed
 np.random.seed(42)
 
-invcovmat = np.genfromtxt("/Users/Dani/TDK/parameter_estim/stim_protocol2/combining_colored/inv_covmat.csv", delimiter=',')
+covmat, invcovmat = inv_cov_mat(aut_corr_func, t_vec)
 print "Inverse covariance matrix is loaded to memory!"
 print invcovmat.shape
 
@@ -110,7 +120,7 @@ for item in hz:
     modell = partial(model, stim=stim)
 
     # Generate synthetic data for each fixed params and given repetition
-    target_traces = more_c_trace(D=noise_D, lamb=noise_lamb, dt=0.1, model=modell, params=fixed_params, rep=noise_rep)
+    target_traces = more_trace_from_covmat(covmat, model=modell, params=fixed_params, rep=noise_rep)
     print "The shape of target traces: " + str(target_traces.shape)
 
     if __name__ == '__main__':
@@ -127,7 +137,7 @@ for item in duration:
     modell = partial(model, stim=stim)
 
     # Generate synthetic data for each fixed params and given repetition
-    target_traces = more_c_trace(D=noise_D, lamb=noise_lamb, dt=0.1, model=modell, params=fixed_params, rep=noise_rep)
+    target_traces = more_trace_from_covmat(covmat, model=modell, params=fixed_params, rep=noise_rep)
 
     if __name__ == '__main__':
         run_protocol_simulations_c(model=modell, target_traces=target_traces, inv_covmat=invcovmat, param_set=prior_set,

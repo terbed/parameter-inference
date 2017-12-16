@@ -96,24 +96,46 @@ def colored(D, lamb, dt, v_vec):
     return np.add(v_vec, noise)
 
 
-def colored_from_covmat(covmat, v_vec):
+def noise_from_covmat(covmat, v_vec):
     from numpy.linalg import cholesky
 
     n = np.random.normal(size=len(v_vec))
 
-    noise = np.dot(cholesky(covmat), noise)
+    noise = np.dot(cholesky(covmat), n)
 
     return np.add(v_vec, noise)
 
 
-def more_c_trace_from_covmat(covmat, model, params, rep):
+def noise_from_cholesky(cholesky, v_vec):
+    n = np.random.normal(size=len(v_vec))
+    noise = np.dot(cholesky, n)
+    return np.add(v_vec, noise)
+
+
+def more_trace_from_covmat(covmat, model, params, rep):
     """
-    :param D:
-    :param lamb:
-    :param dt:
-    :param model:
-    :param params:
-    :return:
+
+    """
+
+    moretrace = []
+    chol = np.linalg.cholesky(covmat)
+
+    for item in params:
+        current_param = []
+        _, v = model(**item)
+
+        for _ in range(rep):
+            current_param.append(noise_from_cholesky(chol, v))
+
+        moretrace.append(current_param)
+        current_param = []
+
+    return np.array(moretrace)
+
+
+def more_trace_from_cholesky(cholesky, model, params, rep):
+    """
+
     """
 
     moretrace = []
@@ -123,7 +145,7 @@ def more_c_trace_from_covmat(covmat, model, params, rep):
         _, v = model(**item)
 
         for _ in range(rep):
-            current_param.append(colored_from_covmat(covmat, v))
+            current_param.append(noise_from_cholesky(cholesky, v))
 
         moretrace.append(current_param)
         current_param = []
@@ -155,8 +177,6 @@ def more_c_trace(D, lamb, dt, model, params, rep):
         current_param = []
 
     return np.array(moretrace)
-
-
 
 
 # Colored noise with generators and list comprehension ----------------------------------------------------------
@@ -260,6 +280,18 @@ def cov_mat(f, t_vec):
     return [[f(abs(t_vec[t1] - t_vec[t2])) for t2 in xrange(len(t_vec))] for t1 in xrange(len(t_vec))]
 
 
+def inv_cov_mat(f, t_vec):
+    """
+
+    :param f:
+    :param t_vec:
+    :return:
+    """
+    covmat = [[f(t_vec[t1] - t_vec[t2]) for t2 in xrange(len(t_vec))] for t1 in xrange(len(t_vec))]
+
+    return np.array(covmat), np.linalg.inv(covmat)
+
+
 def multivariate_normal(vec, t_vec, f):
     """
     Create a noise sampled from multivariate gaussian.
@@ -279,3 +311,4 @@ def multivariate_normal(vec, t_vec, f):
     noise = np.dot(cholesky(cov_mat(f=f, t_vec=t_vec)), noise)
 
     return np.add(vec, noise)
+
