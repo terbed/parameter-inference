@@ -383,7 +383,7 @@ def protocol_comparison(path_list, numfp, inferred_params, out_path, dbs):
 
     KL = []  # [[],[],...] for each protocol -> [[broadness, KL],[broadness, KL],...] for each fp
     broadness = np.empty((len(path_list), numfp, len(inferred_params)))
-    print "\n\n broadness sarpness: " + str(broadness.shape)
+    print "\n\n broadness shape: " + str(broadness.shape)
 
     for idx, path in enumerate(path_list):
         tmp = []
@@ -426,16 +426,20 @@ def protocol_comparison(path_list, numfp, inferred_params, out_path, dbs):
 
     # Create fixed parameter averaged plot
     avrg_KL = np.average(KL, axis=1)
-    avrg_broad = broadness[:, 0, :]
-    for i in range(numfp - m - 1):
-        avrg_broad += broadness[:, i + 1, :]
-    avrg_broad = np.divide(avrg_broad, numfp - m)
+    std_KL = np.std(KL, axis=1)
+    avrg_broad = np.average(broadness, axis=1)
+    std_broad = np.std(broadness, axis=1)
+
+    # for i in range(numfp - m - 1):
+    #     avrg_broad += broadness[:, i + 1, :]
+    # avrg_broad = np.divide(avrg_broad, numfp - m)
 
     plt.figure(figsize=(12, 7))
     plt.title("Averaged Kullback Lieber Divergence test result for each protocol")
     plt.xlabel("Protocol types")
     plt.ylabel("KL test")
     plt.plot(range(len(path_list)), avrg_KL, marker='x')
+    plt.errorbar(range(len(path_list)), avrg_KL, yerr=std_KL, fmt='o')
     plt.grid()
     plt.savefig(out_path + "/averaged_KL_test.pdf")
 
@@ -445,6 +449,7 @@ def protocol_comparison(path_list, numfp, inferred_params, out_path, dbs):
     plt.title("Averaged results for each parameter")
     for idx, param in enumerate(inferred_params):
         plt.plot(range(len(path_list)), avrg_broad[:, idx], marker='x', label=param)
+        plt.errorbar(range(len(path_list)), avrg_broad[:, idx], yerr=std_broad[:, idx], fmt='o')
     plt.legend(loc="best")
     plt.grid()
     plt.savefig(out_path + "/average_broadness.pdf")
