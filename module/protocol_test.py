@@ -438,7 +438,7 @@ def protocol_comparison(path_list, numfp, inferred_params, out_path, dbs):
     plt.title("Averaged Kullback Lieber Divergence test result for each protocol")
     plt.xlabel("Protocol types")
     plt.ylabel("KL test")
-    plt.plot(range(len(path_list)), avrg_KL, marker='x')
+    plt.plot(range(len(path_list)), avrg_KL)
     plt.errorbar(range(len(path_list)), avrg_KL, yerr=std_KL, fmt='o')
     plt.grid()
     plt.savefig(out_path + "/averaged_KL_test.pdf")
@@ -448,7 +448,7 @@ def protocol_comparison(path_list, numfp, inferred_params, out_path, dbs):
     plt.ylabel("Broadness")
     plt.title("Averaged results for each parameter")
     for idx, param in enumerate(inferred_params):
-        plt.plot(range(len(path_list)), avrg_broad[:, idx], marker='x', label=param)
+        plt.plot(range(len(path_list)), avrg_broad[:, idx], label=param)
         plt.errorbar(range(len(path_list)), avrg_broad[:, idx], yerr=std_broad[:, idx], fmt='o')
     plt.legend(loc="best")
     plt.grid()
