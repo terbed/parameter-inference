@@ -449,7 +449,7 @@ def protocol_comparison(path_list, numfp, inferred_params, out_path, dbs):
     plt.title("Averaged results for each parameter")
     for idx, param in enumerate(inferred_params):
         plt.plot(range(len(path_list)), avrg_broad[:, idx], label=param)
-        plt.errorbar(range(len(path_list)), avrg_broad[:, idx], yerr=std_broad[:, idx], fmt='o')
+        plt.errorbar(range(len(path_list)), avrg_broad[:, idx], yerr=std_broad[:, idx], fmt='o', label=param + " std")
     plt.legend(loc="best")
     plt.grid()
     plt.savefig(out_path + "/average_broadness.pdf")
