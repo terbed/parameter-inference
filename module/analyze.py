@@ -113,7 +113,7 @@ class Analyse:
             else:
                 return None
 
-        return info
+        return np.array(info)
 
     def get_broadness(self):
         """

@@ -142,7 +142,7 @@ def analyse(param, p_opt):
     # The relative sigma + mean error
     fit_err = (abs(p_opt[1][1])/abs(p_opt[0][1]) + abs(p_opt[1][0])/abs(p_opt[0][0]))*100
 
-    return abs(p_opt[0][1]), fit_err, rdiff, accuracy, sharper, broadness
+    return [abs(p_opt[0][1]), fit_err, rdiff, accuracy, sharper, broadness]
 
 
 # OLD...

@@ -362,7 +362,8 @@ def combine_likelihood(path_list, numfp, num_mult_single, out_path):
     print "Combining likelihoods DONE!"
 
 
-def protocol_comparison(path_list, numfp, inferred_params, out_path, dbs):
+def protocol_comparison(path_list, numfp, inferred_params, out_path, dbs,
+                        protocol_xticks=['3ms', '20ms', '200ms', '1Hz', '10Hz', '100Hz', 'steps comb', 'sins comb']):
     """
     This function compare the combined protocol results.
     :param path_list: Path for the protocols to be compared -- and where the combined loglikelihood(x).txt files can be found
@@ -370,10 +371,14 @@ def protocol_comparison(path_list, numfp, inferred_params, out_path, dbs):
     :param inferred_params: For example: ["Ra","cm","gpas"]
     :param out_path: The result will be saved in this directory
     :param dbs: paramsetup.hdf5 database object
+    :param protocol_xticks: Protocol names on x axes
     :return: .txt file each contains sharpness, broadness and KL statistics for each protocol
     """
     from matplotlib import pyplot as plt
     m = 0
+
+    # x axes for plot:
+    x = range(len(path_list))
 
     plist = []
     for idx in range(dbs.root.params_init.shape[0]):
@@ -382,6 +387,10 @@ def protocol_comparison(path_list, numfp, inferred_params, out_path, dbs):
     p_set = load_parameter_set(plist)
 
     KL = []  # [[],[],...] for each protocol -> [[broadness, KL],[broadness, KL],...] for each fp
+
+    # statistics containing  (fitted_sigma, fit_err, relative_deviation, acc, sharper, broader)
+    accuracy = np.empty((len(path_list), numfp, len(inferred_params)))
+    rdiff = np.empty((len(path_list), numfp, len(inferred_params)))
     broadness = np.empty((len(path_list), numfp, len(inferred_params)))
     print "\n\n broadness shape: " + str(broadness.shape)
 
@@ -396,6 +405,8 @@ def protocol_comparison(path_list, numfp, inferred_params, out_path, dbs):
 
             # for k in range(len(inferred_params)):
             broadness[idx, j, :] = res.get_broadness()
+            rdiff[idx, j, :] = res.analyse_result()[:, 2]
+            accuracy[idx, j, :] = res.analyse_result()[:, 3]
 
             tmp.append(res.KL)
         KL.append(tmp)
@@ -408,6 +419,7 @@ def protocol_comparison(path_list, numfp, inferred_params, out_path, dbs):
     plt.title("Kullback Lieber Divergence test result for each protocol and fixed parameters")
     plt.xlabel("Protocol types")
     plt.ylabel("KL test")
+    plt.xticks(x, protocol_xticks)
     for i in range(numfp):
         plt.plot(range(len(path_list)), KL[:, i], marker='x')
     plt.grid()
@@ -419,6 +431,7 @@ def protocol_comparison(path_list, numfp, inferred_params, out_path, dbs):
         plt.title(param + " results for each fixed parameter")
         plt.xlabel("Protocol types")
         plt.ylabel("Broadness")
+        plt.xticks(x, protocol_xticks)
         for i in range(numfp - m):
             plt.plot(range(len(path_list)), broadness[:, i, idx], marker='x')
         plt.grid()
@@ -430,6 +443,11 @@ def protocol_comparison(path_list, numfp, inferred_params, out_path, dbs):
     avrg_broad = np.average(broadness, axis=1)
     std_broad = np.std(broadness, axis=1)
 
+    avrg_acc = np.average(accuracy, axis=1)
+    std_acc = np.std(accuracy, axis=1)
+    avrg_rdiff = np.average(rdiff, axis=1)
+    std_rdiff = np.std(rdiff, axis=1)
+
     # for i in range(numfp - m - 1):
     #     avrg_broad += broadness[:, i + 1, :]
     # avrg_broad = np.divide(avrg_broad, numfp - m)
@@ -438,6 +456,7 @@ def protocol_comparison(path_list, numfp, inferred_params, out_path, dbs):
     plt.title("Averaged Kullback Lieber Divergence test result for each protocol")
     plt.xlabel("Protocol types")
     plt.ylabel("KL test")
+    plt.xticks(x, protocol_xticks)
     plt.plot(range(len(path_list)), avrg_KL)
     plt.errorbar(range(len(path_list)), avrg_KL, yerr=std_KL, fmt='o')
     plt.grid()
@@ -446,6 +465,7 @@ def protocol_comparison(path_list, numfp, inferred_params, out_path, dbs):
     plt.figure(figsize=(12, 7))
     plt.xlabel("Protocol types")
     plt.ylabel("Broadness")
+    plt.xticks(x, protocol_xticks)
     plt.title("Averaged results for each parameter")
     for idx, param in enumerate(inferred_params):
         plt.plot(range(len(path_list)), avrg_broad[:, idx], label=param)
@@ -453,6 +473,30 @@ def protocol_comparison(path_list, numfp, inferred_params, out_path, dbs):
     plt.legend(loc="best")
     plt.grid()
     plt.savefig(out_path + "/average_broadness.pdf")
+
+    for idx, param in enumerate(inferred_params):
+        plt.figure(figsize=(12, 7))
+        plt.xlabel("Protocol types")
+        plt.ylabel("Accuracy: p_true/p_infmax*100")
+        plt.xticks(x, protocol_xticks)
+        plt.title("Averaged accuracy for %s" % param)
+        plt.plot(range(len(path_list)), avrg_acc[:, idx], label=param)
+        plt.errorbar(range(len(path_list)), avrg_acc[:, idx], yerr=std_acc[:, idx], fmt='o', label=param + " std")
+        plt.legend(loc="best")
+        plt.grid()
+        plt.savefig(out_path + "/average_accuracy_%s.pdf" % param)
+
+    for idx, param in enumerate(inferred_params):
+        plt.figure(figsize=(12, 7))
+        plt.xlabel("Protocol types")
+        plt.ylabel("Relative difference: (true-inferred)/true*100")
+        plt.xticks(x, protocol_xticks)
+        plt.title("Averaged relative difference for %s" % param)
+        plt.plot(range(len(path_list)), avrg_rdiff[:, idx], label=param)
+        plt.errorbar(range(len(path_list)), avrg_rdiff[:, idx], yerr=std_rdiff[:, idx], fmt='o', label=param + " std")
+        plt.legend(loc="best")
+        plt.grid()
+        plt.savefig(out_path + "/average_rdiff_%s.pdf" % param)
 
 
 if __name__ == "__main__":
