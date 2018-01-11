@@ -136,7 +136,7 @@ def analyse(param, p_opt):
         sharper = sharpness(x, prior) / sharpness(x, posterior)
         broadness = sharpness(x, posterior) / sharpness(x, prior) * 100
 
-    rdiff = (param.value - p_opt[0][0]) / param.value * 100
+    rdiff = (p_opt[0][0] - param.value) / param.value * 100
     accuracy = posterior[true_idx] / np.amax(posterior) * 100
 
     # The relative sigma + mean error
