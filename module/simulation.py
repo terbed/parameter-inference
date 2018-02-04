@@ -359,6 +359,104 @@ def real_morphology_model_dend(stim, gpas=0.0001, Ra=100., cm=1., dt=0.1):
     return t, v
 
 
+def real_morphology_model_sdend_rsoma(stim, gpas=0.0001, Ra=100., cm=1., dt=0.1):
+    # -- Biophysics --
+    # Sec parameters and conductance
+    for sec in h.allsec():
+        sec.Ra = Ra  # Ra is a parameter to infer
+        sec.cm = cm   # parameter optimisation algorithm found this
+        sec.v = 0
+
+        sec.insert('pas')
+        sec.g_pas = gpas  # gpas is a parameter to infer
+        sec.e_pas = 0
+
+    # Print information
+    # h.psection()
+
+    h.dt = dt  # Time step (iteration)
+    h.steps_per_ms = 1 / dt
+
+    # Stimulus
+    h.tstop = len(stim) * dt
+    h.load_file("vplay.hoc")
+    vec = h.Vector(stim)
+    istim = h.IClamp(h.apic[30](0.5))
+    vec.play(istim._ref_amp, h.dt)
+    istim.delay = 0  # Just for Neuron
+    istim.dur = 1e9  # Just for Neuron
+
+
+    # Run simulation ->
+    # Set up recording Vectors
+    v_vec = h.Vector()  # Membrane potential vector
+    t_vec = h.Vector()  # Time stamp vector
+    v_vec.record(h.soma(0.5)._ref_v)
+    t_vec.record(h._ref_t)
+
+    # Simulation duration and RUN
+    # h.tstop = 1200  # Simulation end
+    h.v_init = 0
+    h.finitialize(h.v_init)
+
+    h.init()
+    h.run()
+
+    t = t_vec.to_python()
+    v = v_vec.to_python()
+
+    return t, v
+
+
+def real_morphology_model_ssoma_rdend(stim, gpas=0.0001, Ra=100., cm=1., dt=0.1):
+    # -- Biophysics --
+    # Sec parameters and conductance
+    for sec in h.allsec():
+        sec.Ra = Ra  # Ra is a parameter to infer
+        sec.cm = cm   # parameter optimisation algorithm found this
+        sec.v = 0
+
+        sec.insert('pas')
+        sec.g_pas = gpas  # gpas is a parameter to infer
+        sec.e_pas = 0
+
+    # Print information
+    # h.psection()
+
+    h.dt = dt  # Time step (iteration)
+    h.steps_per_ms = 1 / dt
+
+    # Stimulus
+    h.tstop = len(stim) * dt
+    h.load_file("vplay.hoc")
+    vec = h.Vector(stim)
+    istim = h.IClamp(h.soma(0.5))
+    vec.play(istim._ref_amp, h.dt)
+    istim.delay = 0  # Just for Neuron
+    istim.dur = 1e9  # Just for Neuron
+
+
+    # Run simulation ->
+    # Set up recording Vectors
+    v_vec = h.Vector()  # Membrane potential vector
+    t_vec = h.Vector()  # Time stamp vector
+    v_vec.record(h.apic[30](0.5)._ref_v)
+    t_vec.record(h._ref_t)
+
+    # Simulation duration and RUN
+    # h.tstop = 1200  # Simulation end
+    h.v_init = 0
+    h.finitialize(h.v_init)
+
+    h.init()
+    h.run()
+
+    t = t_vec.to_python()
+    v = v_vec.to_python()
+
+    return t, v
+
+
 if __name__ == "__main__":
     from matplotlib import pyplot as plt
     import numpy as np
@@ -413,7 +511,7 @@ if __name__ == "__main__":
         sec.Ra = 150
     h('forall {nseg = int((L/(0.1*lambda_f(100))+.9)/2)*2 + 1}')  # If Ra_max = 105 dend.nseg = 21 and soma.nseg = 1
 
-    t, v = real_morphology_model_dend(stim=stim, gpas=0.0001)
+    t, v = real_morphology_model_sdend_rsoma(stim=stim)
     # v = white(7., v)
 
     plt.figure(figsize=(12,7))
