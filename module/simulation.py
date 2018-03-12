@@ -457,6 +457,66 @@ def real_morphology_model_ssoma_rdend(stim, gpas=0.0001, Ra=100., cm=1., dt=0.1)
     return t, v
 
 
+def real_morphology_model_ssoma_rdend_spatial(stim, d, m=0.000001, gpas_soma=0.0001, Ra=100., cm=1., dt=0.1):
+    """
+    This simulation protocol  assumes spatial change of the 'gpas' parameter
+
+    :param stim:
+    :para, d:     distance from soma in um
+    :param m:     rate of linear change in gpas density moving away from soma (opt)
+    :param gpas_soma: the value of gpas in soma (opt)
+    :param Ra:    Axial resistance (opt)
+    :param cm:    Membrane conductance (opt)
+    :param dt:    Time step (opt)
+    :return:
+    """
+
+    # Sec parameters and conductance
+    for sec in h.allsec():
+        sec.Ra = Ra  # Ra is a parameter to infer
+        sec.cm = cm  # parameter optimisation algorithm found this
+        sec.v = 0
+
+        sec.insert('pas')
+        sec.g_pas = gpas_soma + d * m  # gpas is a parameter to infer
+        sec.e_pas = 0
+
+    # Print information
+    # h.psection()
+
+    h.dt = dt  # Time step (iteration)
+    h.steps_per_ms = 1 / dt
+
+    # Stimulus
+    h.tstop = len(stim) * dt
+    h.load_file("vplay.hoc")
+    vec = h.Vector(stim)
+    istim = h.IClamp(h.soma(0.5))
+    vec.play(istim._ref_amp, h.dt)
+    istim.delay = 0  # Just for Neuron
+    istim.dur = 1e9  # Just for Neuron
+
+    # Run simulation ->
+    # Set up recording Vectors
+    v_vec = h.Vector()  # Membrane potential vector
+    t_vec = h.Vector()  # Time stamp vector
+    v_vec.record(h.apic[d](0.5)._ref_v)
+    t_vec.record(h._ref_t)
+
+    # Simulation duration and RUN
+    # h.tstop = 1200  # Simulation end
+    h.v_init = 0
+    h.finitialize(h.v_init)
+
+    h.init()
+    h.run()
+
+    t = t_vec.to_python()
+    v = v_vec.to_python()
+
+    return t, v
+
+
 if __name__ == "__main__":
     from matplotlib import pyplot as plt
     import numpy as np
