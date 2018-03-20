@@ -457,12 +457,12 @@ def real_morphology_model_ssoma_rdend(stim, gpas=0.0001, Ra=100., cm=1., dt=0.1)
     return t, v
 
 
-def real_morphology_model_ssoma_rdend_spatial(stim, d, m=0.000001, gpas_soma=0.0001, Ra=100., cm=1., dt=0.1):
+def real_morphology_model_ssoma_rdend_spatial(stim, d=30, k=0.000001, gpas_soma=0.0001, Ra=100., cm=1., dt=0.1):
     """
     This simulation protocol  assumes spatial change of the 'gpas' parameter
 
     :param stim:
-    :para, d:     distance from soma in um
+    :param d:     distance from soma in um
     :param m:     rate of linear change in gpas density moving away from soma (opt)
     :param gpas_soma: the value of gpas in soma (opt)
     :param Ra:    Axial resistance (opt)
@@ -478,11 +478,18 @@ def real_morphology_model_ssoma_rdend_spatial(stim, d, m=0.000001, gpas_soma=0.0
         sec.v = 0
 
         sec.insert('pas')
-        sec.g_pas = gpas_soma + d * m  # gpas is a parameter to infer
+        sec.g_pas = gpas_soma     # gpas is a parameter to infer
         sec.e_pas = 0
 
     # Print information
     # h.psection()
+
+    # Set up gpas density distribution
+    for sec in h.all_dendrites:
+        for seg in sec:
+            h('soma distance()')
+            dist = (h.distance(seg.x))
+            seg.g_pas = gpas_soma*(1+k*dist)
 
     h.dt = dt  # Time step (iteration)
     h.steps_per_ms = 1 / dt
