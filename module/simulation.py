@@ -457,7 +457,117 @@ def real_morphology_model_ssoma_rdend(stim, gpas=0.0001, Ra=100., cm=1., dt=0.1)
     return t, v
 
 
-def real_morphology_model_ssoma_rdend_spatial(stim, d=30, k=0.000001, gpas_soma=0.0001, Ra=100., cm=1., dt=0.1):
+def real_morphology_model_soma_spatial(stim, k=0.001, gpas_soma=0.0001, Ra=100., cm=1., dt=0.1):
+    # -- Biophysics --
+    # Sec parameters and conductance
+    for sec in h.allsec():
+        sec.Ra = Ra  # Ra is a parameter to infer
+        sec.cm = cm   # parameter optimisation algorithm found this
+        sec.v = 0
+
+        sec.insert('pas')
+        sec.g_pas = gpas_soma  # gpas is a parameter to infer
+
+        for seg in sec:
+            h('soma distance()')
+            dist = (h.distance(seg.x))
+            seg.g_pas = gpas_soma*(1+k*dist)
+
+        sec.e_pas = 0
+
+    # Print information
+    # h.psection()
+
+    h.dt = dt  # Time step (iteration)
+    h.steps_per_ms = 1 / dt
+
+    # Stimulus
+    h.tstop = len(stim) * dt
+    h.load_file("vplay.hoc")
+    vec = h.Vector(stim)
+    istim = h.IClamp(h.soma(0.5))
+    vec.play(istim._ref_amp, h.dt)
+    istim.delay = 0  # Just for Neuron
+    istim.dur = 1e9  # Just for Neuron
+
+
+    # Run simulation ->
+    # Set up recording Vectors
+    v_vec = h.Vector()  # Membrane potential vector
+    t_vec = h.Vector()  # Time stamp vector
+    v_vec.record(h.soma(0.5)._ref_v)
+    t_vec.record(h._ref_t)
+
+    # Simulation duration and RUN
+    # h.tstop = 1200  # Simulation end
+    h.v_init = 0
+    h.finitialize(h.v_init)
+
+    h.init()
+    h.run()
+
+    t = t_vec.to_python()
+    v = v_vec.to_python()
+
+    return t, v
+
+
+def real_morphology_model_dend_spatial(stim, d=30, k=0.001, gpas_soma=0.0001, Ra=100., cm=1., dt=0.1):
+    # -- Biophysics --
+    # Sec parameters and conductance
+    for sec in h.allsec():
+        sec.Ra = Ra  # Ra is a parameter to infer
+        sec.cm = cm   # parameter optimisation algorithm found this
+        sec.v = 0
+
+        sec.insert('pas')
+        sec.g_pas = gpas_soma  # gpas is a parameter to infer
+
+        for seg in sec:
+            h('soma distance()')
+            dist = (h.distance(seg.x))
+            seg.g_pas = gpas_soma*(1+k*dist)
+
+        sec.e_pas = 0
+
+    # Print information
+    # h.psection()
+
+    h.dt = dt  # Time step (iteration)
+    h.steps_per_ms = 1 / dt
+
+    # Stimulus
+    h.tstop = len(stim) * dt
+    h.load_file("vplay.hoc")
+    vec = h.Vector(stim)
+    istim = h.IClamp(h.apic[d](0.5))
+    vec.play(istim._ref_amp, h.dt)
+    istim.delay = 0  # Just for Neuron
+    istim.dur = 1e9  # Just for Neuron
+
+
+    # Run simulation ->
+    # Set up recording Vectors
+    v_vec = h.Vector()  # Membrane potential vector
+    t_vec = h.Vector()  # Time stamp vector
+    v_vec.record(h.apic[30](0.5)._ref_v)
+    t_vec.record(h._ref_t)
+
+    # Simulation duration and RUN
+    # h.tstop = 1200  # Simulation end
+    h.v_init = 0
+    h.finitialize(h.v_init)
+
+    h.init()
+    h.run()
+
+    t = t_vec.to_python()
+    v = v_vec.to_python()
+
+    return t, v
+
+
+def real_morphology_model_ssoma_rdend_spatial(stim, d=30, k=0.001, gpas_soma=0.0001, Ra=100., cm=1., dt=0.1):
     """
     This simulation protocol  assumes spatial change of the 'gpas' parameter
 
@@ -478,18 +588,18 @@ def real_morphology_model_ssoma_rdend_spatial(stim, d=30, k=0.000001, gpas_soma=
         sec.v = 0
 
         sec.insert('pas')
-        sec.g_pas = gpas_soma     # gpas is a parameter to infer
+        sec.g_pas = gpas_soma  # gpas is a parameter to infer
+
+        for seg in sec:
+            h('soma distance()')
+            dist = (h.distance(seg.x))
+            print "Distance from soma: " + str(dist)
+            seg.g_pas = gpas_soma*(1+k*dist)
+
         sec.e_pas = 0
 
     # Print information
     # h.psection()
-
-    # Set up gpas density distribution
-    for sec in h.all_dendrites:
-        for seg in sec:
-            h('soma distance()')
-            dist = (h.distance(seg.x))
-            seg.g_pas = gpas_soma*(1+k*dist)
 
     h.dt = dt  # Time step (iteration)
     h.steps_per_ms = 1 / dt
@@ -564,7 +674,7 @@ if __name__ == "__main__":
     plt.xlabel("Time [ms]")
     plt.ylabel("I [uA]")
     plt.plot(tv, stim)
-    plt.savefig("/Users/Dani/TDK/parameter_estim/stim_protocol2/steps/400/imp.png")
+    #plt.savefig("/Users/Dani/TDK/parameter_estim/stim_protocol2/steps/400/imp.png")
     plt.show()
 
     # np.savetxt("/Users/Dani/TDK/parameter_estim/stim_protocol2/steps/400/stim.txt", stim)
@@ -572,16 +682,16 @@ if __name__ == "__main__":
     print len(stim)
 
     # --- Load NEURON morphology
-    h('load_file("/Users/Dani/TDK/parameter_estim/exp/morphology_131117-C2.hoc")')
+    h('load_file("/home/terbe/parameter-inference/exp/morphology_131117-C2.hoc")')
     # Set the appropriate "nseg"
     for sec in h.allsec():
         sec.Ra = 150
     h('forall {nseg = int((L/(0.1*lambda_f(100))+.9)/2)*2 + 1}')  # If Ra_max = 105 dend.nseg = 21 and soma.nseg = 1
 
-    t, v = real_morphology_model_sdend_rsoma(stim=stim)
+    t, v = real_morphology_model_ssoma_rdend_spatial(stim=stim)
     # v = white(7., v)
 
-    plt.figure(figsize=(12,7))
+    plt.figure(figsize=(12, 7))
     plt.title("Voltage response")
     plt.xlabel("Time [ms]")
     plt.ylabel("Voltage [mV]")
