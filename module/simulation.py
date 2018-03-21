@@ -512,6 +512,7 @@ if __name__ == "__main__":
     h('forall {nseg = int((L/(0.1*lambda_f(100))+.9)/2)*2 + 1}')  # If Ra_max = 105 dend.nseg = 21 and soma.nseg = 1
 
     t, v = real_morphology_model_sdend_rsoma(stim=stim)
+    _, v2 = real_morphology_model_ssoma_rdend(stim=stim)
     # v = white(7., v)
 
     plt.figure(figsize=(12,7))
@@ -519,6 +520,7 @@ if __name__ == "__main__":
     plt.xlabel("Time [ms]")
     plt.ylabel("Voltage [mV]")
     plt.plot(t, v)
+    plt.plot(t, v2, '--')
     # plt.savefig("/Users/Dani/TDK/parameter_estim/stim_protocol2/steps/400/resp.png")
     plt.show()
 
