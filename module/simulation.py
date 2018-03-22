@@ -471,7 +471,13 @@ def real_morphology_model_soma_spatial(stim, k=0.001, gpas_soma=0.0001, Ra=100.,
         for seg in sec:
             h('soma distance()')
             dist = (h.distance(seg.x))
-            seg.g_pas = gpas_soma*(1+k*dist)
+            gpas = gpas_soma*(1+k*dist)
+
+            if gpas < 0:
+                seg.g_pas = 0
+                print "WARNING!!! 'gpas' is in negative! Corrected to zero."
+            else:
+                seg.g_pas = gpas
 
         sec.e_pas = 0
 
@@ -526,7 +532,13 @@ def real_morphology_model_dend_spatial(stim, d=30, k=0.001, gpas_soma=0.0001, Ra
         for seg in sec:
             h('soma distance()')
             dist = (h.distance(seg.x))
-            seg.g_pas = gpas_soma*(1+k*dist)
+            gpas = gpas_soma * (1 + k * dist)
+
+            if gpas < 0:
+                seg.g_pas = 0
+                print "WARNING!!! 'gpas' is in negative! Corrected to zero."
+            else:
+                seg.g_pas = gpas
 
         sec.e_pas = 0
 
@@ -593,8 +605,13 @@ def real_morphology_model_ssoma_rdend_spatial(stim, d=30, k=0.001, gpas_soma=0.0
         for seg in sec:
             h('soma distance()')
             dist = (h.distance(seg.x))
-            print "Distance from soma: " + str(dist)
-            seg.g_pas = gpas_soma*(1+k*dist)
+            gpas = gpas_soma * (1 + k * dist)
+
+            if gpas < 0:
+                seg.g_pas = 0
+                print "WARNING!!! 'gpas' is in negative! Corrected to zero."
+            else:
+                seg.g_pas = gpas
 
         sec.e_pas = 0
 

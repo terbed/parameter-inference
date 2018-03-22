@@ -18,7 +18,7 @@ duration = [3, 20, 200]
 p_names = ['gpas_soma', 'k']
 p_res = [101, 101]  # Parameters resolution
 p_range = [[0.00004, 0.00016], [0.0004, 0.0016]]  # Fixed range, but "true value" may change!
-p_mean = [0.0001, 0.001]  # Fixed prior mean
+p_mean = [0.0001, 0.]      # Fixed prior mean
 p_std = [0.00002, 0.0002]  # Fixed prior std
 
 noise_D = 21.6767
