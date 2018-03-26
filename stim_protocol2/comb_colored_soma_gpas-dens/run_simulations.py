@@ -17,7 +17,7 @@ duration = [3, 20, 200]
 
 p_names = ['gpas_soma', 'k']
 p_res = [101, 101]  # Parameters resolution
-p_range = [[0.00004, 0.00016], [0.0004, 0.0016]]  # Fixed range, but "true value" may change!
+p_range = [[0.00004, 0.00016], [-0.0005, 0.0005]]  # Fixed range, but "true value" may change!
 p_mean = [0.0001, 0.]      # Fixed prior mean
 p_std = [0.00002, 0.0002]  # Fixed prior std
 
@@ -39,7 +39,7 @@ fixed_param_num = 10  # The number of fixed parameters sampled from prior
 model = real_morphology_model_soma_spatial
 
 # --- Load NEURON morphology
-h('load_file("/home/terbe/parameter-inference/exp/morphology_131117-C2.hoc")')
+h('load_file("/home/szabolcs/parameter_inference/exp/morphology_131117-C2.hoc")')
 # Set the appropriate "nseg"
 for sec in h.allsec():
     sec.Ra = 100
@@ -81,7 +81,7 @@ fixed_params = sampling_from_prior(prior_set, fixed_param_num)
 
 # Save parameter informations
 # Create database for data
-database = tb.open_file("/home/terbe/parameter-inference/stim_protocol2/comb_colored_soma_gpas-dens/paramsetup.hdf5", mode="w")
+database = tb.open_file("/home/szabolcs/parameter_inference/stim_protocol2_v24/comb_colored_soma_gpas-dens/paramsetup.hdf5", mode="w")
 
 # Save param initialization
 param_init = []
@@ -115,8 +115,8 @@ for item in hz:
     print "\n\n---------------------------------------- Running %i Hz zap protocol" % item
 
     # Stimulus path
-    stim = np.loadtxt("/home/terbe/parameter-inference/stim_protocol2/stimulus/sin/%i/stim.txt" % item)
-    working_path = "/home/terbe/parameter-inference/stim_protocol2/comb_colored_soma_gpas-dens/sins/%i" % item
+    stim = np.loadtxt("/home/szabolcs/parameter_inference/stim_protocol2_v24/stimulus/sin/%i/stim.txt" % item)
+    working_path = "/home/szabolcs/parameter_inference/stim_protocol2_v24/comb_colored_soma_gpas-dens/sins/%i" % item
 
     modell = partial(model, stim=stim)
 
@@ -132,8 +132,8 @@ for item in duration:
     print "\n\n---------------------------------------- Running %i ms impulse protocol" % item
 
     # Stimulus path
-    stim = np.loadtxt("/home/terbe/parameter-inference/stim_protocol2/stimulus/step/%i/stim.txt" % item)
-    working_path = "/home/terbe/parameter-inference/stim_protocol2/comb_colored_soma_gpas-dens/steps/%i" % item
+    stim = np.loadtxt("/home/szabolcs/parameter_inference/stim_protocol2_v24/stimulus/step/%i/stim.txt" % item)
+    working_path = "/home/szabolcs/parameter_inference/stim_protocol2_v24/comb_colored_soma_gpas-dens/steps/%i" % item
 
     modell = partial(model, stim=stim)
 
