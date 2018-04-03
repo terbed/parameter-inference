@@ -562,7 +562,7 @@ def real_morphology_model_dend_spatial(stim, d=30, k=0.001, gpas_soma=0.0001, Ra
     # Set up recording Vectors
     v_vec = h.Vector()  # Membrane potential vector
     t_vec = h.Vector()  # Time stamp vector
-    v_vec.record(h.apic[30](0.5)._ref_v)
+    v_vec.record(h.apic[d](0.5)._ref_v)
     t_vec.record(h._ref_t)
 
     # Simulation duration and RUN
@@ -712,7 +712,6 @@ if __name__ == "__main__":
     plt.xlabel("Time [ms]")
     plt.ylabel("Voltage [mV]")
     plt.plot(t, v)
-    plt.plot(t, v2, '--')
     # plt.savefig("/Users/Dani/TDK/parameter_estim/stim_protocol2/steps/400/resp.png")
     plt.show()
 
