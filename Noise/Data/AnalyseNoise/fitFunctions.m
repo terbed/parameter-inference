@@ -9,7 +9,7 @@ F1 = @(p, t) exp(-t./p(1)).*cos((2*pi/p(2)).*t);
 F2 = @(p, t) p(1).*exp(-t./p(2))-p(3).*exp(-t./p(4));
 
 
-x0 = [400, 500];
+x0 = [400, 1000];
 [p1,resnorm,~,exitflag,output] = lsqcurvefit(F1,x0,tt,XC_soma_avrg);
 
 x0 = [1, 400, 1, 500];
