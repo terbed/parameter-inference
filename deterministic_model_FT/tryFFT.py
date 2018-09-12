@@ -1,9 +1,9 @@
 import numpy as np
 from matplotlib import pyplot as plt
 
-Fs = 1000./30                       # sampling rate
+Fs = 10000                             # sampling rate
 Ts = 1.0/Fs                         # sampling interval
-t = np.arange(0, 30, Ts)             # time vector
+t = np.arange(0, 500, Ts)             # time vector
 
 ff = 1                              # frequency of the signal in Hz
 y = np.sin(2*np.pi*ff*t) + np.random.normal(0, 0.5, len(t))

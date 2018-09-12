@@ -6,34 +6,6 @@ from module.simulation import real_morphology_model
 # We want to answer the question: why is the sin 10Hz protocol seems to be the best
 # The possible answer lies in the properties of the deterministic model changes due to input stimulus
 
-stim1 = np.loadtxt("/home/terbe/parameter-inference/stim_protocol2/stimulus/step/3/stim.txt")
-stim10 = np.loadtxt("/home/terbe/parameter-inference/stim_protocol2/stimulus/sin/10/stim.txt")
-stim100 = np.loadtxt("/home/terbe/parameter-inference/stim_protocol2/stimulus/sin/100/stim.txt")
-
-tv = np.linspace(0, 500, 5001)
-
-fig, ax = plt.subplots(3, 1, figsize=(12, 12))
-ax[0].set_title("1 Hz stimulus")
-ax[0].set_xlabel("Time [ms]")
-ax[0].set_ylabel("I [uA]")
-ax[0].plot(tv, stim1)
-
-ax[1].set_title("10 Hz stimulus")
-ax[1].set_xlabel("Time [ms]")
-ax[1].set_ylabel("I [uA]")
-ax[1].plot(tv, stim10)
-
-ax[2].set_title("100 Hz stimulus")
-ax[2].set_xlabel("Time [ms]")
-ax[2].set_ylabel("I [uA]")
-ax[2].plot(tv, stim100)
-# plt.savefig("/Users/Dani/TDK/parameter_estim/stim_protocol2/steps/400/imp.png")
-fig.show()
-
-# np.savetxt("/Users/Dani/TDK/parameter_estim/stim_protocol2/steps/400/stim.txt", stim)
-
-# print len(stim)
-#
 
 # --- Load NEURON morphology
 h('load_file("/home/terbe/parameter-inference/exp/morphology_131117-C2.hoc")')
@@ -42,71 +14,56 @@ for sec in h.allsec():
     sec.Ra = 150
 h('forall {nseg = int((L/(0.1*lambda_f(100))+.9)/2)*2 + 1}')  # If Ra_max = 105 dend.nseg = 21 and soma.nseg = 1
 
-t, v11 = real_morphology_model(stim=stim1, Ra=50, gpas=0.00005)
-_, v12 = real_morphology_model(stim=stim1)
 
-_, v101 = real_morphology_model(stim=stim10, Ra=50, gpas=0.00005)
-_, v102 = real_morphology_model(stim=stim10)
+# Create random stimulus (all frequency input is present, we are interested in the output difference)
+# ----------------------------------------------------------------------------------------------------
 
-_, v1001 = real_morphology_model(stim=stim100, Ra=50, gpas=0.00005)
-_, v1002 = real_morphology_model(stim=stim100)
-# v = white(7., v)
+for i in range(10):
+    t = np.arange(0, 1000, 0.1)
+    stim = np.random.normal(0, 0.1, len(t))
 
 
-fig, ax = plt.subplots(3, 2, figsize=(16, 12))
-ax[0, 0].set_title("1 Hz stimulus")
-ax[0, 0].set_xlabel("Time [ms]")
-ax[0, 0].set_ylabel("I [uA]")
-ax[0, 0].plot(tv, stim1)
+    tt, v1 = real_morphology_model(stim=stim, Ra=50, gpas=0.00005)
+    _, v2 = real_morphology_model(stim=stim, Ra=100, gpas=0.0001)
 
-ax[0, 1].set_title("Voltage response with 2 differen parameter")
-ax[0, 1].set_xlabel("Time [ms]")
-ax[0, 1].set_ylabel("Voltage [mV]")
-ax[0, 1].plot(t, v11, label='Ra=50, gpas=0.00005')
-ax[0, 1].plot(t, v12, label='Ra=100, gpas=0.0001')
-ax[0, 1].legend()
+    dev = np.subtract(v1, v2)
 
-ax[1, 0].set_title("10 Hz stimulus")
-ax[1, 0].set_xlabel("Time [ms]")
-ax[1, 0].set_ylabel("I [uA]")
-ax[1, 0].plot(tv, stim10)
+    # Watch frequency spectrum
+    Ts = (t[2]-t[1])/1000               # sampling interval in msec
+    Fs = 1./Ts                          # sampling frequency
+    n = len(dev)                       # length of the signal in samples
+    k = np.arange(n)
+    L = n/Fs                            # length of signal in time [s]
+    fb = 1/L                            # frequency bin
+    frq = k/L                           # two sides frequency range
+    frq = frq                           # one side frequency range
+    frq = frq[range(n/2)]               # one side frequency range
 
-ax[1, 1].set_title("Voltage response with 2 differen parameter")
-ax[1, 1].set_xlabel("Time [ms]")
-ax[1, 1].set_ylabel("Voltage [mV]")
-ax[1, 1].plot(t, v101, label='Ra=50, gpas=0.00005')
-ax[1, 1].plot(t, v102, label='Ra=100, gpas=0.0001')
-ax[1, 1].legend()
+    f1 = np.arange(0, 50, fb)
 
-ax[2, 0].set_title("100 Hz stimulus")
-ax[2, 0].set_xlabel("Time [ms]")
-ax[2, 0].set_ylabel("I [uA]")
-ax[2, 0].plot(tv, stim100)
+    Y1 = np.fft.fft(dev)/n                 # fft computing and normalization
 
-ax[2, 1].set_title("Voltage response with 2 differen parameter")
-ax[2, 1].set_xlabel("Time [ms]")
-ax[2, 1].set_ylabel("Voltage [mV]")
-ax[2, 1].plot(t, v1001, label='Ra=50, gpas=0.00005')
-ax[2, 1].plot(t, v1002, '--', label='Ra=100, gpas=0.0001')
-ax[2, 1].legend()
+    fig, ax = plt.subplots(4, 1, figsize=(16, 16))
+    ax[0].plot(t, stim)
+    ax[0].set_xlabel('Time [ms]')
+    ax[0].set_ylabel('Stimulus [uA]')
+    ax[0].set_title('Random white stimulus')
 
-# plt.savefig("/Users/Dani/TDK/parameter_estim/stim_protocol2/steps/400/imp.png")
-fig.show()
+    ax[1].plot(tt, v1, label='Ra=50, gpas=0.00005')
+    ax[1].plot(tt, v2, label='Ra=100, gpas=0.0001')
+    ax[1].set_xlabel('Time [ms]')
+    ax[1].set_ylabel('Stimulus [uA]')
+    ax[1].set_title('Deterministic response of the model for different parameter setting')
+    ax[1].legend()
 
+    ax[2].plot(tt, dev)
+    ax[2].set_xlabel('Time [ms]')
+    ax[2].set_ylabel('Voltage difference [mV]')
+    ax[2].set_title('Deterministic model difference')
 
-dev1 = [i - j for i, j in zip(v11, v12)]
-dev2 = [i - j for i, j in zip(v101, v102)]
-dev3 = [i - j for i, j in zip(v1001, v1002)]
-
-plt.figure(figsize=(12, 7))
-plt.title("Voltage response difference")
-plt.xlabel("Time [ms]")
-plt.ylabel("Voltage [mV]")
-plt.plot(t, dev1)
-plt.plot(t, dev2)
-plt.plot(t, dev3)
-# plt.savefig("/Users/Dani/TDK/parameter_estim/stim_protocol2/steps/400/resp.png")
-plt.show()
-
-
-# Watch frequency spa
+    ax[3].plot(f1, abs(Y1[0:len(f1)]))        # plotting the spectrum
+    ax[3].set_xlabel('Freq (Hz)')
+    ax[3].set_ylabel('|Y(freq)|')
+    ax[3].set_title('Trace in frequency domain')
+    #fig.show()
+    plt.savefig('modelFFT%i.png' % i)
