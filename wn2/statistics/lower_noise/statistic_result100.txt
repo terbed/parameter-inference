@@ -1,8 +1,0 @@
-sigma_noise = 5
-
-The distance of the most likely parameter from the true one on the average: 0.0365365365365
-The standard deviation of the upper distance: 0.0286466479758
-The inferred most probable parameter is how many times probable on the average (according to the posterior distribution) then the true one: 1.97767176726
-The standard deviation of the upper stat: 3.77188080595
-The posterior distribution is how many times sharper then the prior distribution on the average: 3.7189008426
-The standard deviation of the upper sharpness: 0.119697442651
