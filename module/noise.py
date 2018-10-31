@@ -114,7 +114,12 @@ def noise_from_cholesky(cholesky, v_vec):
 
 def more_trace_from_covmat(covmat, model, params, rep):
     """
+    Creates @param rep number of noised traces according to @param covmat for the given @param model and params
 
+    :param covmat Covariance matrix of the noise
+    :param model Deterministic model to superimpose noise
+    :param params parameters for the deterministic model
+    :param rep repetition of noisy traces for the given parameter
     """
 
     moretrace = []
@@ -131,6 +136,22 @@ def more_trace_from_covmat(covmat, model, params, rep):
         current_param = []
 
     return np.array(moretrace)
+
+
+def more_trace_from_covmat_sd(covmat, model, params, rep):
+    """
+    SOMA-DENDRIT recording version
+
+    Creates @param rep number of noised traces according to @param covmat for the given @param model and params
+
+    :param covmat Covariance matrix of the noise
+    :param model Deterministic model to superimpose noise
+    :param params parameters for the deterministic model
+    :param rep repetition of noisy traces for the given parameter
+    """
+
+    # TODO
+    pass
 
 
 def more_trace_from_cholesky(cholesky, model, params, rep):
@@ -282,14 +303,43 @@ def cov_mat(f, t_vec):
 
 def inv_cov_mat(f, t_vec):
     """
+    Produces inverse covariance matrix for given autocorrelation function
 
-    :param f:
-    :param t_vec:
-    :return:
+    :param f: autocorrrelation function (with adjusted parameters)
+    :param t_vec: time vector for the function
+    :return: the covariance matrix and the inverse covariance matrix
     """
     covmat = [[f(t_vec[t1] - t_vec[t2]) for t2 in xrange(len(t_vec))] for t1 in xrange(len(t_vec))]
 
     return np.array(covmat), np.linalg.inv(covmat)
+
+def inv_cov_mat_sd(f, t_vec):
+    """
+    SOMA-DENDRIT recording version
+
+    Produces inverse covariance matrix for given autocorrelation function
+
+    :param f: autocorrrelation function (with adjusted parameters)
+    :param t_vec: time vector for the function
+    :return: the covariance matrix and the inverse covariance matrix
+    """
+
+    covmat = [[f(t_vec[t1] - t_vec[t2]) for t2 in xrange(len(t_vec))] for t1 in xrange(len(t_vec))]
+    inv_covmat = np.linalg.inv(covmat)
+    s = inv_covmat.shape[0]
+
+    # creating big matrix containing soma-dendrit cross-correlation
+    inv_covmat_sd = np.zeros(shape=(s*2, s*2))
+
+    # Fill the diagonal
+    inv_covmat_sd[0:s, 0:s] = inv_covmat
+    inv_covmat_sd[s:s*2, s:s*2] = inv_covmat
+
+    # Fill the off-diagonal
+    inv_covmat_sd[0:s, s:s*2] = 0.5*inv_covmat
+    inv_covmat_sd[s:s*2, 0:s] = 0.5*inv_covmat
+
+    return covmat, inv_covmat_sd
 
 
 def multivariate_normal(vec, t_vec, f):
