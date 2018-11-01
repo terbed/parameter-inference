@@ -138,35 +138,6 @@ def more_trace_from_covmat(covmat, model, params, rep):
     return np.array(moretrace)
 
 
-def more_trace_from_covmat_sd(covmat_sd, model_sd, params, rep):
-    """
-    SOMA-DENDRIT recording version
-
-    Creates @param rep number of noised traces according to @param covmat for the given @param model and params
-
-    :param covmat_sd extended covariance matrix of the noise handling soma-dendrit recording
-    :param model_sd Deterministic model to superimpose noise with soma-dendrit output
-    :param params parameters for the deterministic model
-    :param rep repetition of noisy traces for the given parameter
-    """
-
-    moretrace = []
-    chol = np.linalg.cholesky(covmat_sd)
-
-    for item in params:
-        current_param = []
-        _, v_soma, v_dend = model_sd(**item)
-        v = np.concatenate(v_soma, v_dend)
-
-        for _ in range(rep):
-            current_param.append(noise_from_cholesky(chol, v))
-
-        moretrace.append(current_param)
-        current_param = []
-
-    return np.array(moretrace)
-    pass
-
 
 def more_trace_from_cholesky(cholesky, model, params, rep):
     """
