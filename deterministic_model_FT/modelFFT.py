@@ -22,7 +22,6 @@ for i in range(10):
     t = np.arange(0, 1000, 0.1)
     stim = np.random.normal(0, 0.1, len(t))
 
-
     tt, v1 = real_morphology_model(stim=stim, Ra=50, gpas=0.00005)
     _, v2 = real_morphology_model(stim=stim, Ra=100, gpas=0.0001)
 

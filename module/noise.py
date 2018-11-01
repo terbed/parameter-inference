@@ -138,19 +138,33 @@ def more_trace_from_covmat(covmat, model, params, rep):
     return np.array(moretrace)
 
 
-def more_trace_from_covmat_sd(covmat, model, params, rep):
+def more_trace_from_covmat_sd(covmat_sd, model_sd, params, rep):
     """
     SOMA-DENDRIT recording version
 
     Creates @param rep number of noised traces according to @param covmat for the given @param model and params
 
-    :param covmat Covariance matrix of the noise
-    :param model Deterministic model to superimpose noise
+    :param covmat_sd extended covariance matrix of the noise handling soma-dendrit recording
+    :param model_sd Deterministic model to superimpose noise with soma-dendrit output
     :param params parameters for the deterministic model
     :param rep repetition of noisy traces for the given parameter
     """
 
-    # TODO
+    moretrace = []
+    chol = np.linalg.cholesky(covmat_sd)
+
+    for item in params:
+        current_param = []
+        _, v_soma, v_dend = model_sd(**item)
+        v = np.concatenate(v_soma, v_dend)
+
+        for _ in range(rep):
+            current_param.append(noise_from_cholesky(chol, v))
+
+        moretrace.append(current_param)
+        current_param = []
+
+    return np.array(moretrace)
     pass
 
 
@@ -313,6 +327,7 @@ def inv_cov_mat(f, t_vec):
 
     return np.array(covmat), np.linalg.inv(covmat)
 
+
 def inv_cov_mat_sd(f, t_vec):
     """
     SOMA-DENDRIT recording version
@@ -325,21 +340,22 @@ def inv_cov_mat_sd(f, t_vec):
     """
 
     covmat = [[f(t_vec[t1] - t_vec[t2]) for t2 in xrange(len(t_vec))] for t1 in xrange(len(t_vec))]
-    inv_covmat = np.linalg.inv(covmat)
-    s = inv_covmat.shape[0]
 
     # creating big matrix containing soma-dendrit cross-correlation
-    inv_covmat_sd = np.zeros(shape=(s*2, s*2))
+    s = covmat.shape[0]
+    covmat_sd = np.zeros(shape=(s*2, s*2))
 
     # Fill the diagonal
-    inv_covmat_sd[0:s, 0:s] = inv_covmat
-    inv_covmat_sd[s:s*2, s:s*2] = inv_covmat
+    covmat_sd[0:s, 0:s] = covmat
+    covmat_sd[s:s*2, s:s*2] = covmat
 
     # Fill the off-diagonal
-    inv_covmat_sd[0:s, s:s*2] = 0.5*inv_covmat
-    inv_covmat_sd[s:s*2, 0:s] = 0.5*inv_covmat
+    covmat_sd[0:s, s:s*2] = 0.5*covmat
+    covmat_sd[s:s*2, 0:s] = 0.5*covmat
 
-    return covmat, inv_covmat_sd
+    inv_covmat_sd = np.linalg.inv(covmat_sd)
+
+    return covmat_sd, inv_covmat_sd
 
 
 def multivariate_normal(vec, t_vec, f):
