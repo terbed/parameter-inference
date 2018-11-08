@@ -1,6 +1,6 @@
 from neuron import h, gui
 from module.probability import RandomVariable
-
+import numpy as np
 
 def get_default_param(name):
     Ra = RandomVariable(name='Ra', range_min=50., range_max=150., resolution=10, mean=100., sigma=20.)
