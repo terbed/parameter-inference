@@ -122,7 +122,7 @@ for item in hz:
     modell = partial(model, stim=stim)
 
     # Generate synthetic data for each fixed params and given repetition
-    target_traces = more_trace_from_covmat(covmat, model_sd=modell, params=fixed_params, rep=noise_rep)
+    target_traces = more_trace_from_covmat(covmat, model=modell, params=fixed_params, rep=noise_rep)
     print "The shape of target traces: " + str(target_traces.shape)
 
     if __name__ == '__main__':
@@ -139,7 +139,7 @@ for item in duration:
     modell = partial(model, stim=stim)
 
     # Generate synthetic data for each fixed params and given repetition
-    target_traces = more_trace_from_covmat(covmat, model_sd=modell, params=fixed_params, rep=noise_rep)
+    target_traces = more_trace_from_covmat(covmat, model=modell, params=fixed_params, rep=noise_rep)
 
     if __name__ == '__main__':
         run_protocol_simulations_c(model=modell, target_traces=target_traces, inv_covmat=invcovmat, param_set=prior_set,
