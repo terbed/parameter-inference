@@ -722,6 +722,9 @@ def real_morphology_model_srsoma_rdend_spatial(stim, d=30, k=0.001, gpas_soma=0.
     t = t_vec.to_python()
     v_soma = vs_vec.to_python()
     v_dend = vd_vec.to_python()
+    
+    v_soma = np.array(v_soma)
+    v_dend = np.array(v_dend)
 
     v = np.concatenate(v_soma, v_dend)
     return t, v
