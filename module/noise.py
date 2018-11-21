@@ -138,7 +138,6 @@ def more_trace_from_covmat(covmat, model, params, rep):
     return np.array(moretrace)
 
 
-
 def more_trace_from_cholesky(cholesky, model, params, rep):
     """
 
