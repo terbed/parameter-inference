@@ -1,6 +1,6 @@
 from neuron import h, gui
 from module.probability import RandomVariable
-
+import numpy as np
 
 def get_default_param(name):
     Ra = RandomVariable(name='Ra', range_min=50., range_max=150., resolution=10, mean=100., sigma=20.)
@@ -722,8 +722,11 @@ def real_morphology_model_srsoma_rdend_spatial(stim, d=30, k=0.001, gpas_soma=0.
     t = t_vec.to_python()
     v_soma = vs_vec.to_python()
     v_dend = vd_vec.to_python()
+    
+    v_soma = np.array(v_soma)
+    v_dend = np.array(v_dend)
 
-    v = np.concatenate(v_soma, v_dend)
+    v = np.concatenate((v_soma, v_dend))
     return t, v
 
 

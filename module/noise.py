@@ -309,7 +309,7 @@ def inv_cov_mat_sd(f, t_vec):
     :return: the covariance matrix and the inverse covariance matrix
     """
 
-    covmat = [[f(t_vec[t1] - t_vec[t2]) for t2 in xrange(len(t_vec))] for t1 in xrange(len(t_vec))]
+    covmat = np.array([[f(t_vec[t1] - t_vec[t2]) for t2 in xrange(len(t_vec))] for t1 in xrange(len(t_vec))])
 
     # creating big matrix containing soma-dendrit cross-correlation
     s = covmat.shape[0]
