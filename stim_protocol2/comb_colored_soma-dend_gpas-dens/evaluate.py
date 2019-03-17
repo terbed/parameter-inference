@@ -5,7 +5,13 @@ import tables as tb
 
 startTime = time.time()
 nfp = 10  # Number of fixed parameters
+nr = 30   # Number of repetition
 p_names = ['gpas', 'k']
+
+dir = "/Users/Dani/TDK/parameter_estim/stim_protocol2/comb_colored_soma-dend_gpas-dens/"  # directory where data is
+subdirs = ["steps/3", "steps/20", "steps/200", "sins/1", "sins/10", "sins/100"]    # subdirectories of the man directory
+comb_lists = [["steps/3", "steps/20", "steps/200"],         # we will combine these protocols
+              ["sins/1", "sins/10", "sins/100"]]
 
 # Load parameter space initializator
 pinit = tb.open_file("/home/szabolcs/parameter_inference/stim_protocol2_v24/comb_colored_soma-dend_gpas-dens/paramsetup.hdf5", mode="r")
@@ -50,6 +56,7 @@ plot_combined_results("/home/szabolcs/parameter_inference/stim_protocol2_v24/com
 plot_combined_results("/home/szabolcs/parameter_inference/stim_protocol2_v24/comb_colored_soma-dend_gpas-dens/steps/20", 10, dbs=pinit)
 plot_combined_results("/home/szabolcs/parameter_inference/stim_protocol2_v24/comb_colored_soma-dend_gpas-dens/steps/200", 10, dbs=pinit)
 plot_combined_results("/home/szabolcs/parameter_inference/stim_protocol2_v24/comb_colored_soma-dend_gpas-dens/steps/comb", 10, dbs=pinit)
+
 
 path_list = ["/home/szabolcs/parameter_inference/stim_protocol2_v24/comb_colored_soma-dend_gpas-dens/steps/3",
              "/home/szabolcs/parameter_inference/stim_protocol2_v24/comb_colored_soma-dend_gpas-dens/steps/20",

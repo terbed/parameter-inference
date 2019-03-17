@@ -129,7 +129,7 @@ def analyse(param, p_opt):
     true_idx = (np.abs(x - param.value)).argmin()
 
     # Handle the case when fitted gauss go out of range
-    if sharpness(x, posterior) == None:
+    if sharpness(x, posterior) is None:
         sharper = 1
         broadness = 100
     else:

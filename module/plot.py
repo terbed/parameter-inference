@@ -10,6 +10,7 @@ import numpy as np
 from matplotlib import cm as CM
 from matplotlib import pyplot as plt
 from module.prior import normal
+import csv
 
 
 def check_directory(working_path):
@@ -103,6 +104,13 @@ def fullplot(result):
     f, ax = plt.subplots(pnum, pnum, figsize=(14, 9))
     f.subplots_adjust(hspace=.001, wspace=.001)
 
+    data = []
+    data_err = []
+    data_borad = []
+    data_sharp = []
+    data_rdiff = []
+    data_acc = []
+    data_KL = []
     for row in range(pnum):
         for col in range(pnum):
             # Marginal plots
@@ -171,15 +179,23 @@ def fullplot(result):
                                              labelright='off')
             elif row == 0 and col == pnum-1:
                 ax[row, col].set_axis_off()
+                res = result.analyse_result()
                 text = "\n\n\nKLD: %.3f" % result.KL
+                data_KL.append(result.KL)
                 for idx, param in enumerate(result.p.params):
                     text += "\n\n" + param.name
-                    text += "\nbroadness: %.2f %%" % result.get_broadness()[idx]
-                    text += "\nsharpness: %.2f" % result.analyse_result()[idx][4]
-                    text += "\nrdiff: %.2f %%" % result.analyse_result()[idx][2]
-                    text += "\naccuracy: %.2f %%" % result.analyse_result()[idx][3]
-                    text += "\nfitted sigma: %.2e" % result.analyse_result()[idx][0]
-                    text += "\nrelative fit err: %.2f %%" % result.analyse_result()[idx][1]
+                    text += "\nbroadness: %.2f %%" % res[idx][5]
+                    data_borad.append(res[idx][5])
+                    text += "\nsharpness: %.2f" % res[idx][4]
+                    data_sharp.append(res[idx][4])
+                    text += "\nrdiff: %.2f %%" % res[idx][2]
+                    data_rdiff.append(res[idx][2])
+                    text += "\naccuracy: %.2f %%" % res[idx][3]
+                    data_acc.append(res[idx][3])
+                    text += "\nfitted sigma: %.2e" % res[idx][0]
+                    data.append(res[idx][0]/result.p.params[idx].sigma)
+                    text += "\nrelative fit err: %.2f %%" % res[idx][1]
+                    data_err.append(res[idx][1])
                 ax[row, col].text(0.5, 0.5, text, horizontalalignment='center',
                                   verticalalignment='center')
             else:
@@ -189,6 +205,36 @@ def fullplot(result):
     while os.path.exists('{}({:d}).pdf'.format(result.working_path + "/fullplot_P", i)):
         i += 1
     plt.savefig('{}({:d}).pdf'.format(result.working_path + "/fullplot_P", i))
+
+    # save statistics in a .csv file
+    # df = pd.DataFrame(data=data, columns=result.p.params, index=[0,])
+    with open(result.working_path + "/sk.csv", 'a') as f:
+        writer = csv.writer(f)
+        writer.writerow(data)
+
+    with open(result.working_path + "/fitted_sigma_err.csv", 'a') as f:
+        writer = csv.writer(f)
+        writer.writerow(data_err)
+
+    with open(result.working_path + "/broadness.csv", 'a') as f:
+        writer = csv.writer(f)
+        writer.writerow(data_borad)
+
+    with open(result.working_path + "/sharpness.csv", 'a') as f:
+        writer = csv.writer(f)
+        writer.writerow(data_sharp)
+
+    with open(result.working_path + "/accuracy.csv", 'a') as f:
+        writer = csv.writer(f)
+        writer.writerow(data_acc)
+
+    with open(result.working_path + "/rdiff.csv", 'a') as f:
+        writer = csv.writer(f)
+        writer.writerow(data_rdiff)
+
+    with open(result.working_path + "/KL.csv", 'a') as f:
+        writer = csv.writer(f)
+        writer.writerow(data_KL)
 
 
 def plot_joint(result, param1, param2):

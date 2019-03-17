@@ -2,6 +2,7 @@ import numpy as np
 from module.trace import analyse, kl_test
 import module.plot as plot
 import os
+from module.trace import fit_normal
 
 
 class Analyse:
@@ -69,7 +70,6 @@ class Analyse:
                 np.sum(self.posterior, axis=tuple(item)) * self.p.margin_step[idx]
 
     def __fit_posterior(self):
-        from module.trace import fit_normal
         for item in self.p.params:
             item.fitted_gauss = fit_normal(item.values, item.posterior, item.value, item.sigma)
 

@@ -362,12 +362,13 @@ def combine_likelihood(path_list, numfp, num_mult_single, out_path):
     print "Combining likelihoods DONE!"
 
 
-def protocol_comparison(path_list, numfp, inferred_params, out_path, dbs,
+def protocol_comparison(path_list, numfp, repnum_k, inferred_params, out_path, dbs,
                         protocol_xticks=['3ms', '20ms', '200ms', '1Hz', '10Hz', '100Hz', 'steps comb', 'sins comb']):
     """
     This function compare the combined protocol results.
     :param path_list: Path for the protocols to be compared -- and where the combined loglikelihood(x).txt files can be found
-    :param numfp: Number of fixed params -- the number of loglikelihood.txt files in the path 
+    :param numfp: Number of fixed params -- the number of loglikelihood.txt files in the path
+    :param repnum_k: Number of repitition
     :param inferred_params: For example: ["Ra","cm","gpas"]
     :param out_path: The result will be saved in this directory
     :param dbs: paramsetup.hdf5 database object
@@ -377,8 +378,7 @@ def protocol_comparison(path_list, numfp, inferred_params, out_path, dbs,
     from matplotlib import pyplot as plt
     m = 0
 
-    # x axes for plot:
-    x = range(len(path_list))
+
 
     plist = []
     for idx in range(dbs.root.params_init.shape[0]):
@@ -392,6 +392,9 @@ def protocol_comparison(path_list, numfp, inferred_params, out_path, dbs,
     accuracy = np.empty((len(path_list), numfp, len(inferred_params)))
     rdiff = np.empty((len(path_list), numfp, len(inferred_params)))
     broadness = np.empty((len(path_list), numfp, len(inferred_params)))
+    sigma = np.empty((len(path_list), numfp, len(inferred_params)))
+    repnum = np.empty((len(path_list), numfp, len(inferred_params)))
+
     print "\n\n broadness shape: " + str(broadness.shape)
 
     for idx, path in enumerate(path_list):
@@ -407,12 +410,22 @@ def protocol_comparison(path_list, numfp, inferred_params, out_path, dbs,
             broadness[idx, j, :] = res.get_broadness()
             rdiff[idx, j, :] = res.analyse_result()[:, 2]
             accuracy[idx, j, :] = res.analyse_result()[:, 3]
+            sigma[idx, j, :] = res.analyse_result()[:, 0]
 
             tmp.append(res.KL)
         KL.append(tmp)
 
+    # Calculate repetition number
+    for i in range(sigma.shape[0]):
+        for j in range(sigma.shape[1]):
+            for k in range(sigma.shape[2]):
+                repnum[i, j, k] = est_rep_num(repnum_k, p_set.params[k].sigma, sigma[i, j, k], 10)
+
     broadness = np.array(broadness)
     KL = np.array(KL)
+
+    # x axes for plot:
+    x = range(len(path_list))
 
     # Plot KL result for each protocol
     plt.figure(figsize=(12, 7))
@@ -448,9 +461,49 @@ def protocol_comparison(path_list, numfp, inferred_params, out_path, dbs,
     avrg_rdiff = np.average(rdiff, axis=1)
     std_rdiff = np.std(rdiff, axis=1)
 
+    avrg_repnum = np.average(repnum, axis=1)
+    std_repnum = np.std(repnum, axis=1)
+
+    # repnum plot for each scenario
+    for path_idx in range(avrg_repnum.shape[0]):
+        for param_idx in range(avrg_repnum.shape[1]):
+            x = []
+            y = []
+            y_err = []
+            for d in np.linspace(1, 20, 200):
+                ns = []
+                for sig in sigma[path_idx, :, param_idx]:
+                    n = est_rep_num(repnum_k, p_set.params[param_idx].sigma, sig, d)
+                    ns.append(n)
+
+                x.append(d)
+                mean_n = np.mean(ns)
+                std_n = np.std(ns)
+                y.append(mean_n)
+                y_err.append(std_n)
+
+            y_min = np.array(y) - np.array(y_err)
+            y_max = np.array(y) + np.array(y_err)
+            plt.figure(figsize=(12, 7))
+            plt.title(
+                "Estimated repetition number in function of posterior std parameter | param.:" + inferred_params[param_idx] + " | sigma_prior: " + str(
+                    p_set.params[param_idx].sigma))
+            plt.xlabel("d (sigma_posterior=sigma_prior/d)")
+            plt.ylabel("repetition number")
+            plt.plot(x, y, color="black", label="avrg estimated rep.num.")
+            plt.plot(x, y_min, "--", color="r", alpha=0.5, label="min: avrg-std")
+            plt.plot(x, y_max, "--", color="r", alpha=0.5, label="max: avrg+std")
+            plt.grid()
+            plt.legend(loc="best")
+            plt.savefig(path_list[path_idx] + "/repnum_" + inferred_params[param_idx] + ".pdf")
+            plt.close()
+
     # for i in range(numfp - m - 1):
     #     avrg_broad += broadness[:, i + 1, :]
     # avrg_broad = np.divide(avrg_broad, numfp - m)
+
+    # x axes for plot:
+    x = range(len(path_list))
 
     plt.figure(figsize=(12, 7))
     plt.title("Averaged Kullback Lieber Divergence test result for each protocol")
@@ -466,7 +519,7 @@ def protocol_comparison(path_list, numfp, inferred_params, out_path, dbs,
     plt.xlabel("Protocol types")
     plt.ylabel("Broadness")
     plt.xticks(x, protocol_xticks)
-    plt.title("Averaged results for each parameter")
+    plt.title("Averaged broadness for each parameter")
     for idx, param in enumerate(inferred_params):
         plt.plot(range(len(path_list)), avrg_broad[:, idx], label=param, marker='x')
         plt.errorbar(range(len(path_list)), avrg_broad[:, idx], yerr=std_broad[:, idx],  fmt='none', ecolor='black')
@@ -497,6 +550,67 @@ def protocol_comparison(path_list, numfp, inferred_params, out_path, dbs,
         plt.legend(loc="best")
         plt.grid()
         plt.savefig(out_path + "/average_rdiff_%s.pdf" % param)
+
+    for idx, param in enumerate(inferred_params):
+        plt.figure(figsize=(12, 7))
+        plt.title("Number of repetition needed to achieve a posterior distribution with sigma_prior/10 std parameter")
+        plt.xlabel("Protocol types")
+        plt.ylabel("Repetition number")
+        plt.xticks(x, protocol_xticks)
+        plt.plot(range(len(path_list)), avrg_repnum[:, idx], label=(param + " prior sigma: " + str(p_set.params[idx].sigma)), color='b', marker='x')
+        plt.errorbar(range(len(path_list)), avrg_repnum[:, idx], yerr=std_repnum[:, idx], fmt='none', ecolor='b')
+        plt.legend(loc="best")
+        for i, j, k in zip(range(len(path_list)), avrg_repnum[:, idx], std_repnum[:, idx]):
+            plt.annotate(str(int(round(j))) + "\n+/-" + str(int(round(k))), xy=(i, j), xytext=(10, 10), textcoords='offset points', color='red')
+        plt.grid()
+        plt.savefig(out_path + "/average_repnum_%s.pdf" % param)
+
+
+def est_rep_num(k, sigma_0, mean_sigma_k, d):
+    """
+
+    :param k: number of repetition through the posterior is attained
+    :param sigma_0: the std parameter of the prior distribution
+    :param mean_sigma_k: the mean value of the posterior distribution's std parameter
+    :param d: the sigma of desired posterior distribution is sigma_0/d
+    :return: the number of repetition needed for the desired posterior distribution with error
+    """
+
+    sk = mean_sigma_k/sigma_0
+    sn = 1./d
+    alpha = (sn**2/(1-sn**2))
+    n = k*(sk**2/(1-sk**2))/alpha
+
+    return n
+
+
+def est_rep_num2(k, sk, d):
+    """
+
+    :param k: number of repetition through the posterior is attained
+    :param sk: sigma_posterior_k/sigma_prior
+    :param d: the sigma of desired posterior distribution is sigma_0/d
+    :return: the number of repetition needed for the desired posterior distribution with error
+    """
+
+    sn = 1./d
+    alpha = (sn**2/(1-sn**2))
+    n = k*(sk**2/(1-sk**2))/alpha
+
+    return n
+
+
+def plot_repnum_fig(path_list, repnum, param_list):
+    """
+    Estimates the posterior's std in function of repetition number
+
+    :param path_list: Path list directs to sk.csv simulation output files
+    :param repnum: Number of repetition applied to given protocols
+    :param param_list: list of names of inferred parameters (in order used in simulations) \ for example: ["Ra", "gpas"]
+    :return: Save plots from posterior's std in function of repetition number
+    """
+    pass
+
 
 
 if __name__ == "__main__":
