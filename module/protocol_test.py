@@ -9,6 +9,7 @@ from module.save_load import save_zipped_pickle, save_to_txt, load_zipped_pickle
 from module.analyze import Analyse
 import os
 import tables as tb
+from scipy.interpolate import interp1d
 
 
 def check_directory(working_path):
@@ -469,33 +470,56 @@ def protocol_comparison(path_list, numfp, repnum_k, inferred_params, out_path, d
         for param_idx in range(avrg_repnum.shape[1]):
             x = []
             y = []
-            y_err = []
-            for d in np.linspace(1, 20, 200):
+            x_err = []
+
+            d = 1
+            max_rep = 1000
+            prev_repnum = 0
+            while prev_repnum < max_rep:
                 ns = []
+
                 for sig in sigma[path_idx, :, param_idx]:
                     n = est_rep_num(repnum_k, p_set.params[param_idx].sigma, sig, d)
                     ns.append(n)
 
-                x.append(d)
                 mean_n = np.mean(ns)
                 std_n = np.std(ns)
-                y.append(mean_n)
-                y_err.append(std_n)
+                sn = 1/d
 
-            y_min = np.array(y) - np.array(y_err)
-            y_max = np.array(y) + np.array(y_err)
+                x.append(int(np.round(mean_n)))
+                y.append(sn)
+                x_err.append(int(np.round(std_n)))
+
+                prev_repnum = mean_n + std_n
+                d += 0.1
+
+            y = np.array(y)
+            x = np.array(x)
+            x_err = np.array(x_err)
+
+            # lower upper bound
+            x_min = x - x_err
+            x_max = x + x_err
+
+            f = interp1d(x, y, fill_value='extrapolate')
+
+            # upper and lower bound traces
+            y_min = f(x_min)
+            y_max = f(x_max)
+
             plt.figure(figsize=(12, 7))
+            plt.rc('text', usetex=True)
             plt.title(
-                "Estimated repetition number in function of posterior std parameter | param.:" + inferred_params[param_idx] + " | sigma_prior: " + str(
+                "Posterior dist. std parameter in function of protocol repetition num. | param.: " + inferred_params[param_idx] + r" | $\sigma_{prior}$: " + str(
                     p_set.params[param_idx].sigma))
-            plt.xlabel("d (sigma_posterior=sigma_prior/d)")
-            plt.ylabel("repetition number")
-            plt.plot(x, y, color="black", label="avrg estimated rep.num.")
-            plt.plot(x, y_min, "--", color="r", alpha=0.5, label="min: avrg-std")
-            plt.plot(x, y_max, "--", color="r", alpha=0.5, label="max: avrg+std")
+            plt.xlabel("n (number of protocol repetition)")
+            plt.ylabel(r"$s_n = \sigma_{post}/\sigma_{prior}$")
+            plt.plot(x, y, color="black", label=r"$s_n$ avrg")
+            plt.plot(x, y_max, color="red", linestyle="--", alpha=0.5, label="error")
+            plt.plot(x, y_min, color="red", linestyle="--", alpha=0.5)
             plt.grid()
             plt.legend(loc="best")
-            plt.savefig(path_list[path_idx] + "/repnum_" + inferred_params[param_idx] + ".pdf")
+            plt.savefig(path_list[path_idx] + "/post_std_" + inferred_params[param_idx] + ".pdf")
             plt.close()
 
     # for i in range(numfp - m - 1):
@@ -523,6 +547,9 @@ def protocol_comparison(path_list, numfp, repnum_k, inferred_params, out_path, d
     for idx, param in enumerate(inferred_params):
         plt.plot(range(len(path_list)), avrg_broad[:, idx], label=param, marker='x')
         plt.errorbar(range(len(path_list)), avrg_broad[:, idx], yerr=std_broad[:, idx],  fmt='none', ecolor='black')
+        for i, j, k in zip(range(len(path_list)), avrg_broad[:, idx], std_broad[:, idx]):
+            plt.annotate(str(int(round(j))) + "\n+/-" + str(int(round(k))), xy=(i, j), xytext=(10, 10), textcoords='offset points', color='red')
+
     plt.legend(loc="best")
     plt.grid()
     plt.savefig(out_path + "/average_broadness.pdf")
@@ -530,11 +557,13 @@ def protocol_comparison(path_list, numfp, repnum_k, inferred_params, out_path, d
     for idx, param in enumerate(inferred_params):
         plt.figure(figsize=(12, 7))
         plt.xlabel("Protocol types")
-        plt.ylabel("Accuracy: p_true/p_infmax*100")
+        plt.ylabel(r"Accuracy: $p_{true}/p_{infmax}*100$")
         plt.xticks(x, protocol_xticks)
         plt.title("Averaged accuracy for %s" % param)
         plt.plot(range(len(path_list)), avrg_acc[:, idx], label=param, color='b', marker='x')
         plt.errorbar(range(len(path_list)), avrg_acc[:, idx], yerr=std_acc[:, idx], fmt='none', ecolor='b')
+        for i, j, k in zip(range(len(path_list)), avrg_acc[:, idx], std_acc[:, idx]):
+            plt.annotate(str(int(round(j))) + "\n+/-" + str(int(round(k))), xy=(i, j), xytext=(10, 10), textcoords='offset points', color='red')
         plt.legend(loc="best")
         plt.grid()
         plt.savefig(out_path + "/average_accuracy_%s.pdf" % param)
@@ -542,18 +571,20 @@ def protocol_comparison(path_list, numfp, repnum_k, inferred_params, out_path, d
     for idx, param in enumerate(inferred_params):
         plt.figure(figsize=(12, 7))
         plt.xlabel("Protocol types")
-        plt.ylabel("Relative difference: (inferred-true)/true*100")
+        plt.ylabel(r"Relative difference: $(inferred-true)/true*100$")
         plt.xticks(x, protocol_xticks)
         plt.title("Averaged relative difference for %s" % param)
         plt.plot(range(len(path_list)), avrg_rdiff[:, idx], label=param, color='b', marker='x')
         plt.errorbar(range(len(path_list)), avrg_rdiff[:, idx], yerr=std_rdiff[:, idx], fmt='none',  ecolor='b')
+        for i, j, k in zip(range(len(path_list)), avrg_rdiff[:, idx], std_rdiff[:, idx]):
+            plt.annotate(str(int(round(j))) + "\n+/-" + str(int(round(k))), xy=(i, j), xytext=(10, 10), textcoords='offset points', color='red')
         plt.legend(loc="best")
         plt.grid()
         plt.savefig(out_path + "/average_rdiff_%s.pdf" % param)
 
     for idx, param in enumerate(inferred_params):
         plt.figure(figsize=(12, 7))
-        plt.title("Number of repetition needed to achieve a posterior distribution with sigma_prior/10 std parameter")
+        plt.title(r"Number of repetition needed to achieve a posterior distribution with $\sigma_{post}=\sigma_{prior}/10$ std parameter")
         plt.xlabel("Protocol types")
         plt.ylabel("Repetition number")
         plt.xticks(x, protocol_xticks)
@@ -564,6 +595,20 @@ def protocol_comparison(path_list, numfp, repnum_k, inferred_params, out_path, d
             plt.annotate(str(int(round(j))) + "\n+/-" + str(int(round(k))), xy=(i, j), xytext=(10, 10), textcoords='offset points', color='red')
         plt.grid()
         plt.savefig(out_path + "/average_repnum_%s.pdf" % param)
+
+    for idx, param in enumerate(inferred_params):
+        plt.figure(figsize=(12, 7))
+        plt.title(r"Number of repetition needed to achieve a posterior distribution with $\sigma_{post}=\sigma_{prior}/10$ std parameter")
+        plt.xlabel("Protocol types")
+        plt.ylabel("log(Repetition number)")
+        plt.xticks(x, protocol_xticks)
+        plt.plot(range(len(path_list)), np.log(avrg_repnum[:, idx]), label=(param + " prior sigma: " + str(p_set.params[idx].sigma)), color='b', marker='x')
+        plt.errorbar(range(len(path_list)), np.log(avrg_repnum[:, idx]), yerr=np.log(std_repnum[:, idx]), fmt='none', ecolor='b')
+        plt.legend(loc="best")
+        for i, j, k in zip(range(len(path_list)), avrg_repnum[:, idx], std_repnum[:, idx]):
+            plt.annotate(str(int(round(j))) + "\n+/-" + str(int(round(k))), xy=(i, np.log(j)), xytext=(10, 10), textcoords='offset points', color='red')
+        plt.grid()
+        plt.savefig(out_path + "/log_average_repnum_%s.pdf" % param)
 
 
 def est_rep_num(k, sigma_0, mean_sigma_k, d):
@@ -578,10 +623,32 @@ def est_rep_num(k, sigma_0, mean_sigma_k, d):
 
     sk = mean_sigma_k/sigma_0
     sn = 1./d
-    alpha = (sn**2/(1-sn**2))
+    try:
+        alpha = (sn**2/(1-sn**2))
+    except ZeroDivisionError:
+        return 0.
+
     n = k*(sk**2/(1-sk**2))/alpha
 
     return n
+
+
+def inv_est_rep_num(k, sigma_0, sigma_k, n):
+    """
+
+    :param k: number of repetition through the posterior is attained
+    :param sigma_0: the std parameter of the prior distribution
+    :param sigma_k: std parameter assigned to kth posterior
+    :param n: the repetition number is needed to achieve a posterior with given std parameter
+    :return: the posteriors distribution after nth repetition divided by sigma_0
+    """
+
+    sk = sigma_k/sigma_0
+    gamma = k/n*(sk**2/(1-sk**2))
+
+    sn = np.sqrt(gamma/(1+gamma))
+
+    return sn
 
 
 def est_rep_num2(k, sk, d):
