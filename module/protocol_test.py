@@ -424,49 +424,29 @@ def protocol_comparison(path_list, numfp, repnum_k, inferred_params, out_path, d
 
     broadness = np.array(broadness)
     KL = np.array(KL)
-
-    # x axes for plot:
-    x = range(len(path_list))
-
-    # Plot KL result for each protocol
-    plt.figure(figsize=(12, 7))
-    plt.title("Kullback Lieber Divergence test result for each protocol and fixed parameters")
-    plt.xlabel("Protocol types")
-    plt.ylabel("KL test")
-    plt.xticks(x, protocol_xticks)
-    for i in range(numfp):
-        plt.plot(range(len(path_list)), KL[:, i], marker='x')
-    plt.grid()
-    plt.savefig(out_path + "/KL_test.pdf")
-
-    # Plot each fixed param result in one plot for each parameter:
-    for idx, param in enumerate(inferred_params):
-        plt.figure(figsize=(12, 7))
-        plt.title(param + " results for each fixed parameter")
-        plt.xlabel("Protocol types")
-        plt.ylabel("Broadness")
-        plt.xticks(x, protocol_xticks)
-        for i in range(numfp - m):
-            plt.plot(range(len(path_list)), broadness[:, i, idx], marker='x')
-        plt.grid()
-        plt.savefig(out_path + "/%s_broadness.pdf" % param)
+    # print("-----------------------------------------------------------------KL.shape: " + str(KL.shape))
 
     # Create fixed parameter averaged plot
-    avrg_KL = np.average(KL, axis=1)
-    std_KL = np.std(KL, axis=1)
+    #avrg_KL = np.average(KL, axis=1)
+    #std_KL = np.std(KL, axis=1)
     avrg_broad = np.average(broadness, axis=1)
     std_broad = np.std(broadness, axis=1)
 
-    avrg_acc = np.average(accuracy, axis=1)
-    std_acc = np.std(accuracy, axis=1)
-    avrg_rdiff = np.average(rdiff, axis=1)
-    std_rdiff = np.std(rdiff, axis=1)
+    #avrg_acc = np.average(accuracy, axis=1)
+    #std_acc = np.std(accuracy, axis=1)
+    #avrg_rdiff = np.average(rdiff, axis=1)
+    #std_rdiff = np.std(rdiff, axis=1)
 
     avrg_repnum = np.average(repnum, axis=1)
     std_repnum = np.std(repnum, axis=1)
 
+    setup_name = path_list[0].split('/')[-3]
+    setup_name = setup_name.replace('_', '-', 100)
+
     # repnum plot for each scenario
     for path_idx in range(avrg_repnum.shape[0]):
+        splitted_path_list = path_list[path_idx].split('/')
+        protocol_name = setup_name + "-" + splitted_path_list[-2] + "-" + splitted_path_list[-1]
         for param_idx in range(avrg_repnum.shape[1]):
             x = []
             y = []
@@ -510,13 +490,15 @@ def protocol_comparison(path_list, numfp, repnum_k, inferred_params, out_path, d
             plt.figure(figsize=(12, 7))
             plt.rc('text', usetex=True)
             plt.title(
-                "Posterior dist. std parameter in function of protocol repetition num. | param.: " + inferred_params[param_idx] + r" | $\sigma_{prior}$: " + str(
+                "Posterior dist. std parameter" + "  | Protocol: " + protocol_name + "  | param.: " + inferred_params[param_idx] + r" | $\sigma_{prior}$: " + str(
                     p_set.params[param_idx].sigma))
             plt.xlabel("n (number of protocol repetition)")
             plt.ylabel(r"$s_n = \sigma_{post}/\sigma_{prior}$")
             plt.plot(x, y, color="black", label=r"$s_n$ avrg")
             plt.plot(x, y_max, color="red", linestyle="--", alpha=0.5, label="error")
             plt.plot(x, y_min, color="red", linestyle="--", alpha=0.5)
+            plt.axhline(y=0.1, linestyle="-.", color="blue", alpha=0.5, label=r"$s_n = \sigma_{post}/\sigma_{prior}$ = 0.1")
+            plt.ylim(0, 1)
             plt.grid()
             plt.legend(loc="best")
             plt.savefig(path_list[path_idx] + "/post_std_" + inferred_params[param_idx] + ".pdf")
@@ -528,63 +510,109 @@ def protocol_comparison(path_list, numfp, repnum_k, inferred_params, out_path, d
 
     # x axes for plot:
     x = range(len(path_list))
+    xbox = [val+1 for val in range(len(path_list))]
 
+    # Plot KL result for each protocol
     plt.figure(figsize=(12, 7))
-    plt.title("Averaged Kullback Lieber Divergence test result for each protocol")
+    plt.title("Kullback-Leiblert Divergence test result for each protocol and fixed parameters | " + setup_name)
     plt.xlabel("Protocol types")
     plt.ylabel("KL test")
     plt.xticks(x, protocol_xticks)
-    plt.plot(range(len(path_list)), avrg_KL, color='b', marker='x')
-    plt.errorbar(range(len(path_list)), avrg_KL, yerr=std_KL, fmt='none', ecolor='b')
+    for i in range(numfp):
+        plt.plot(range(len(path_list)), KL[:, i], marker='x')
     plt.grid()
-    plt.savefig(out_path + "/averaged_KL_test.pdf")
+    plt.savefig(out_path + "/KL_test.pdf")
 
+    # Plot each fixed param result in one plot for each parameter:
+    for idx, param in enumerate(inferred_params):
+        plt.figure(figsize=(12, 7))
+        plt.title("Broadness for each fixed parameter | " + param + " | " + setup_name)
+        plt.xlabel("Protocol types")
+        plt.ylabel("Broadness")
+        plt.xticks(x, protocol_xticks)
+        for i in range(numfp - m):
+            plt.plot(range(len(path_list)), broadness[:, i, idx], marker='x')
+        plt.grid()
+        plt.savefig(out_path + "/%s_broadness.pdf" % param)
+
+    plt.figure(figsize=(12, 7))
+
+    #plt.plot(range(len(path_list)), avrg_KL, color='b', marker='x')
+    #plt.errorbar(range(len(path_list)), avrg_KL, yerr=std_KL, fmt='none', ecolor='b')
+    plt.boxplot(KL.transpose())
+    plt.title("Averaged Kullback-Leibler Divergence test result for each protocol | " + setup_name)
+    plt.xlabel("Protocol types")
+    plt.ylabel("KL test")
+    plt.xticks(xbox, protocol_xticks)
+    plt.grid()
+    plt.savefig(out_path + "/box_KL_test.pdf")
+
+    # Average broadness of each parameter in one plot
     plt.figure(figsize=(12, 7))
     plt.xlabel("Protocol types")
     plt.ylabel("Broadness")
     plt.xticks(x, protocol_xticks)
-    plt.title("Averaged broadness for each parameter")
+    plt.title("Averaged broadness for each parameter | " + setup_name)
     for idx, param in enumerate(inferred_params):
         plt.plot(range(len(path_list)), avrg_broad[:, idx], label=param, marker='x')
         plt.errorbar(range(len(path_list)), avrg_broad[:, idx], yerr=std_broad[:, idx],  fmt='none', ecolor='black')
         for i, j, k in zip(range(len(path_list)), avrg_broad[:, idx], std_broad[:, idx]):
             plt.annotate(str(int(round(j))) + "\n+/-" + str(int(round(k))), xy=(i, j), xytext=(10, 10), textcoords='offset points', color='red')
-
+    plt.ylim(0, 100)
     plt.legend(loc="best")
     plt.grid()
     plt.savefig(out_path + "/average_broadness.pdf")
 
+    # Box and Whisker plot of broadness for each param
     for idx, param in enumerate(inferred_params):
         plt.figure(figsize=(12, 7))
+
+        plt.boxplot(broadness[:, :, idx].transpose())
+        plt.xlabel("Protocol types")
+        plt.ylabel("Broadness")
+        plt.xticks(xbox, protocol_xticks)
+        plt.title("Posterior broadness relative to prior dist. | param.: " + param + " | " + setup_name)
+        plt.ylim(0, 100)
+        plt.legend(loc="best")
+        plt.grid()
+        plt.savefig(out_path + "/box_broadness_%s.pdf" % param)
+
+    for idx, param in enumerate(inferred_params):
+        plt.figure(figsize=(12, 7))
+
+        #plt.plot(range(len(path_list)), avrg_acc[:, idx], label=param, color='b', marker='x')
+        #plt.errorbar(range(len(path_list)), avrg_acc[:, idx], yerr=std_acc[:, idx], fmt='none', ecolor='b')
+        #for i, j, k in zip(range(len(path_list)), avrg_acc[:, idx], std_acc[:, idx]):
+        #    plt.annotate(str(int(round(j))) + "\n+/-" + str(int(round(k))), xy=(i, j), xytext=(10, 10), textcoords='offset points', color='red')
+        plt.boxplot(accuracy[:, :, idx].transpose())
         plt.xlabel("Protocol types")
         plt.ylabel(r"Accuracy: $p_{true}/p_{infmax}*100$")
-        plt.xticks(x, protocol_xticks)
-        plt.title("Averaged accuracy for %s" % param)
-        plt.plot(range(len(path_list)), avrg_acc[:, idx], label=param, color='b', marker='x')
-        plt.errorbar(range(len(path_list)), avrg_acc[:, idx], yerr=std_acc[:, idx], fmt='none', ecolor='b')
-        for i, j, k in zip(range(len(path_list)), avrg_acc[:, idx], std_acc[:, idx]):
-            plt.annotate(str(int(round(j))) + "\n+/-" + str(int(round(k))), xy=(i, j), xytext=(10, 10), textcoords='offset points', color='red')
+        plt.xticks(xbox, protocol_xticks)
+        plt.title(("Accuracy for %s | " % param) + setup_name)
         plt.legend(loc="best")
+        plt.ylim(0, 100)
         plt.grid()
-        plt.savefig(out_path + "/average_accuracy_%s.pdf" % param)
+        plt.savefig(out_path + "/box_accuracy_%s.pdf" % param)
 
     for idx, param in enumerate(inferred_params):
         plt.figure(figsize=(12, 7))
+
+        #plt.plot(range(len(path_list)), avrg_rdiff[:, idx], label=param, color='b', marker='x')
+        #plt.errorbar(range(len(path_list)), avrg_rdiff[:, idx], yerr=std_rdiff[:, idx], fmt='none',  ecolor='b')
+        #for i, j, k in zip(range(len(path_list)), avrg_rdiff[:, idx], std_rdiff[:, idx]):
+        #    plt.annotate(str(int(round(j))) + "\n+/-" + str(int(round(k))), xy=(i, j), xytext=(10, 10), textcoords='offset points', color='red')
+        plt.boxplot(rdiff[:, :, idx].transpose())
         plt.xlabel("Protocol types")
         plt.ylabel(r"Relative difference: $(inferred-true)/true*100$")
-        plt.xticks(x, protocol_xticks)
-        plt.title("Averaged relative difference for %s" % param)
-        plt.plot(range(len(path_list)), avrg_rdiff[:, idx], label=param, color='b', marker='x')
-        plt.errorbar(range(len(path_list)), avrg_rdiff[:, idx], yerr=std_rdiff[:, idx], fmt='none',  ecolor='b')
-        for i, j, k in zip(range(len(path_list)), avrg_rdiff[:, idx], std_rdiff[:, idx]):
-            plt.annotate(str(int(round(j))) + "\n+/-" + str(int(round(k))), xy=(i, j), xytext=(10, 10), textcoords='offset points', color='red')
+        plt.xticks(xbox, protocol_xticks)
+        plt.title(("Averaged relative difference for %s | " % param) + setup_name)
         plt.legend(loc="best")
         plt.grid()
-        plt.savefig(out_path + "/average_rdiff_%s.pdf" % param)
+        plt.savefig(out_path + "/box_rdiff_%s.pdf" % param)
 
     for idx, param in enumerate(inferred_params):
         plt.figure(figsize=(12, 7))
-        plt.title(r"Number of repetition needed to achieve a posterior distribution with $\sigma_{post}=\sigma_{prior}/10$ std parameter")
+        plt.title(r"Number of repetition needed to attain $\sigma_{post}=\sigma_{prior}/10$ | param.: " + param + " | " + setup_name)
         plt.xlabel("Protocol types")
         plt.ylabel("Repetition number")
         plt.xticks(x, protocol_xticks)
@@ -593,22 +621,35 @@ def protocol_comparison(path_list, numfp, repnum_k, inferred_params, out_path, d
         plt.legend(loc="best")
         for i, j, k in zip(range(len(path_list)), avrg_repnum[:, idx], std_repnum[:, idx]):
             plt.annotate(str(int(round(j))) + "\n+/-" + str(int(round(k))), xy=(i, j), xytext=(10, 10), textcoords='offset points', color='red')
-        plt.grid()
+        plt.yscale('log')
+        plt.autoscale(True)
+        plt.grid(which="both")
         plt.savefig(out_path + "/average_repnum_%s.pdf" % param)
 
     for idx, param in enumerate(inferred_params):
         plt.figure(figsize=(12, 7))
-        plt.title(r"Number of repetition needed to achieve a posterior distribution with $\sigma_{post}=\sigma_{prior}/10$ std parameter")
+        bp_dict = plt.boxplot(repnum[:, :, idx].transpose())
+        plt.setp(bp_dict['boxes'], color='blue')
+        plt.setp(bp_dict['whiskers'], color='red')
+        plt.setp(bp_dict['caps'], color='red')
+        for line in bp_dict['medians']:
+            # get position data for median line
+            x, y = line.get_xydata()[1]
+            # overlay median value
+            plt.annotate(str(int(round(y))), xy=(x, y), xytext=(2, 0), textcoords='offset points', color="orangered")
+        for line in bp_dict['boxes']:
+            x, y = line.get_xydata()[0]
+            plt.annotate(str(int(round(y))), xy=(x, y), xytext=(-10, -10), textcoords='offset points', color="black")
+            x, y = line.get_xydata()[3]
+            plt.annotate(str(int(round(y))), xy=(x, y), xytext=(-10, +2), textcoords='offset points', color="black")
+        plt.title(r"Number of repetition needed to achieve $\sigma_{post}=\sigma_{prior}/10$ | param.: " + param + " | " + setup_name)
         plt.xlabel("Protocol types")
-        plt.ylabel("log(Repetition number)")
-        plt.xticks(x, protocol_xticks)
-        plt.plot(range(len(path_list)), np.log(avrg_repnum[:, idx]), label=(param + " prior sigma: " + str(p_set.params[idx].sigma)), color='b', marker='x')
-        plt.errorbar(range(len(path_list)), np.log(avrg_repnum[:, idx]), yerr=np.log(std_repnum[:, idx]), fmt='none', ecolor='b')
-        plt.legend(loc="best")
-        for i, j, k in zip(range(len(path_list)), avrg_repnum[:, idx], std_repnum[:, idx]):
-            plt.annotate(str(int(round(j))) + "\n+/-" + str(int(round(k))), xy=(i, np.log(j)), xytext=(10, 10), textcoords='offset points', color='red')
-        plt.grid()
-        plt.savefig(out_path + "/log_average_repnum_%s.pdf" % param)
+        plt.ylabel("Repetition number")
+        plt.yscale('log')
+        plt.autoscale(True)
+        plt.xticks(xbox, protocol_xticks)
+        plt.grid(which="both")
+        plt.savefig(out_path + "/box_repnum_%s.pdf" % param)
 
 
 def est_rep_num(k, sigma_0, mean_sigma_k, d):
