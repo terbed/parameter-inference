@@ -9,7 +9,8 @@ from module.save_load import save_zipped_pickle, save_to_txt, load_zipped_pickle
 from module.analyze import Analyse
 import os
 import tables as tb
-from scipy.interpolate import interp1d
+import pandas as pd
+import seaborn as sb
 
 
 def check_directory(working_path):
@@ -378,8 +379,8 @@ def protocol_comparison(path_list, numfp, repnum_k, inferred_params, out_path, d
     """
     from matplotlib import pyplot as plt
     m = 0
-
-
+    setup_name = path_list[0].split('/')[-3]
+    setup_name = setup_name.replace('_', '-', 100)
 
     plist = []
     for idx in range(dbs.root.params_init.shape[0]):
@@ -395,6 +396,7 @@ def protocol_comparison(path_list, numfp, repnum_k, inferred_params, out_path, d
     broadness = np.empty((len(path_list), numfp, len(inferred_params)))
     sigma = np.empty((len(path_list), numfp, len(inferred_params)))
     repnum = np.empty((len(path_list), numfp, len(inferred_params)))
+    df = pd.DataFrame(columns=["protocol", "repnum", "setup", "param"])
 
     print "\n\n broadness shape: " + str(broadness.shape)
 
@@ -417,10 +419,20 @@ def protocol_comparison(path_list, numfp, repnum_k, inferred_params, out_path, d
         KL.append(tmp)
 
     # Calculate repetition number
+    row_idx = 0
     for i in range(sigma.shape[0]):
+        splitted_path_list = path_list[i].split('/')
+        protocol_name = splitted_path_list[-2] + "-" + splitted_path_list[-1]
         for j in range(sigma.shape[1]):
             for k in range(sigma.shape[2]):
-                repnum[i, j, k] = est_rep_num(repnum_k, p_set.params[k].sigma, sigma[i, j, k], 10)
+                n = est_rep_num(repnum_k, p_set.params[k].sigma, sigma[i, j, k], 10)
+                repnum[i, j, k] = n
+                # pandas data frame for final protocol-setup comparison
+                df.loc[row_idx] = [protocol_name, n, setup_name, inferred_params[k]]
+                row_idx += 1
+
+    # Save datafram in the protocol's directory
+    df.to_csv(out_path + "/repnums.csv")
 
     broadness = np.array(broadness)
     KL = np.array(KL)
@@ -440,17 +452,14 @@ def protocol_comparison(path_list, numfp, repnum_k, inferred_params, out_path, d
     avrg_repnum = np.average(repnum, axis=1)
     std_repnum = np.std(repnum, axis=1)
 
-    setup_name = path_list[0].split('/')[-3]
-    setup_name = setup_name.replace('_', '-', 100)
-
     # repnum plot for each scenario
     for path_idx in range(avrg_repnum.shape[0]):
         splitted_path_list = path_list[path_idx].split('/')
-        protocol_name = setup_name + "-" + splitted_path_list[-2] + "-" + splitted_path_list[-1]
+        full_identification = setup_name + "-" + splitted_path_list[-2] + "-" + splitted_path_list[-1]
         for param_idx in range(avrg_repnum.shape[1]):
             x = []
             y = []
-            x_err = []
+            x_med = []
 
             d = 1
             max_rep = 1000
@@ -458,47 +467,50 @@ def protocol_comparison(path_list, numfp, repnum_k, inferred_params, out_path, d
             while prev_repnum < max_rep:
                 ns = []
 
-                for sig in sigma[path_idx, :, param_idx]:
+                for idx, sig in enumerate(sigma[path_idx, :, param_idx]):
                     n = est_rep_num(repnum_k, p_set.params[param_idx].sigma, sig, d)
+
                     ns.append(n)
 
                 mean_n = np.mean(ns)
-                std_n = np.std(ns)
-                sn = 1/d
+                sn = 1./d
 
-                x.append(int(np.round(mean_n)))
+                x.append(ns)
+                x_med.append(np.median(ns))
                 y.append(sn)
-                x_err.append(int(np.round(std_n)))
 
-                prev_repnum = mean_n + std_n
+                prev_repnum = np.min(ns)
                 d += 0.1
 
             y = np.array(y)
-            x = np.array(x)
-            x_err = np.array(x_err)
+            x = np.array(x)         # columns will be plotted
+
+            #x_err = np.array(x_err)
 
             # lower upper bound
-            x_min = x - x_err
-            x_max = x + x_err
+            #x_min = x - x_err
+            #x_max = x + x_err
 
-            f = interp1d(x, y, fill_value='extrapolate')
+            #f = interp1d(x, y, fill_value='extrapolate')
 
             # upper and lower bound traces
-            y_min = f(x_min)
-            y_max = f(x_max)
+            #y_min = f(x_min)
+            #y_max = f(x_max)
 
             plt.figure(figsize=(12, 7))
             plt.rc('text', usetex=True)
             plt.title(
-                "Posterior dist. std parameter" + "  | Protocol: " + protocol_name + "  | param.: " + inferred_params[param_idx] + r" | $\sigma_{prior}$: " + str(
+                "Posterior dist. std parameter" + "  | Protocol: " + full_identification + "  | param.: " + inferred_params[param_idx] + r" | $\sigma_{prior}$: " + str(
                     p_set.params[param_idx].sigma))
             plt.xlabel("n (number of protocol repetition)")
             plt.ylabel(r"$s_n = \sigma_{post}/\sigma_{prior}$")
-            plt.plot(x, y, color="black", label=r"$s_n$ avrg")
-            plt.plot(x, y_max, color="red", linestyle="--", alpha=0.5, label="error")
-            plt.plot(x, y_min, color="red", linestyle="--", alpha=0.5)
+            plt.plot(x, y, color="black", alpha=0.7, linewidth=0.5, linestyle="--")
+            plt.plot(x_med, y, color="orangered", label="median")
+            #plt.plot(x, y_max, color="red", linestyle="--", alpha=0.5, label="error")
+            #plt.plot(x, y_min, color="red", linestyle="--", alpha=0.5)
             plt.axhline(y=0.1, linestyle="-.", color="blue", alpha=0.5, label=r"$s_n = \sigma_{post}/\sigma_{prior}$ = 0.1")
             plt.ylim(0, 1)
+            plt.xlim(0, 1000)
             plt.grid()
             plt.legend(loc="best")
             plt.savefig(path_list[path_idx] + "/post_std_" + inferred_params[param_idx] + ".pdf")
