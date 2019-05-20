@@ -38,7 +38,7 @@ fixed_param_num = 10  # The number of fixed parameters sampled from prior
 model = real_morphology_model
 
 # --- Load NEURON morphology
-h('load_file("/Users/Dani/TDK/parameter_estim/exp/morphology_131117-C2.hoc")')
+h('load_file("/home/szabolcs/parameter_inference/exp/morphology_131117-C2.hoc")')
 # Set the appropriate "nseg"
 for sec in h.allsec():
     sec.Ra = p_range[0][1]
@@ -80,7 +80,7 @@ fixed_params = sampling_from_prior(prior_set, fixed_param_num)
 
 # Save parameter informations
 # Create database for data
-database = tb.open_file("/Users/Dani/TDK/parameter_estim/stim_protocol2/combining_colored/paramsetup.hdf5", mode="w")
+database = tb.open_file("/home/szabolcs/parameter_inference/stim_protocol2_v21/combining_colored/paramsetup.hdf5", mode="w")
 
 # Save param initialization
 param_init = []
@@ -114,8 +114,8 @@ for item in hz:
     print "\n\n---------------------------------------- Running %i Hz zap protocol" % item
 
     # Stimulus path
-    stim = np.loadtxt("/Users/Dani/TDK/parameter_estim/stim_protocol2/stimulus/sin/%i/stim.txt" % item)
-    working_path = "/Users/Dani/TDK/parameter_estim/stim_protocol2/combining_colored/sins/%i" % item
+    stim = np.loadtxt("/home/szabolcs/parameter_inference/stim_protocol2_v21/stimulus/sin/%i/stim.txt" % item)
+    working_path = "/home/szabolcs/parameter_inference/stim_protocol2_v21/combining_colored/sins/%i" % item
 
     modell = partial(model, stim=stim)
 
@@ -131,8 +131,8 @@ for item in duration:
     print "\n\n---------------------------------------- Running %i ms impulse protocol" % item
 
     # Stimulus path
-    stim = np.loadtxt("/Users/Dani/TDK/parameter_estim/stim_protocol2/stimulus/step/%i/stim.txt" % item)
-    working_path = "/Users/Dani/TDK/parameter_estim/stim_protocol2/combining_colored/steps/%i" % item
+    stim = np.loadtxt("/home/szabolcs/parameter_inference/stim_protocol2_v21/stimulus/step/%i/stim.txt" % item)
+    working_path = "/home/szabolcs/parameter_inference/stim_protocol2_v21/combining_colored/steps/%i" % item
 
     modell = partial(model, stim=stim)
 

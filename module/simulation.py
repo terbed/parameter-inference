@@ -100,7 +100,7 @@ def one_compartment(cm=1., gpas=0.0001, dt=0.1, stype='broad', custom_stim=None)
     t = t_vec.to_python()
     v = v_vec.to_python()
 
-    return t, v
+    return np.array(t), np.array(v)
 
 
 def stick_and_ball(Ra=100., gpas=0.0001, cm=1., Ra_max=250., dt=0.1, stype='both', custom_stim=None):
@@ -209,7 +209,7 @@ def stick_and_ball(Ra=100., gpas=0.0001, cm=1., Ra_max=250., dt=0.1, stype='both
     t = t_vec.to_python()
     v = v_vec.to_python()
 
-    return t, v
+    return np.array(t), np.array(v)
 
 
 def exp_model(Ra=157.3621, gpas=0.000403860792, cm=7.849480, dt=0.1):
@@ -515,6 +515,17 @@ def real_morphology_model_srsoma_rdend(stim, gpas=0.0001, Ra=100., cm=1., dt=0.1
 
 
 def real_morphology_model_soma_spatial(stim, k=0.001, gpas_soma=0.0001, Ra=100., cm=1., dt=0.1):
+    """
+    asdbkjas
+
+    :param stim:
+    :param k:
+    :param gpas_soma:
+    :param Ra:
+    :param cm:
+    :param dt:
+    :return:
+    """
     # -- Biophysics --
     # Sec parameters and conductance
     for sec in h.allsec():

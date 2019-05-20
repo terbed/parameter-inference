@@ -10,7 +10,6 @@ from module.analyze import Analyse
 import os
 import tables as tb
 import pandas as pd
-import seaborn as sb
 
 
 def check_directory(working_path):
