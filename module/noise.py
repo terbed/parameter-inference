@@ -97,7 +97,6 @@ def colored(D, lamb, dt, v_vec):
 
 
 def noise_from_covmat(covmat, v_vec):
-    from numpy.linalg import cholesky
 
     n = np.random.normal(size=len(v_vec))
 

@@ -1,6 +1,6 @@
 import numpy as np
 from neuron import h, gui
-from module.simulation import real_morphology_model_dend
+from module.simulation import real_morphology_model
 from module.probability import ParameterSet, RandomVariable
 from module.noise import more_trace_from_covmat, sampling_from_prior, inv_cov_mat
 from functools import partial
@@ -38,7 +38,7 @@ t_vec = np.linspace(0, dur, dur_len)
 
 noise_rep = 30  # How many repetition while params are fixed
 fixed_param_num = 10  # The number of fixed parameters sampled from prior
-model = real_morphology_model_dend
+model = real_morphology_model
 
 # --- Load NEURON morphology
 h('load_file("/Users/Dani/TDK/parameter_estim/exp/morphology_131117-C2.hoc")')
