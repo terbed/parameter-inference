@@ -11,7 +11,7 @@ startTime = time.time()
 
 p_names = ['Ra', 'gpas', 'cm']
 p_res = [101, 101, 101]  # Parameters resolution
-p_range = [[40, 160], [0.00004, 0.00016], [0.4, 1.6]]  # Fixed range, but "true value" may change!
+p_range = [[40, 500], [0.00004, 0.0003], [0.4, 1.8]]  # Fixed range, but "true value" may change!
 p_mean = [100., 0.0001, 1.]  # Fixed prior mean
 p_std = [20., 0.00002, 0.2]  # Fixed prior std
 
