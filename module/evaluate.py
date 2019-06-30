@@ -1,5 +1,5 @@
 from module.protocol_test import plot_single_results, plot_combined_results, mult_likelihood,\
-    combine_likelihood, protocol_comparison
+    combine_likelihood, protocol_comparison, plot_single_results_reps
 import time
 import tables as tb
 import os
@@ -15,7 +15,7 @@ class Evaluation:
     Class for evaluating the result of simulations
     """
 
-    def __init__(self, n_fixed_params, n_rep, p_names, dir, subdirs, comb_lists):
+    def __init__(self, n_fixed_params, n_rep, p_names, dir, subdirs):
         """
 
         :param n_fixed_params: number of fixed parameters
@@ -31,7 +31,6 @@ class Evaluation:
         self.pnames = p_names
         self.rootdir = dir
         self.subdirs = subdirs
-        self.comblists = comb_lists
 
         # Load parameter space initializator
         self.pinit = tb.open_file(dir + "paramsetup.hdf5", mode="r")
@@ -39,17 +38,30 @@ class Evaluation:
     def __del__(self):
         self.pinit.close()
 
-    def single_result_plot(self, which=0):
+    def single_result_plot(self, which_rep=0):
         """
         This function save the plots of likelihoods and posteriors for each fixed parameter and one chosen repetition
         (because it would be too many to plot all of them...)
 
-        :param which: at which repetition number to plot results (should be less than the number of repetitions...)
+        :param which_rep: at which repetition number to plot results (should be less than the number of repetitions...)
         :return: save the plots of the single likelihood and posterior distributions at given repnum for all fix params
         """
 
         for protocol in self.subdirs:
-            plot_single_results(path=(self.rootdir + protocol), numfp=self.nfp, which=which, dbs=self.pinit)
+            plot_single_results(path=(self.rootdir + protocol), numfp=self.nfp, which=which_rep, dbs=self.pinit)
+
+    def single_result_plot_allrep(self, which_fp=0):
+        """
+        This function save the plots of likelihoods and posteriors for one fixed parameter all repetition
+        (because it would be too many to plot all of them...)
+
+        :param which_fp: at which repetition number to plot results (should be less than the number of repetitions...)
+        :return: save the plots of the single likelihood and posterior distributions at given repnum for all fix params
+        """
+
+        for protocol in self.subdirs:
+            plot_single_results_reps(path=(self.rootdir + protocol), numrep=self.nrep, which=which_fp, dbs=self.pinit)
+
 
     def likelihood_mult(self):
         """

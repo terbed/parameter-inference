@@ -132,7 +132,6 @@ def more_trace_from_covmat(covmat, model, params, rep):
             current_param.append(noise_from_cholesky(chol, v))
 
         moretrace.append(current_param)
-        current_param = []
 
     return np.array(moretrace)
 

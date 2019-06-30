@@ -273,6 +273,34 @@ def plot_single_results(path, numfp, which, dbs):
         lldbs.close()
 
 
+def plot_single_results_reps(path, numrep, which, dbs):
+    """
+    :param path: Working directory where the .hdf5 result file can be found (for given protocol)
+    :param numrep: number of repetition number
+    :param: which: which fixed (initial) parameter should be plotted
+    :param: dbs: parameter initializer hdf5 database object
+    :return: Plot inference result for each parameter -- the selected one (which)
+    """
+    print "\n\n ------------------- Plot single result: %s" % path
+    plist = []
+    for idx in range(dbs.root.params_init.shape[0]):
+        plist.append(dbs.root.params_init[idx, :])
+
+    p_set = load_parameter_set(plist)
+
+    lldbs = tb.open_file(path + "/ll%i.hdf5" % which, mode="r")
+
+    for i in range(numrep):
+        print "\n\n%i th repetition: --------------------------" % i
+
+        for idx, param in enumerate(p_set.params):
+            param.value = dbs.root.fixed_params[which, idx]
+
+        res = Analyse(lldbs.root.ll[:, i], p_set, path + "/single_plots")
+        print res
+    lldbs.close()
+
+
 def plot_combined_results(path, numfp, dbs):
     print "\n\n ------------------- Plot combined result: %s" % path
     plist = []

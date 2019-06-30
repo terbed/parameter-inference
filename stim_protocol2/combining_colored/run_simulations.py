@@ -31,7 +31,7 @@ def aut_corr_func(x):
 dt = 0.1
 dur_len = 5002
 dur = dur_len*dt
-t_vec = np.linspace(0,dur, dur_len)
+t_vec = np.linspace(0, dur, dur_len)
 
 noise_rep = 30  # How many repetition while params are fixed
 fixed_param_num = 10  # The number of fixed parameters sampled from prior
