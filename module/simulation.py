@@ -246,7 +246,7 @@ def exp_model(Ra=157.3621, gpas=0.000403860792, cm=7.849480, dt=0.1):
     t_vec.record(h._ref_t)
 
     # Simulation duration and RUN
-    h.tstop = 1200  # Simulation end
+    h.tstop = (15000-1)*dt  # Simulation end
     h.dt = dt  # Time step (iteration)
     h.steps_per_ms = 1 / dt
     h.v_init = 0

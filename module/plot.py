@@ -111,6 +111,9 @@ def fullplot(result):
     data_rdiff = []
     data_acc = []
     data_KL = []
+    data_MAP = []
+    data_ML = []
+
     for row in range(pnum):
         for col in range(pnum):
             # Marginal plots
@@ -196,6 +199,8 @@ def fullplot(result):
                     data.append(res[idx][0]/result.p.params[idx].sigma)
                     text += "\nrelative fit err: %.2f %%" % res[idx][1]
                     data_err.append(res[idx][1])
+                    data_ML.append(param.max_l)
+                    data_MAP.append(param.max_p)
                 ax[row, col].text(0.5, 0.5, text, horizontalalignment='center',
                                   verticalalignment='center')
             else:
@@ -235,6 +240,14 @@ def fullplot(result):
     with open(result.working_path + "/KL.csv", 'a') as f:
         writer = csv.writer(f)
         writer.writerow(data_KL)
+
+    with open(result.working_path + "/ML.csv", 'a') as f:
+        writer = csv.writer(f)
+        writer.writerow(data_ML)
+
+    with open(result.working_path + "/MAP.csv", 'a') as f:
+        writer = csv.writer(f)
+        writer.writerow(data_MAP)
 
 
 def plot_joint(result, param1, param2):
