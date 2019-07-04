@@ -13,7 +13,7 @@ subdirs = [""]    # subdirectories of the man directory
 e = Evaluation(nfp, nr, p_names, dir, subdirs)
 
 # 1.) some single result plot
-e.single_result_plot_allrep(which_fp=0)
+# e.single_result_plot_allrep(which_fp=0)
 
 # 2.) likelihood multiplications
 e.likelihood_mult()

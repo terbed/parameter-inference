@@ -12,8 +12,11 @@ def normal(vec, mean, sigma):
     """Returns a normal distribution as a numpy array
         equal to map(partial(normal_val, mean=mean, sigma=sigma), vec)
     """
-    normal_val_map = partial(normal_val, mean=mean, sigma=sigma)
-    return [normal_val_map(x) for x in vec]
+    if mean is None or sigma is None:
+        return None
+    else:
+        normal_val_map = partial(normal_val, mean=mean, sigma=sigma)
+        return [normal_val_map(x) for x in vec]
 
 
 def normal2d(x_mean, x_sigma, x_values, y_mean, y_sigma, y_values):

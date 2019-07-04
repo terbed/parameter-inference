@@ -129,7 +129,8 @@ def fullplot(result):
 
                 tt = np.linspace(result.p.params[i].range_min, result.p.params[i].range_max, 2000)
                 fitted = normal(tt, result.p.params[i].fitted_gauss[0][0], result.p.params[i].fitted_gauss[0][1])
-                ax[row, col].plot(tt, fitted, color="#FF5F2E", label="fitted")
+                if fitted is not None:
+                    ax[row, col].plot(tt, fitted, color="#FF5F2E", label="fitted")
 
                 ax[row, col].plot(result.p.params[i].values, result.p.params[i].prior, color="#2EFFC8", label="prior")
                 # leg = ax[row, col].legend()
@@ -183,26 +184,32 @@ def fullplot(result):
             elif row == 0 and col == pnum-1:
                 ax[row, col].set_axis_off()
                 res = result.analyse_result()
-                text = "\n\n\nKLD: %.3f" % result.KL
-                data_KL.append(result.KL)
-                for idx, param in enumerate(result.p.params):
-                    text += "\n\n" + param.name
-                    text += "\nbroadness: %.2f %%" % res[idx][5]
-                    data_borad.append(res[idx][5])
-                    text += "\nsharpness: %.2f" % res[idx][4]
-                    data_sharp.append(res[idx][4])
-                    text += "\nrdiff: %.2f %%" % res[idx][2]
-                    data_rdiff.append(res[idx][2])
-                    text += "\naccuracy: %.2f %%" % res[idx][3]
-                    data_acc.append(res[idx][3])
-                    text += "\nfitted sigma: %.2e" % res[idx][0]
-                    data.append(res[idx][0]/result.p.params[idx].sigma)
-                    text += "\nrelative fit err: %.2f %%" % res[idx][1]
-                    data_err.append(res[idx][1])
-                    data_ML.append(param.max_l)
-                    data_MAP.append(param.max_p)
-                ax[row, col].text(0.5, 0.5, text, horizontalalignment='center',
-                                  verticalalignment='center')
+
+                if res is not None:
+                    text = "\n\n\nKLD: %.3f" % result.KL
+                    data_KL.append(result.KL)
+                    for idx, param in enumerate(result.p.params):
+                        text += "\n\n" + param.name
+                        text += "\nbroadness: %.2f %%" % res[idx][5]
+                        data_borad.append(res[idx][5])
+                        text += "\nsharpness: %.2f" % res[idx][4]
+                        data_sharp.append(res[idx][4])
+                        text += "\nrdiff: %.2f %%" % res[idx][2]
+                        data_rdiff.append(res[idx][2])
+                        text += "\naccuracy: %.2f %%" % res[idx][3]
+                        data_acc.append(res[idx][3])
+                        text += "\nfitted sigma: %.2e" % res[idx][0]
+                        data.append(res[idx][0]/result.p.params[idx].sigma)
+                        text += "\nrelative fit err: %.2f %%" % res[idx][1]
+                        data_err.append(res[idx][1])
+                        data_ML.append(param.max_l)
+                        data_MAP.append(param.max_p)
+                    ax[row, col].text(0.5, 0.5, text, horizontalalignment='center',
+                                      verticalalignment='center')
+                else:
+                    for idx, param in enumerate(result.p.params):
+                        data_ML.append(param.max_l)
+                        data_MAP.append(param.max_p)
             else:
                 ax[row, col].set_axis_off()
 

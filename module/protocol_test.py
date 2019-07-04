@@ -323,6 +323,7 @@ def plot_combined_results(path, numfp, dbs):
         if res.get_broadness() is not None:
             print res
         else:
+            print res
             print "--- Couldn't fit posterior to data!!! ---"
 
 
