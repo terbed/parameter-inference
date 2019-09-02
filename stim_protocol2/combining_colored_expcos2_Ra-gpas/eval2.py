@@ -5,15 +5,15 @@ nfp = 10  # Number of fixed parameters
 nr = 30   # Number of repetition
 p_names = ['Ra', 'gpas']
 
-dir = "/Users/Dani/TDK/parameter_estim/stim_protocol2/combining_colored_expcos2_Ra_gpas/"
+dir = "/Users/Dani/TDK/parameter_estim/stim_protocol2/combining_colored_expcos2_Ra-gpas/"
 subdirs = ["steps/3", "steps/20", "steps/200", "sins/1", "sins/10", "sins/100"]    # subdirectories of the man directory
 comb_lists = [["steps/3", "steps/20", "steps/200"],         # we will combine these protocols
               ["sins/1", "sins/10", "sins/100"]]
 
-e = Evaluation(nfp, nr, p_names, dir, subdirs, comb_lists)
+e = Evaluation(nfp, nr, p_names, dir, subdirs)
 
 # 1.) some single result plot
-e.single_result_plot(which=0)
+e.single_result_plot()
 
 # 2.) likelihood multiplications
 e.likelihood_mult()

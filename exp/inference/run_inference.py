@@ -10,14 +10,14 @@ import time
 startTime = time.time()
 
 p_names = ['Ra', 'gpas', 'cm']
-p_res = [101, 101, 101]  # Parameters resolution
-p_range = [[40, 300], [0.00004, 0.00045], [0.4, 8.]]
-p_mean = [100., 0.0001, 1.]  # Fixed prior mean
-p_std = [80., 0.00008, 0.9]  # Fixed prior std
+p_res = [30, 30, 30]  # Parameters resolution
+p_range = [[30., 300.], [0.00002, 0.0005], [0.4, 10.0]]
+p_mean = [150., 0.0002, 3.0]  # Fixed prior mean
+p_std = [150., 0.0002, 3.0]  # Fixed prior std
 
 dt = 0.1
 samples_num = 15000
-noise_rep = 489       # How many repetition while params are fixed
+noise_rep = 489      # How many repetition while params are fixed
 fixed_param_num = 1  # The number of fixed parameters sampled from prior
 
 # parameters of the noise
@@ -28,13 +28,14 @@ def aut_corr_func(x):
     return p[0]*np.exp(-np.abs(x)/p[1])*np.cos(2*np.pi/p[2]*np.abs(x))
 
 # Load noise
-target_traces = np.loadtxt("/Users/Dani/TDK/parameter_estim/exp/inference/resampled_experimental_traces.txt")
+target_traces = np.loadtxt("/home/szabolcs/parameter_inference/exp/inference/resampled_experimental_traces.txt")
+target_traces = target_traces.T
 target_traces = target_traces.reshape((1, noise_rep, samples_num))
 print target_traces.shape
 
 
 # --- Load NEURON morphology
-h('load_file("/Users/Dani/TDK/parameter_estim/exp/morphology_131117-C2.hoc")')
+h('load_file("/home/szabolcs/parameter_inference/exp/morphology_131117-C2.hoc")')
 # Set the appropriate "nseg"
 for sec in h.allsec():
     sec.Ra = 100
@@ -68,7 +69,7 @@ prior_set.create_batch()
 
 # Save parameter informations
 # Create database for data
-database = tb.open_file("/Users/Dani/TDK/parameter_estim/exp/inference/paramsetup.hdf5", mode="w")
+database = tb.open_file("/home/szabolcs/parameter_inference/exp/inference/paramsetup.hdf5", mode="w")
 
 # Save param initialization
 param_init = []
@@ -99,7 +100,7 @@ database.close()
 
 
 # RUN INFERENCE --------------------------------------------------------------------------------------------
-working_path = "/Users/Dani/TDK/parameter_estim/exp/inference"
+working_path = "/home/szabolcs/parameter_inference/exp/inference"
 
 
 if __name__ == '__main__':
@@ -108,4 +109,3 @@ if __name__ == '__main__':
 
 runningTime = (time.time()-startTime)/60
 print "\n\nThe script was running for %f minutes" % runningTime
-
