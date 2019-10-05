@@ -20,7 +20,7 @@ noise_rep = 489       # How many repetition while params are fixed
 fixed_param_num = 1  # The number of fixed parameters sampled from prior
 
 # parameters of the noise
-noise_std = 0.5
+noise_std = 0.3
 
 
 # Load noise
