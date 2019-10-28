@@ -229,9 +229,9 @@ def exp_model(Ra=157.3621, gpas=0.000403860792, cm=7.849480, dt=0.1):
 
     # Stimulus
     stim1 = h.IClamp(h.soma(0.01))
-    stim1.delay = 200
+    stim1.delay = 199.9
     stim1.amp = 0.5
-    stim1.dur = 2.9
+    stim1.dur = 3.1
 
     stim2 = h.IClamp(h.soma(0.01))
     stim2.delay = 503
