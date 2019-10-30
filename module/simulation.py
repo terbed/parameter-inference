@@ -229,6 +229,55 @@ def exp_model(Ra=157.3621, gpas=0.000403860792, cm=7.849480, dt=0.1):
 
     # Stimulus
     stim1 = h.IClamp(h.soma(0.01))
+    stim1.delay = 200
+    stim1.amp = 0.5
+    stim1.dur = 2.9
+
+    stim2 = h.IClamp(h.soma(0.01))
+    stim2.delay = 503
+    stim2.amp = 0.01
+    stim2.dur = 599.9
+
+    # Run simulation ->
+    # Set up recording Vectors
+    v_vec = h.Vector()  # Membrane potential vector
+    t_vec = h.Vector()  # Time stamp vector
+    v_vec.record(h.soma(0.5)._ref_v)
+    t_vec.record(h._ref_t)
+
+    # Simulation duration and RUN
+    h.tstop = (15000-1)*dt  # Simulation end
+    h.dt = dt  # Time step (iteration)
+    h.steps_per_ms = 1 / dt
+    h.v_init = 0
+    h.finitialize(h.v_init)
+
+    h.init()
+    h.run()
+
+    t = t_vec.to_python()
+    v = v_vec.to_python()
+
+    return t, v
+
+
+def exp_model2(Ra=157.3621, gpas=0.000403860792, cm=7.849480, dt=0.1):
+    # -- Biophysics --
+    # Sec parameters and conductance
+    for sec in h.allsec():
+        sec.Ra = Ra  # Ra is a parameter to infer
+        sec.cm = cm   # parameter optimisation algorithm found this
+        sec.v = 0
+
+        sec.insert('pas')
+        sec.g_pas = gpas  # gpas is a parameter to infer
+        sec.e_pas = 0
+
+    # Print information
+    #h.psection()
+
+    # Stimulus
+    stim1 = h.IClamp(h.soma(0.01))
     stim1.delay = 199.9
     stim1.amp = 0.5
     stim1.dur = 3.1
@@ -259,7 +308,6 @@ def exp_model(Ra=157.3621, gpas=0.000403860792, cm=7.849480, dt=0.1):
     v = v_vec.to_python()
 
     return t, v
-
 
 def real_morphology_model(stim, gpas=0.0001, Ra=100., cm=1., dt=0.1):
     # -- Biophysics --
