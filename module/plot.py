@@ -59,7 +59,7 @@ def fullplot(result):
                                              labeltop='off')
             # Joint plots
             elif col < row:
-                likelihood = result.likelihood
+                likelihood = np.copy(result.likelihood)
                 ax[row, col].grid()
                 ax[row, col].axvline(result.p.params[col].value, color='#3acead', linewidth=0.8, alpha=1)
                 ax[row, col].axvline(result.p.params[col].max_l, color='#FF1493', linewidth=0.8, alpha=1, linestyle='dashed')
@@ -68,9 +68,13 @@ def fullplot(result):
 
                 # Marginalize if needed
                 if len(result.p.params) > 2:
+                    idxs_to_marginalize = []
                     for idx, item in enumerate(result.p.params):
                         if idx != row and idx != col:
-                            likelihood = np.sum(likelihood, axis=idx) * item.step
+                            idxs_to_marginalize.append(idx)
+
+                    # print "Indecies to marginalize: ", idxs_to_marginalize
+                    likelihood = np.sum(likelihood, axis=tuple(idxs_to_marginalize)) * item.step
 
                 # Contour plot
                 y, x = np.meshgrid(result.p.params[row].values, result.p.params[col].values)
@@ -147,7 +151,7 @@ def fullplot(result):
                                              labeltop='off')
             # Joint plots
             elif col < row:
-                posterior = result.posterior
+                posterior = np.copy(result.posterior)
                 ax[row, col].grid()
                 ax[row, col].axvline(result.p.params[col].value, color='#3acead', linewidth=0.8, alpha=1)
                 ax[row, col].axvline(result.p.params[col].max_p, color='#FF1493', linewidth=0.8, alpha=1, linestyle='dashed')
@@ -156,9 +160,12 @@ def fullplot(result):
 
                 # Marginalize if needed
                 if len(result.p.params) > 2:
+                    idxs_to_marginalize = []
                     for idx, item in enumerate(result.p.params):
                         if idx != row and idx != col:
-                            posterior = np.sum(posterior, axis=idx) * item.step
+                            idxs_to_marginalize.append(idx)
+
+                    posterior = np.sum(posterior, axis=tuple(idxs_to_marginalize)) * item.step
 
                 # Contour plot
                 y, x = np.meshgrid(result.p.params[row].values, result.p.params[col].values)
@@ -270,8 +277,8 @@ def plot_joint(result, param1, param2):
 
     ax1 = 0
     ax2 = 0
-    likelihood = result.likelihood
-    posterior = result.posterior
+    likelihood = np.copy(result.likelihood)
+    posterior = np.copy(result.posterior)
 
     # Axes of parameters to be plotted
     for idx, item in enumerate(result.p.params):
