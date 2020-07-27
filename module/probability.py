@@ -50,7 +50,9 @@ class RandomVariable:
 
         # Maximum inferred parameter values
         self.max_p = None
+        self.max_marginal_p = None
         self.max_l = None
+        self.max_marginal_l = None
 
         if self.value is None:
             self.value = self.mean
@@ -222,8 +224,8 @@ class Inference:
 
         self.__create_likelihood()
         self.__create_posterior()
-        self.__max_probability()
         self.__marginalize()
+        self.__max_probability()
         self.__fit_posterior()
 
         print "Check FULL posterior correctness: the integrate of posterior: + " + str(np.sum(self.posterior)*self.p.joint_step)
@@ -242,9 +244,12 @@ class Inference:
         max_l = self.p.parameter_set_seq[np.argmax(self.likelihood)]
         max_p = self.p.parameter_set_seq[np.argmax(self.posterior)]
 
-        for item in self.p.params:
+        for idx, item in enumerate(self.p.params):
             item.max_l = max_l[item.name]
+            item.max_marginal_l = self.p.params[idx].values[np.argmax(self.p.params[idx].likelihood)]
+
             item.max_p = max_p[item.name]
+            item.max_marginal_p = self.p.params[idx].values[np.argmax(self.p.params[idx].posterior)]
 
     def __marginalize(self):
         for idx, item in enumerate(self.p.margin_ax):
