@@ -35,7 +35,7 @@ def fullplot(result):
     num_of_plot = pnum + (pnum ** 2 - pnum) / 2
 
     f, ax = plt.subplots(pnum, pnum, figsize=(14, 9))
-    f.subplots_adjust(hspace=.001, wspace=.001)
+    f.subplots_adjust(hspace=.1, wspace=.1)
 
     for row in range(pnum):
         for col in range(pnum):
@@ -46,17 +46,25 @@ def fullplot(result):
                 ax[row, col].set_xlabel(result.p.params[i].name + ' ' + result.p.params[i].unit)
                 ax[row, col].plot(result.p.params[i].values, result.p.params[i].likelihood, marker='o', color="#ffc82e")
                 ax[row, col].axvline(result.p.params[i].value, color='#3acead', linewidth=0.8, alpha=1)
-                ax[row, col].axvline(result.p.params[i].max_l, color='#FF1493', linewidth=0.8, alpha=1, linestyle='dashed')
+                ax[row, col].axvline(result.p.params[i].max_l, color='#FF1493', linewidth=0.8, alpha=1,
+                                     linestyle='dashed')
 
-                ax[row, col].tick_params(axis='y', which='both', left='off', right='on', labelleft='off',
-                                         labelright='on')
-                ax[row, col].tick_params(axis='x', which='both', top='off', bottom='off', labelbottom='off',
-                                         labeltop='off')
-                ax[row, col].xaxis.set_label_position('top')
+                if row != pnum-1:
+                    ax[row, col].ticklabel_format(axis="both", style="sci", scilimits=(-4, 4))
+                    ax[row, col].tick_params(axis='y', which='both', left='off', right='on', labelleft='off',
+                                             labelright='on')
+                    ax[row, col].tick_params(axis='x', which='both', top='off', bottom='off', labelbottom='off',
+                                             labeltop='off')
+                    ax[row, col].xaxis.set_label_position('top')
 
-                if row == pnum - 1:
+                else:
+                    ax[row, col].ticklabel_format(axis="both", style="sci", scilimits=(-4, 4))
                     ax[row, col].tick_params(axis='x', which='both', top='off', bottom='on', labelbottom='on',
                                              labeltop='off')
+                    ax[row, col].tick_params(axis='y', which='both', left='off', right='on', labelleft='off',
+                                             labelright='on')
+                    ax[row, col].set_xlabel(result.p.params[col].name + ' ' + result.p.params[col].unit)
+
             # Joint plots
             elif col < row:
                 likelihood = np.copy(result.likelihood)
@@ -89,14 +97,18 @@ def fullplot(result):
                 ax[row, col].tick_params(axis='x', which='both', top='off', bottom='off', labelbottom='off',
                                          labeltop='off')
 
+                # bottombar
                 if row == pnum - 1:
                     ax[row, col].tick_params(axis='x', which='both', top='off', bottom='on', labelbottom='on',
                                              labeltop='off')
                     ax[row, col].set_xlabel(result.p.params[col].name + ' ' + result.p.params[col].unit)
+                    ax[row, col].ticklabel_format(axis="both", style="sci", scilimits=(-4, 4))
 
+                # sidebar
                 if col == 0:
                     ax[row, col].tick_params(axis='y', which='both', left='on', right='off', labelleft='on',
                                              labelright='off')
+                    ax[row, col].ticklabel_format(axis="both", style="sci", scilimits=(-4, 4))
             else:
                 ax[row, col].set_axis_off()
 
@@ -106,7 +118,7 @@ def fullplot(result):
     plt.savefig('{}({:d}).pdf'.format(result.working_path + "/fullplot_L", i))
 
     f, ax = plt.subplots(pnum, pnum, figsize=(14, 9))
-    f.subplots_adjust(hspace=.001, wspace=.001)
+    f.subplots_adjust(hspace=.1, wspace=.1)
 
     data = []
     data_err = []
@@ -117,6 +129,8 @@ def fullplot(result):
     data_KL = []
     data_MAP = []
     data_ML = []
+    data_marginal_ML = []
+    data_marginal_MAP = []
 
     for row in range(pnum):
         for col in range(pnum):
@@ -125,7 +139,8 @@ def fullplot(result):
                 i = row
                 ax[i, i].grid()
                 ax[row, col].axvline(result.p.params[i].value, color='#3acead', linewidth=0.8, alpha=1)
-                ax[row, col].axvline(result.p.params[i].max_p, color='#FF1493', linewidth=0.8, alpha=1, linestyle='dashed')
+                ax[row, col].axvline(result.p.params[i].max_p, color='#FF1493', linewidth=0.8, alpha=1,
+                                     linestyle='dashed')
 
                 ax[row, col].set_xlabel(result.p.params[i].name + ' ' + result.p.params[i].unit)
                 ax[row, col].plot(result.p.params[i].values, result.p.params[i].posterior, 'o', color="#FF5F2E",
@@ -139,16 +154,21 @@ def fullplot(result):
                 ax[row, col].plot(result.p.params[i].values, result.p.params[i].prior, color="#2EFFC8", label="prior")
                 # leg = ax[row, col].legend()
                 # leg.get_frame().set_alpha(0.3)
-
-                ax[row, col].tick_params(axis='y', which='both', left='off', right='on', labelleft='off',
-                                         labelright='on')
-                ax[row, col].tick_params(axis='x', which='both', top='off', bottom='off', labelbottom='off',
-                                         labeltop='off')
-                ax[row, col].xaxis.set_label_position('top')
-
-                if row == pnum - 1:
+                if row != pnum-1:
+                    ax[row, col].ticklabel_format(axis="both", style="sci", scilimits=(-4, 4))
+                    ax[row, col].tick_params(axis='y', which='both', left='off', right='on', labelleft='off',
+                                             labelright='on')
+                    ax[row, col].tick_params(axis='x', which='both', top='off', bottom='off', labelbottom='off',
+                                             labeltop='off')
+                    ax[row, col].xaxis.set_label_position('top')
+                else:
+                    ax[row, col].ticklabel_format(axis="both", style="sci", scilimits=(-4, 4))
                     ax[row, col].tick_params(axis='x', which='both', top='off', bottom='on', labelbottom='on',
                                              labeltop='off')
+                    ax[row, col].tick_params(axis='y', which='both', left='off', right='on', labelleft='off',
+                                             labelright='on')
+                    ax[row, col].set_xlabel(result.p.params[col].name + ' ' + result.p.params[col].unit)
+
             # Joint plots
             elif col < row:
                 posterior = np.copy(result.posterior)
@@ -180,14 +200,20 @@ def fullplot(result):
                 ax[row, col].tick_params(axis='x', which='both', top='off', bottom='off', labelbottom='off',
                                          labeltop='off')
 
+                # bottombar
                 if row == pnum - 1:
                     ax[row, col].tick_params(axis='x', which='both', top='off', bottom='on', labelbottom='on',
                                              labeltop='off')
                     ax[row, col].set_xlabel(result.p.params[col].name + ' ' + result.p.params[col].unit)
+                    ax[row, col].ticklabel_format(axis="both", style="sci", scilimits=(-4, 4))
 
+                # sidebar
                 if col == 0:
                     ax[row, col].tick_params(axis='y', which='both', left='on', right='off', labelleft='on',
                                              labelright='off')
+                    ax[row, col].ticklabel_format(axis="both", style="sci", scilimits=(-4, 4))
+
+            # infoplot
             elif row == 0 and col == pnum-1:
                 ax[row, col].set_axis_off()
                 res = result.analyse_result()
@@ -211,12 +237,17 @@ def fullplot(result):
                         data_err.append(res[idx][1])
                         data_ML.append(param.max_l)
                         data_MAP.append(param.max_p)
+                        data_marginal_ML.append(param.max_marginal_l)
+                        data_marginal_MAP.append(param.max_marginal_p)
                     ax[row, col].text(0.5, 0.5, text, horizontalalignment='center',
                                       verticalalignment='center')
                 else:
                     for idx, param in enumerate(result.p.params):
                         data_ML.append(param.max_l)
                         data_MAP.append(param.max_p)
+                        data_marginal_ML.append(param.max_marginal_l)
+                        data_marginal_MAP.append(param.max_marginal_p)
+
             else:
                 ax[row, col].set_axis_off()
 
@@ -262,6 +293,14 @@ def fullplot(result):
     with open(result.working_path + "/MAP.csv", 'a') as f:
         writer = csv.writer(f)
         writer.writerow(data_MAP)
+
+    with open(result.working_path + "/ML_marginal.csv", 'a') as f:
+        writer = csv.writer(f)
+        writer.writerow(data_marginal_ML)
+
+    with open(result.working_path + "/MAP_marginal.csv", 'a') as f:
+        writer = csv.writer(f)
+        writer.writerow(data_marginal_MAP)
 
 
 def plot_joint(result, param1, param2):
