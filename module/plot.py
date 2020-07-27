@@ -50,7 +50,7 @@ def fullplot(result):
                                      linestyle='dashed')
 
                 if row != pnum-1:
-                    ax[row, col].ticklabel_format(axis="both", style="sci", scilimits=(-4, 4))
+                    ax[row, col].ticklabel_format(axis="y", style="sci", scilimits=(-4, 4))
                     ax[row, col].tick_params(axis='y', which='both', left='off', right='on', labelleft='off',
                                              labelright='on')
                     ax[row, col].tick_params(axis='x', which='both', top='off', bottom='off', labelbottom='off',
@@ -155,7 +155,7 @@ def fullplot(result):
                 # leg = ax[row, col].legend()
                 # leg.get_frame().set_alpha(0.3)
                 if row != pnum-1:
-                    ax[row, col].ticklabel_format(axis="both", style="sci", scilimits=(-4, 4))
+                    ax[row, col].ticklabel_format(axis="y", style="sci", scilimits=(-4, 4))
                     ax[row, col].tick_params(axis='y', which='both', left='off', right='on', labelleft='off',
                                              labelright='on')
                     ax[row, col].tick_params(axis='x', which='both', top='off', bottom='off', labelbottom='off',
