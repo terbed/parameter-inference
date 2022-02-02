@@ -1,0 +1,10 @@
+name: param-estim
+dependencies:
+  - python=2.7
+  - numpy
+  - scipy
+  - matplotlib
+  - pytables
+  - neuron
+  - pandas
+  - seaborn
