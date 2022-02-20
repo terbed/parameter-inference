@@ -19,7 +19,7 @@ exp_v = white(noise, v)
 
 # 4.) Set up inference
 inf = IndependentInference(model=stick_and_ball, noise_std=noise, target_trace=exp_v, parameter_set=cm_gpas,
-                           working_path="/Users/Dani/TDK/parameter_estim/module/debug", speed='max', save=False)
+                           working_path="/home/terbed/PROJECTS/SPE/parameter-inference/module/examples/output", speed='max', save=False)
 
 # 5.) Run inference
 if __name__ == "__main__":
