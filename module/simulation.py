@@ -432,15 +432,15 @@ def real_morphology_model_2(stim, gpas=0.0001, Ra=100., ffact=1., dt=0.1):
             seg.g_pas = gpas  # gpas is a parameter to infer
             seg.e_pas = -69.196
 
-        for s in h.basal:
-            s.cm *= ffact
-            for seg in s:
-                seg.g_pas *= ffact
+    for sec in h.basal:
+        sec.cm *= ffact
+        for seg in sec:
+            seg.g_pas *= ffact
 
-        for s in h.apical:
-            s.cm *= ffact
-            for seg in s:
-                seg.g_pas *= ffact
+    for sec in h.apical:
+        sec.cm *= ffact
+        for seg in sec:
+            seg.g_pas *= ffact
 
     # Print information
     # h.psection()
