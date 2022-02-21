@@ -10,6 +10,7 @@ from module.analyze import Analyse
 import os
 import tables as tb
 import pandas as pd
+from tqdm import tqdm
 
 
 def check_directory(working_path):
@@ -132,7 +133,7 @@ def run_protocol_simulations(model, target_traces, noise_std, param_set, working
             store.append((lldbs, database))
         del lol
 
-        for idx, batch in enumerate(param_set.parameter_set_batch_list):
+        for idx, batch in tqdm(enumerate(param_set.parameter_set_batch_list)):
             print str(idx) + ' batch of work is done out of ' \
                   + str(len(param_set.parameter_set_batch_list))
 
@@ -223,7 +224,7 @@ def run_protocol_simulations_c(model, target_traces, inv_covmat, param_set, work
             store.append((lldbs, database))
         del lol
 
-        for idx, batch in enumerate(param_set.parameter_set_batch_list):
+        for idx, batch in tqdm(enumerate(param_set.parameter_set_batch_list)):
             print str(idx) + ' batch of work is done out of ' \
                   + str(len(param_set.parameter_set_batch_list))
 

@@ -10,3 +10,4 @@ dependencies:
   - neuron
   - pandas
   - seaborn
+  - tqdm

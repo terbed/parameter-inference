@@ -58,7 +58,12 @@ class RandomVariable:
             self.value = self.mean
 
     def get_unit(self):
-        database = {'Ra': '[ohm cm]', 'cm': '[uF/cm^2]', 'gpas': '[uS/cm^2]', 'gpas_soma': '[uS/cm^2]', 'gpas_soma': '[uS/cm^2]', 'k': '1/(um)'}
+        database = {'Ra': '[ohm cm]',
+                    'cm': '[uF/cm^2]',
+                    'gpas': '[uS/cm^2]',
+                    'gpas_soma': '[uS/cm^2]',
+                    'k': '1/(um)',
+                    'ffact': ''}
         return database[self.name]
 
     def get_init(self):
@@ -67,7 +72,7 @@ class RandomVariable:
 
     # The typical range around mean fo parameter
     def get_offset(self):
-        database = {'Ra': 50., 'cm': 0.5, 'gpas': 0.00005, 'gpas_soma': 0.00005, 'k': 0.0005}
+        database = {'Ra': 50., 'cm': 0.5, 'gpas': 0.00005, 'gpas_soma': 0.00005, 'k': 0.0005, 'ffact': 2.5}
         return database[self.name]
 
     def __get_values(self):
