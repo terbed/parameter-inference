@@ -1,4 +1,4 @@
-import cPickle
+import pickle
 import gzip
 import os
 import numpy as np
@@ -68,7 +68,7 @@ def save_to_txt(target_traces, log_likelihood, fixed_params, param_set, working_
                       header=str(param_set.name) + str(param_set.shape))
             save_file(target_traces[j, idx, :], working_path + "/fixed_params(%i)" % j, "target_trace")
 
-    print "Log likelihood data Saved!"
+    print("Log likelihood data Saved!")
 
 
 def save_zipped_pickle(obj, path, filename="fixed_params", protocol=-1):
@@ -77,13 +77,13 @@ def save_zipped_pickle(obj, path, filename="fixed_params", protocol=-1):
     while os.path.exists('{}({:d}).gz'.format(path + '/' + filename, i)):
         i += 1
     with gzip.open('{}({:d}).gz'.format(path + '/' + filename, i), 'wb') as f:
-        cPickle.dump(obj, f, protocol)
+        pickle.dump(obj, f, protocol)
 
 
 def extend_zipped_pickle(obj, path, filename, protocol=-1):
     check_directory(path)
     with gzip.open('{}.gz'.format(path + '/' + filename), 'wb') as f:
-        cPickle.dump(obj, f, protocol)
+        pickle.dump(obj, f, protocol)
 
 
 def unzip(path, filename):
@@ -103,7 +103,7 @@ def unzip(path, filename):
 
 def load_zipped_pickle(path, filename):
     with gzip.open(path+'/'+filename, 'rb') as f:
-        loaded_object = cPickle.load(f)
+        loaded_object = pickle.load(f)
         return loaded_object
 
 #if __name__ == "__main__":

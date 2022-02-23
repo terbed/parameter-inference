@@ -100,13 +100,13 @@ database.create_array(database.root, "fixed_params",
                       shape=fixed_p.shape, obj=fixed_p)
 
 database.flush()
-print "Parameter space initialization data saved to disk"
-print database
+print("Parameter space initialization data saved to disk")
+print(database)
 database.close()
 
 
 for item in hz:
-    print "\n\n---------------------------------------- Running %i Hz zap protocol" % item
+    print("\n\n---------------------------------------- Running %i Hz zap protocol" % item)
 
     # Stimulus path
     stim = np.loadtxt("/Users/Dani/TDK/parameter_estim/stim_protocol2/stimulus/sin/%i/stim.txt" % item)
@@ -116,14 +116,14 @@ for item in hz:
 
     # Generate synthetic data for each fixed params and given repetition
     target_traces = more_c_trace(D=noise_D, lamb=noise_lamb, dt=0.1, model=modell, params=fixed_params, rep=noise_rep)
-    print "The shape of target traces: " + str(target_traces.shape)
+    print("The shape of target traces: " + str(target_traces.shape))
 
     if __name__ == '__main__':
         run_protocol_simulations(model=modell, target_traces=target_traces, noise_std=noise, param_set=prior_set,
                                  working_path=working_path)
 
 for item in duration:
-    print "\n\n---------------------------------------- Running %i ms impulse protocol" % item
+    print("\n\n---------------------------------------- Running %i ms impulse protocol" % item)
 
     # Stimulus path
     stim = np.loadtxt("/Users/Dani/TDK/parameter_estim/stim_protocol2/stimulus/step/%i/stim.txt" % item)
@@ -139,4 +139,4 @@ for item in duration:
                                  working_path=working_path)
 
 runningTime = (time.time()-startTime)/60
-print "\n\nThe script was running for %f minutes" % runningTime
+print("\n\nThe script was running for %f minutes" % runningTime)

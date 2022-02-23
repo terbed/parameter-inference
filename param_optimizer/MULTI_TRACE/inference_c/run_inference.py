@@ -59,12 +59,12 @@ target_traces = target_traces.reshape((1, 30, 12000))
 
 # LOAD STIMULUS ...............................
 stim = np.loadtxt("/Users/Dani/TDK/parameter_estim/param_optimizer/MULTI_TRACE/ca1pc_anat/stimulus_vector.txt")
-print "Stimulus vector length: %i" % len(stim)
+print("Stimulus vector length: %i" % len(stim))
 
-print "Constructing covmat and invcovmat..."
+print("Constructing covmat and invcovmat...")
 covmat, invcovmat = inv_cov_mat(aut_corr_func, t_vec)
-print "Inverse covariance matrix is loaded to memory!"
-print invcovmat.shape
+print("Inverse covariance matrix is loaded to memory!")
+print(invcovmat.shape)
 
 # Set up parameters using prior information about them (fix the range we are assuming the true parameter)
 prior_params = []
@@ -107,8 +107,8 @@ database.create_array(database.root, "fixed_params",
                       shape=fixed_p.shape, obj=fixed_p)
 
 database.flush()
-print "Parameter space initialization data saved to disk"
-print database
+print("Parameter space initialization data saved to disk")
+print(database)
 database.close()
 
 
@@ -123,5 +123,5 @@ if __name__ == '__main__':
                                working_path=working_path)
 
 runningTime = (time.time()-startTime)/60
-print "\n\nThe script was running for %f minutes" % runningTime
+print("\n\nThe script was running for %f minutes" % runningTime)
 

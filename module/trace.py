@@ -34,12 +34,12 @@ def interpolate(x, y):
     data_points = len(x[left_idx:right_idx])
 
     if data_points < 8 or len(x[left_idx:max_idx]) < 3 or len(x[max_idx:right_idx]) < 4:
-        print "\nData points on the left side: " + str(len(x[left_idx:max_idx]))
-        print "Data points on the right side: " + str(len(x[max_idx:right_idx]))
-        print "Data points to measure sharpness: " + str(data_points)
-        print "\nWARNING! This trace is too sharp for this sampling frequency!\n" \
+        print(("\nData points on the left side: " + str(len(x[left_idx:max_idx]))))
+        print(("Data points on the right side: " + str(len(x[max_idx:right_idx]))))
+        print(("Data points to measure sharpness: " + str(data_points)))
+        print("\nWARNING! This trace is too sharp for this sampling frequency!\n" \
               "Note that the interpolation may not work efficiently \n" \
-              "if the resolution is high enough so  -data point-  >= 8\n"
+              "if the resolution is high enough so  -data point-  >= 8\n")
 
     # Interpolate
     f = interp1d(x, y, kind='cubic')
@@ -73,7 +73,7 @@ def sharpness(x, y):
             right_idx = len(y[:max_idx]) + (np.abs(y[max_idx:] - value)).argmin()
             full_dev += np.abs(x[right_idx] - x[left_idx])
         except ValueError:
-            print "WARNING: ValueError in sharpness checking! The fitted normal distribution might be out of range!!!"
+            print("WARNING: ValueError in sharpness checking! The fitted normal distribution might be out of range!!!")
             # raw_input("Press a key to continue the program...")
             # from matplotlib import pyplot as plt
             # plt.figure()
@@ -94,10 +94,10 @@ def fit_normal(x, y, *p_init):
     except (ValueError, RuntimeError) as err:
         # ValueError: array must not contain infs or NaNs
         # RuntimeError: Optimal parameters not found: Number of calls to function has reached maxfev = 600.
-        print "WARNING: Something went wrong fitting gauss to data...\n"
+        print("WARNING: Something went wrong fitting gauss to data...\n")
         # raw_input("Press a key to continue the program...")
         print(err)
-        print(err.args)
+        print((err.args))
         return ([None, None], [None, None])
 
 
@@ -161,13 +161,13 @@ def stat(param):
     try:
         p_opt, p_cov = curve_fit(normal_val, param.values, param.posterior, p0=p_init)
         p_err = np.sqrt(np.diag(p_cov))
-        print "\nError of fitting gauss to posterior: " + str(p_err)
+        print(("\nError of fitting gauss to posterior: " + str(p_err)))
     except (ValueError, RuntimeError) as err:
         # ValueError: array must not contain infs or NaNs
         # RuntimeError: Optimal parameters not found: Number of calls to function has reached maxfev = 600.
-        print "Something went wrong fitting gauss to data...\n"
+        print("Something went wrong fitting gauss to data...\n")
         print(err)
-        print(err.args)
+        print((err.args))
         p_opt[1] = param.sigma
         p_err[1] = 0.
         return abs(p_opt[1]), param.sigma, 0., 1., p_err[1], 0.
@@ -240,7 +240,7 @@ def re_sampling(old_res_trace, new_res):
 
 if __name__ == "__main__":
     from matplotlib import pyplot
-    import prior
+    from . import prior
 
     sigma = 5
 
@@ -252,9 +252,9 @@ if __name__ == "__main__":
     x_true = 0.
 
     diff, pdiff, sharper = stat(y, y_prior, x, x_true)
-    print "Difference: " + str(diff)
-    print "Probability mistake: " + str(pdiff)
-    print "Sharper: " + str(sharper)
+    print(("Difference: " + str(diff)))
+    print(("Probability mistake: " + str(pdiff)))
+    print(("Sharper: " + str(sharper)))
 
     pyplot.plot(x, y)
     pyplot.plot(x, y_prior)

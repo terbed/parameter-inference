@@ -60,4 +60,4 @@ protocol_comparison(path_list, numfp=10, inferred_params=['Ra', 'cm', 'gpas'],
                     out_path="/Users/Dani/TDK/parameter_estim/stim_protocol2/combining2")
 
 runningTime = (time.time()-startTime)/60
-print "\n\nThe script was running for %f minutes" % runningTime
+print("\n\nThe script was running for %f minutes" % runningTime)

@@ -24,7 +24,7 @@ pcm = RandomVariable(name='cm', range_min=0.5, range_max=1.5, resolution=40, mea
 
 startTime = time.time()
 for i in range(num_of_iter):
-    print str(i) + " is DONE out of " + str(num_of_iter)
+    print(str(i) + " is DONE out of " + str(num_of_iter))
 
     # Sampling current parameter from normal distribution
     current_Ra = np.random.normal(pRa.mean, 10)
@@ -80,13 +80,13 @@ for i in range(num_of_iter):
 
     # Plot some single joint distribution
     if i == num_of_iter - 1:
-        print inference
+        print(inference)
         fullplot(inference)
         plot_joint(inference, Ra, gpas)
         plot_joint(inference, Ra, cm)
         plot_joint(inference, cm, gpas)
 
-    print "\n\n"
+    print("\n\n")
 
 runningTime = (time.time() - startTime) / 60
 lasted = "The Ra-gpas-cm ball-and-stick simulation was running for %f minutes\n" % runningTime

@@ -15,7 +15,7 @@ n = 50
 model = stick_and_ball
 
 for item in hz:
-    print "\n\n---------------------------------------- Running %i ms impulse protocol" % item
+    print("\n\n---------------------------------------- Running %i ms impulse protocol" % item)
 
     stim = np.loadtxt("/Users/Dani/TDK/parameter_estim/stim_protocol2/zap/best_comb/%i/stim.txt" % item)
     working_path = "/Users/Dani/TDK/parameter_estim/stim_protocol2/zap/best_comb/%i" % item

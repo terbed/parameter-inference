@@ -31,7 +31,7 @@ def aut_corr_func(x):
 target_traces = np.loadtxt("/home/szabolcs/parameter_inference/exp_v3/corrected_target_traces.txt")
 target_traces = target_traces.T
 target_traces = target_traces.reshape((1, noise_rep, samples_num))
-print target_traces.shape
+print(target_traces.shape)
 
 
 # --- Load NEURON morphology
@@ -48,10 +48,10 @@ initial_params = [{'Ra': None, 'gpas_soma': None, 'k': None}]
 
 t_vec = np.linspace(0, (samples_num-1)*dt, samples_num)
 
-print "Constructing covmat and invcovmat..."
+print("Constructing covmat and invcovmat...")
 covmat, invcovmat = inv_cov_mat(aut_corr_func, t_vec)
-print "Inverse covariance matrix is loaded to memory!"
-print invcovmat.shape
+print("Inverse covariance matrix is loaded to memory!")
+print(invcovmat.shape)
 
 # Set up parameters using prior information about them (fix the range we are assuming the true parameter)
 prior_params = []
@@ -94,8 +94,8 @@ database.create_array(database.root, "fixed_params",
                       shape=fixed_p.shape, obj=fixed_p)
 
 database.flush()
-print "Parameter space initialization data saved to disk"
-print database
+print("Parameter space initialization data saved to disk")
+print(database)
 database.close()
 
 
@@ -108,4 +108,4 @@ if __name__ == '__main__':
                                working_path=working_path)
 
 runningTime = (time.time()-startTime)/60
-print "\n\nThe script was running for %f minutes" % runningTime
+print("\n\nThe script was running for %f minutes" % runningTime)

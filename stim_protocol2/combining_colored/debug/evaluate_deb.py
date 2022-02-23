@@ -66,4 +66,4 @@ protocol_comparison(path_list, numfp=10, inferred_params=p_names,
 
 pinit.close()
 runningTime = (time.time()-startTime)/60
-print "\n\nThe script was running for %f minutes" % runningTime
+print("\n\nThe script was running for %f minutes" % runningTime)

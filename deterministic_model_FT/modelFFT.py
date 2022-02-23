@@ -36,7 +36,7 @@ for i in range(10):
     fb = 1/L                            # frequency bin
     frq = k/L                           # two sides frequency range
     frq = frq                           # one side frequency range
-    frq = frq[range(n/2)]               # one side frequency range
+    frq = frq[list(range(n/2))]               # one side frequency range
 
     f1 = np.arange(0, 50, fb)
 

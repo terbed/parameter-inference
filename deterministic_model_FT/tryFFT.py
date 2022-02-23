@@ -13,12 +13,12 @@ k = np.arange(n)
 T = n/Fs                            # length of signal in time [s]
 fb = 1/T                            # frequency bin
 frq = k/T                           # two sides frequency range
-frq = frq[range(n/2)]               # one side frequency range
+frq = frq[list(range(n/2))]               # one side frequency range
 
 f = np.arange(0, 5, fb)
 
 Y = np.fft.fft(y)/n                 # fft computing and normalization
-Y = Y[range(n/2)]
+Y = Y[list(range(n/2))]
 
 fig, ax = plt.subplots(2, 1, figsize=(12, 6))
 ax[0].plot(t, y)

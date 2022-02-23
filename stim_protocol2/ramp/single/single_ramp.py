@@ -31,7 +31,7 @@ if __name__ == '__main__':
 # inference.save_result()
 inference.run_evaluation()
 
-print inference
+print(inference)
 fullplot(inference)
 plot_joint(inference, Ra, gpas)
 plot_joint(inference, Ra, cm)

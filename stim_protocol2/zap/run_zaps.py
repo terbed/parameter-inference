@@ -17,7 +17,7 @@ n = 50
 model = stick_and_ball
 
 for item in hz:
-    print "\n\n---------------------------------------- Running %i ms impulse protocol" % item
+    print("\n\n---------------------------------------- Running %i ms impulse protocol" % item)
 
     """
     Run statistic on given experiment protocol and parameters.
@@ -48,7 +48,7 @@ for item in hz:
 
     # Inference and statistics
     for i in range(n):
-        print "\n\n--------------------------------------- %i is DONE out of %i" % (i, n)
+        print("\n\n--------------------------------------- %i is DONE out of %i" % (i, n))
 
         # Set up mean and range for a cycle of simulation
         current_mean = {}
@@ -94,7 +94,7 @@ for item in hz:
 
         m = 0
         if inf.analyse_result() is None:
-            print "\nCouldn't fit gauss to data!"
+            print("\nCouldn't fit gauss to data!")
             for i, item in enumerate(stat_list):
                 stat_list[i] = np.delete(stat_list, (i - m), axis=0)
             m += 1
@@ -109,7 +109,7 @@ for item in hz:
         # Plot last signle result at the end
         if i == n - 1:
             # Marginal plots
-            print inf
+            print(inf)
 
             # Fullplot
             fullplot(inf)
@@ -121,7 +121,7 @@ for item in hz:
 
     # Plot results
     for q, item in enumerate(stat_list):
-        print "Result saved to: " + working_path + "/" + p_names[q] + "_stat.txt"
+        print("Result saved to: " + working_path + "/" + p_names[q] + "_stat.txt")
         np.savetxt(working_path + "/" + p_names[q] + "_stat.txt", item,
                    header='\nsigma\tfit_err\trdiff\taccuracy\tsharper\tbroadness', delimiter='\t')
 

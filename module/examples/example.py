@@ -28,9 +28,9 @@ if __name__ == "__main__":
 # 6.) Run evaluation
 inf.run_evaluation()
 
-print "KL divergence test: %f" % inf.KL
+print("KL divergence test: %f" % inf.KL)
 
 # 7.) Plot solution
-print inf
+print(inf)
 plot_joint(inf, cm, gpas)
 fullplot(inf)

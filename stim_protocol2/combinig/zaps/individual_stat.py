@@ -47,7 +47,7 @@ for idx, dur in enumerate(hz):
         stat = inf.analyse_result()
         fullplot(inf)
 
-        print stat[0][4]
+        print(stat[0][4])
         result_Ra[idx, n+1] = stat[0][4]
         result_Ra_b[idx, n + 1] = stat[0][5]
         result_cm[idx, n+1] = stat[1][4]

@@ -56,10 +56,10 @@ batch_size = 30000                 # Set it to "None" to compute the whole param
 # Set up random seed
 np.random.seed(42)
 
-print "Computing covmat and invcovmat..."
+print("Computing covmat and invcovmat...")
 covmat, invcovmat = inv_cov_mat(aut_corr_func, t_vec)
-print "Inverse covariance matrix is loaded to memory!"
-print invcovmat.shape
+print("Inverse covariance matrix is loaded to memory!")
+print(invcovmat.shape)
 
 
 # END OF SETTING UP SIMULATION PARAMETERS -----------------------------------------------------------------------------
@@ -114,13 +114,13 @@ database.create_array(database.root, "fixed_params",
                       shape=fixed_p.shape, obj=fixed_p)
 
 database.flush()
-print "Parameter space initialization data saved to disk"
-print database
+print("Parameter space initialization data saved to disk")
+print(database)
 database.close()
 
 
 for item in hz:
-    print "\n\n---------------------------------------- Running %i Hz zap protocol" % item
+    print("\n\n---------------------------------------- Running %i Hz zap protocol" % item)
 
     # Stimulus path
     stim = np.loadtxt("/Users/Dani/TDK/parameter_estim/stim_protocol2/stimulus/sin/%i/stim.txt" % item)
@@ -130,14 +130,14 @@ for item in hz:
 
     # Generate synthetic data for each fixed params and given repetition
     target_traces = more_trace_from_covmat(covmat, model=modell, params=fixed_params, rep=noise_rep)
-    print "The shape of target traces: " + str(target_traces.shape)
+    print("The shape of target traces: " + str(target_traces.shape))
 
     if __name__ == '__main__':
         run_protocol_simulations_c(model=modell, target_traces=target_traces, inv_covmat=invcovmat, param_set=prior_set,
                                  working_path=working_path)
 
 for item in duration:
-    print "\n\n---------------------------------------- Running %i ms impulse protocol" % item
+    print("\n\n---------------------------------------- Running %i ms impulse protocol" % item)
 
     # Stimulus path
     stim = np.loadtxt("/Users/Dani/TDK/parameter_estim/stim_protocol2/stimulus/step/%i/stim.txt" % item)
@@ -153,4 +153,4 @@ for item in duration:
                                  working_path=working_path)
 
 runningTime = (time.time()-startTime)/60
-print "\n\nThe script was running for %f minutes" % runningTime
+print("\n\nThe script was running for %f minutes" % runningTime)

@@ -18,13 +18,13 @@ pcm = RandomVariable(name='cm', range_min=0.5, range_max=1.5, resolution=80, mea
 pgpas = RandomVariable(name='gpas', range_min=0.00005, range_max=0.00015, resolution=100, mean=0.0001, sigma=0.00002)
 
 # Load inverse covariance matrix for inference
-print "Loading inverse covariance matrix..."
+print("Loading inverse covariance matrix...")
 inv_covmat = np.genfromtxt('/Users/Dani/TDK/parameter_estim/stim_protocol/broad_invcovmat.csv')
-print "Done!"
+print("Done!")
 
 startTime = time.time()
 for i in range(num_of_iter):
-    print str(i) + " is DONE out of " + str(num_of_iter)
+    print(str(i) + " is DONE out of " + str(num_of_iter))
 
     # Sampling current parameter from normal distribution
     current_cm = np.random.normal(pcm.mean, pcm.sigma)
@@ -68,11 +68,11 @@ for i in range(num_of_iter):
     if stat(cm) is not str:
         cm_stat[i, 0], cm_stat[i, 1], cm_stat[i, 2], cm_stat[i, 3], cm_stat[4] = stat(cm)
     else:
-        print "\n WARNING!!! OUT OF RANGE!!!  You should delete the simulation data lines with no results! (0 values)\n"
+        print("\n WARNING!!! OUT OF RANGE!!!  You should delete the simulation data lines with no results! (0 values)\n")
     if stat(gpas) is not str:
         gpas_stat[i, 0], gpas_stat[i, 1], gpas_stat[i, 2], gpas_stat[i, 3], gpas_stat[4] = stat(gpas)
     else:
-        print "\n WARNING!!! OUT OF RANGE!!!  You should delete the simulation data lines with no results! (0 values)\n"
+        print("\n WARNING!!! OUT OF RANGE!!!  You should delete the simulation data lines with no results! (0 values)\n")
 
 runningTime = (time.time() - startTime) / 60
 lasted = "The simulation was running for %f minutes\n" % runningTime

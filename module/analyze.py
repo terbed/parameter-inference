@@ -33,7 +33,7 @@ class Analyse:
             os.makedirs(working_path)
 
     def run_evaluation(self):
-        print "\nConstructing posterior distribution..."
+        print("\nConstructing posterior distribution...")
 
         self.__create_likelihood()
         self.__create_posterior()
@@ -41,7 +41,7 @@ class Analyse:
         self.__max_probability()
         self.__fit_posterior()
 
-        print "Check FULL posterior correctness: the integrate of posterior: + " + str(np.sum(self.posterior)*self.p.joint_step)
+        print(("Check FULL posterior correctness: the integrate of posterior: + " + str(np.sum(self.posterior)*self.p.joint_step)))
 
     def __create_likelihood(self):
         self.likelihood = np.reshape(self.likelihood, self.p.shape)
@@ -86,7 +86,7 @@ class Analyse:
         #     plot.plot_joint(self, self.p.params[item[0]], self.p.params[item[1]])
 
         # fullplot
-        print "Reconstructed likelihood shape before plot: ",  self.likelihood.shape
+        print(("Reconstructed likelihood shape before plot: ",  self.likelihood.shape))
         plot.fullplot(self)
 
         return "Plot Done!\n" \
@@ -107,7 +107,7 @@ class Analyse:
         """
         :return: (fitted_sigma, fit_err, relative_deviation, acc, sharper, broader) tuple for each parameter
         """
-        print "\n Running analysis on inference result..."
+        print("\n Running analysis on inference result...")
 
         # Do some analysis on results
         info = []
@@ -123,7 +123,7 @@ class Analyse:
         """
         :return: broader value for each parameter
         """
-        print "\n get_broadness()..."
+        print("\n get_broadness()...")
 
         # Do some analysis on results
         info = []
@@ -131,7 +131,7 @@ class Analyse:
             if item.fitted_gauss[0][0] is not None:
                 info.append(analyse(item, item.fitted_gauss)[5])
             else:
-                print "--- Cannot fit normal to posterior!!! ---"
+                print("--- Cannot fit normal to posterior!!! ---")
                 return info.append(100.)
 
         return info

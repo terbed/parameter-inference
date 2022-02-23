@@ -32,7 +32,7 @@ pgpas = RandomVariable(name='gpas', range_min=gpas_start, range_max=gpas_end, re
 
 startTime = time.time()
 for i in range(num_of_iter):
-    print str(i) + " is DONE out of " + str(num_of_iter)
+    print(str(i) + " is DONE out of " + str(num_of_iter))
 
     # Sampling current parameter from normal distribution
     current_cm = np.random.normal(cm_mean, cm_sig)
@@ -75,11 +75,11 @@ for i in range(num_of_iter):
     if stat(cm) is not str:
         cm_stat[i, 0], cm_stat[i, 1], cm_stat[i, 2], cm_stat[i, 3], cm_stat[4] = stat(cm)
     else:
-        print "\n WARNING!!! OUT OF RANGE!!!  You should delete the simulation data lines with no results! (0 values)\n"
+        print("\n WARNING!!! OUT OF RANGE!!!  You should delete the simulation data lines with no results! (0 values)\n")
     if stat(gpas) is not str:
         gpas_stat[i, 0], gpas_stat[i, 1], gpas_stat[i, 2], gpas_stat[i, 3], gpas_stat[4] = stat(gpas)
     else:
-        print "\n WARNING!!! OUT OF RANGE!!!  You should delete the simulation data lines with no results! (0 values)\n"
+        print("\n WARNING!!! OUT OF RANGE!!!  You should delete the simulation data lines with no results! (0 values)\n")
 
 runningTime = (time.time() - startTime) / 60
 lasted = "The simulation was running for %f minutes\n" % runningTime

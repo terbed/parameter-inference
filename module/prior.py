@@ -116,7 +116,7 @@ if __name__ == "__main__":
            an array of shape (x.dim, x.ndim) + x.shape
            where the array[i, j, ...] corresponds to the second derivative x_ij
         """
-        print x.shape
+        print((x.shape))
         x_grad = np.gradient(x, step)
         hessian = np.empty((x.ndim, x.ndim) + x.shape, dtype=x.dtype)
         for k, grad_k in enumerate(x_grad):

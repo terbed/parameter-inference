@@ -3,7 +3,7 @@ import numpy as np
 import multiprocessing
 from multiprocessing import Pool
 from functools import partial
-import likelihood
+from . import likelihood
 from module.save_load import save_zipped_pickle, save_to_txt, load_zipped_pickle, load_parameter_set, save_file, \
     extend_zipped_pickle, save_params
 from module.analyze import Analyse
@@ -42,14 +42,14 @@ def run_prot_sim(model, target_traces, noise_std, param_set, working_path):
     pool = Pool(multiprocessing.cpu_count() - 1)
     log_likelihood_func = partial(likelihood.rill, model=model, target_traces=target_traces, noise_std=noise_std)
 
-    print "Running " + str(len(param_set.parameter_set_seq)) + " simulations on all cores..."
+    print(("Running " + str(len(param_set.parameter_set_seq)) + " simulations on all cores..."))
 
     log_likelihood = pool.map(log_likelihood_func, param_set.parameter_set_seq)
     log_likelihood = np.array(log_likelihood)
     pool.close()
     pool.join()
 
-    print "log likelihood DONE!"
+    print("log likelihood DONE!")
 
     i = 0
     name = '{}{:d}.hdf5'.format(working_path + "/ll", i)
@@ -62,7 +62,7 @@ def run_prot_sim(model, target_traces, noise_std, param_set, working_path):
                            shape=log_likelihood.shape, filters=filters,
                            obj=log_likelihood)
 
-    print "Data SAVED!"
+    print("Data SAVED!")
 
 
 def run_protocol_simulations(model, target_traces, noise_std, param_set, working_path):
@@ -94,14 +94,14 @@ def run_protocol_simulations(model, target_traces, noise_std, param_set, working
                   header="For given fixed parameter %i rep (row)" % rep)
 
     if param_set.isBatch is False:
-        print "Running " + str(len(param_set.parameter_set_seq)) + " simulations on all cores..."
+        print(("Running " + str(len(param_set.parameter_set_seq)) + " simulations on all cores..."))
 
         log_likelihood = pool.map(log_likelihood_func, param_set.parameter_set_seq)
         log_likelihood = np.array(log_likelihood)
         pool.close()
         pool.join()
 
-        print "log likelihood DONE!"
+        print("log likelihood DONE!")
 
         # Save parameter initializer data
         for idx in range(fpnum):
@@ -113,11 +113,11 @@ def run_protocol_simulations(model, target_traces, noise_std, param_set, working
                                    shape=(log_likelihood.shape[0], log_likelihood.shape[2]), filters=filters,
                                    obj=log_likelihood[:, idx, :])
             database.flush()
-            print "Data saved to disk"
-            print database
+            print("Data saved to disk")
+            print(database)
             database.close()
 
-        print "Data SAVED!"
+        print("Data SAVED!")
     else:
         store = []
         lol = np.empty(shape=(2, 2), dtype=np.float64)
@@ -134,8 +134,8 @@ def run_protocol_simulations(model, target_traces, noise_std, param_set, working
         del lol
 
         for idx, batch in tqdm(enumerate(param_set.parameter_set_batch_list)):
-            print str(idx) + ' batch of work is done out of ' \
-                  + str(len(param_set.parameter_set_batch_list))
+            print((str(idx) + ' batch of work is done out of ' \
+                  + str(len(param_set.parameter_set_batch_list))))
 
             batch_likelihood = pool.map(log_likelihood_func, batch)
             batch_likelihood = np.array(batch_likelihood)
@@ -146,14 +146,14 @@ def run_protocol_simulations(model, target_traces, noise_std, param_set, working
                 item[0].append(batch_likelihood[:, i, :])
                 item[1].flush()
 
-        print "Data saved to disk"
+        print("Data saved to disk")
 
         for item in store:
             item[1].close()
 
         pool.close()
         pool.join()
-        print "log_likelihood: Done!"
+        print("log_likelihood: Done!")
 
 
 def run_protocol_simulations_c(model, target_traces, inv_covmat, param_set, working_path):
@@ -185,14 +185,14 @@ def run_protocol_simulations_c(model, target_traces, inv_covmat, param_set, work
                   header="For given fixed parameter %i rep (row)" % rep)
 
     if param_set.isBatch is False:
-        print "Running " + str(len(param_set.parameter_set_seq)) + " simulations on all cores..."
+        print(("Running " + str(len(param_set.parameter_set_seq)) + " simulations on all cores..."))
 
         log_likelihood = pool.map(log_likelihood_func, param_set.parameter_set_seq)
         log_likelihood = np.array(log_likelihood)
         pool.close()
         pool.join()
 
-        print "log likelihood DONE!"
+        print("log likelihood DONE!")
 
         # Save parameter initializer data
         for idx in range(fpnum):
@@ -204,11 +204,11 @@ def run_protocol_simulations_c(model, target_traces, inv_covmat, param_set, work
                                    shape=(log_likelihood.shape[0], log_likelihood.shape[2]), filters=filters,
                                    obj=log_likelihood[:, idx, :])
             database.flush()
-            print "Data saved to disk"
-            print database
+            print("Data saved to disk")
+            print(database)
             database.close()
 
-        print "Data SAVED!"
+        print("Data SAVED!")
     else:
         store = []
         lol = np.empty(shape=(2, 2), dtype=np.float64)
@@ -225,8 +225,8 @@ def run_protocol_simulations_c(model, target_traces, inv_covmat, param_set, work
         del lol
 
         for idx, batch in tqdm(enumerate(param_set.parameter_set_batch_list)):
-            print str(idx) + ' batch of work is done out of ' \
-                  + str(len(param_set.parameter_set_batch_list))
+            print((str(idx) + ' batch of work is done out of ' \
+                  + str(len(param_set.parameter_set_batch_list))))
 
             batch_likelihood = pool.map(log_likelihood_func, batch)
             batch_likelihood = np.array(batch_likelihood)
@@ -237,14 +237,14 @@ def run_protocol_simulations_c(model, target_traces, inv_covmat, param_set, work
                 item[0].append(batch_likelihood[:, i, :])
                 item[1].flush()
 
-        print "Data saved to disk"
+        print("Data saved to disk")
 
         for item in store:
             item[1].close()
 
         pool.close()
         pool.join()
-        print "log_likelihood: Done!"
+        print("log_likelihood: Done!")
 
 
 def plot_single_results(path, numfp, which, dbs):
@@ -255,7 +255,7 @@ def plot_single_results(path, numfp, which, dbs):
     :param: dbs: parameter initializer hdf5 database object
     :return: Plot inference result for each parameter -- the selected one (which)
     """
-    print "\n\n ------------------- Plot single result: %s" % path
+    print(("\n\n ------------------- Plot single result: %s" % path))
     plist = []
     for idx in range(dbs.root.params_init.shape[0]):
         plist.append(dbs.root.params_init[idx, :])
@@ -263,14 +263,14 @@ def plot_single_results(path, numfp, which, dbs):
     p_set = load_parameter_set(plist)
 
     for i in range(numfp):
-        print "\n\n%i th parameter: --------------------------" % i
+        print(("\n\n%i th parameter: --------------------------" % i))
         lldbs = tb.open_file(path + "/ll%i.hdf5" % i, mode="r")
 
         for idx, param in enumerate(p_set.params):
             param.value = dbs.root.fixed_params[i, idx]
 
         res = Analyse(lldbs.root.ll[:, which], p_set, path + "/single_plots")
-        print res
+        print(res)
         lldbs.close()
 
 
@@ -282,7 +282,7 @@ def plot_single_results_reps(path, numrep, which, dbs):
     :param: dbs: parameter initializer hdf5 database object
     :return: Plot inference result for each parameter -- the selected one (which)
     """
-    print "\n\n ------------------- Plot single result: %s" % path
+    print(("\n\n ------------------- Plot single result: %s" % path))
     plist = []
     for idx in range(dbs.root.params_init.shape[0]):
         plist.append(dbs.root.params_init[idx, :])
@@ -292,18 +292,18 @@ def plot_single_results_reps(path, numrep, which, dbs):
     lldbs = tb.open_file(path + "/ll%i.hdf5" % which, mode="r")
 
     for i in range(numrep):
-        print "\n\n%i th repetition: --------------------------" % i
+        print(("\n\n%i th repetition: --------------------------" % i))
 
         for idx, param in enumerate(p_set.params):
             param.value = dbs.root.fixed_params[which, idx]
 
         res = Analyse(lldbs.root.ll[:, i], p_set, path + "/single_plots")
-        print res
+        print(res)
     lldbs.close()
 
 
 def plot_combined_results(path, numfp, dbs):
-    print "\n\n ------------------- Plot combined result: %s" % path
+    print(("\n\n ------------------- Plot combined result: %s" % path))
     plist = []
     for idx in range(dbs.root.params_init.shape[0]):
         plist.append(dbs.root.params_init[idx, :])
@@ -311,7 +311,7 @@ def plot_combined_results(path, numfp, dbs):
     p_set = load_parameter_set(plist)
 
     for i in range(numfp):
-        print "\n\n%i th parameter: ---------------------" % i
+        print(("\n\n%i th parameter: ---------------------" % i))
 
         for idx, param in enumerate(p_set.params):
             param.value = dbs.root.fixed_params[i, idx]
@@ -322,10 +322,10 @@ def plot_combined_results(path, numfp, dbs):
         data.close()
 
         if res.get_broadness() is not None:
-            print res
+            print(res)
         else:
-            print res
-            print "--- Couldn't fit posterior to data!!! ---"
+            print(res)
+            print("--- Couldn't fit posterior to data!!! ---")
 
 
 def mult_likelihood(path, numfp, num_mult):
@@ -336,10 +336,10 @@ def mult_likelihood(path, numfp, num_mult):
     :param num_mult: Number of likelihoods to be multiplied
     :return: Added loglikelihoods for each parameter and params_init pickelled (saved in path directory in .gz files)
     """
-    print "\n\n------ Adding loglikelihoods: %s ---------" % path
+    print(("\n\n------ Adding loglikelihoods: %s ---------" % path))
     filters = tb.Filters(complevel=6, complib='lzo')
     for i in range(numfp):
-        print "%i is done out of %i" % (i, numfp)
+        print(("%i is done out of %i" % (i, numfp)))
         data = tb.open_file(path + "/ll%i.hdf5" % i, mode="r")
         loglikelihood = data.root.ll[:, 0]
 
@@ -353,7 +353,7 @@ def mult_likelihood(path, numfp, num_mult):
                             shape=loglikelihood.shape, title="Added loglikelihoods", filters=filters, obj=loglikelihood)
         store.close()
 
-    print "Adding loglikelihoods DONE!"
+    print("Adding loglikelihoods DONE!")
 
 
 def combine_likelihood(path_list, numfp, num_mult_single, out_path):
@@ -367,7 +367,7 @@ def combine_likelihood(path_list, numfp, num_mult_single, out_path):
     """
     filters = tb.Filters(complevel=6, complib='lzo')
     check_directory(out_path)
-    print "\n\n-------------- Combining likelihoods from more protocols -----------------"
+    print("\n\n-------------- Combining likelihoods from more protocols -----------------")
 
     for i in range(numfp):
         data = tb.open_file(path_list[0] + "/ll%i.hdf5" % i, mode="r")
@@ -387,10 +387,10 @@ def combine_likelihood(path_list, numfp, num_mult_single, out_path):
         store.create_carray(store.root, name="ll", atom=tb.Atom.from_dtype(loglikelihood.dtype),
                             shape=loglikelihood.shape, title="Combined loglikelihood from more protocol",
                             filters=filters, obj=loglikelihood)
-        print store
+        print(store)
         store.close()
 
-    print "Combining likelihoods DONE!"
+    print("Combining likelihoods DONE!")
 
 
 def protocol_comparison(path_list, numfp, repnum_k, inferred_params, out_path, dbs,
@@ -427,7 +427,7 @@ def protocol_comparison(path_list, numfp, repnum_k, inferred_params, out_path, d
     repnum = np.empty((len(path_list), numfp, len(inferred_params)))
     df = pd.DataFrame(columns=["protocol", "repnum", "setup", "param"])
 
-    print "\n\n broadness shape: " + str(broadness.shape)
+    print(("\n\n broadness shape: " + str(broadness.shape)))
 
     for idx, path in enumerate(path_list):
         tmp = []
@@ -550,7 +550,7 @@ def protocol_comparison(path_list, numfp, repnum_k, inferred_params, out_path, d
     # avrg_broad = np.divide(avrg_broad, numfp - m)
 
     # x axes for plot:
-    x = range(len(path_list))
+    x = list(range(len(path_list)))
     xbox = [val+1 for val in range(len(path_list))]
 
     # Plot KL result for each protocol
@@ -560,7 +560,7 @@ def protocol_comparison(path_list, numfp, repnum_k, inferred_params, out_path, d
     plt.ylabel("KL test")
     plt.xticks(x, protocol_xticks)
     for i in range(numfp):
-        plt.plot(range(len(path_list)), KL[:, i], marker='x')
+        plt.plot(list(range(len(path_list))), KL[:, i], marker='x')
     plt.grid()
     plt.savefig(out_path + "/KL_test.pdf")
 
@@ -572,7 +572,7 @@ def protocol_comparison(path_list, numfp, repnum_k, inferred_params, out_path, d
         plt.ylabel("Broadness")
         plt.xticks(x, protocol_xticks)
         for i in range(numfp - m):
-            plt.plot(range(len(path_list)), broadness[:, i, idx], marker='x')
+            plt.plot(list(range(len(path_list))), broadness[:, i, idx], marker='x')
         plt.grid()
         plt.savefig(out_path + "/%s_broadness.pdf" % param)
 
@@ -595,9 +595,9 @@ def protocol_comparison(path_list, numfp, repnum_k, inferred_params, out_path, d
     plt.xticks(x, protocol_xticks)
     plt.title("Averaged broadness for each parameter | " + setup_name)
     for idx, param in enumerate(inferred_params):
-        plt.plot(range(len(path_list)), avrg_broad[:, idx], label=param, marker='x')
-        plt.errorbar(range(len(path_list)), avrg_broad[:, idx], yerr=std_broad[:, idx],  fmt='none', ecolor='black')
-        for i, j, k in zip(range(len(path_list)), avrg_broad[:, idx], std_broad[:, idx]):
+        plt.plot(list(range(len(path_list))), avrg_broad[:, idx], label=param, marker='x')
+        plt.errorbar(list(range(len(path_list))), avrg_broad[:, idx], yerr=std_broad[:, idx],  fmt='none', ecolor='black')
+        for i, j, k in zip(list(range(len(path_list))), avrg_broad[:, idx], std_broad[:, idx]):
             plt.annotate(str(int(round(j))) + "\n+/-" + str(int(round(k))), xy=(i, j), xytext=(10, 10), textcoords='offset points', color='red')
     plt.ylim(0, 100)
     plt.legend(loc="best")
@@ -657,10 +657,10 @@ def protocol_comparison(path_list, numfp, repnum_k, inferred_params, out_path, d
         plt.xlabel("Protocol types")
         plt.ylabel("Repetition number")
         plt.xticks(x, protocol_xticks)
-        plt.plot(range(len(path_list)), avrg_repnum[:, idx], label=(param + " prior sigma: " + str(p_set.params[idx].sigma)), color='b', marker='x')
-        plt.errorbar(range(len(path_list)), avrg_repnum[:, idx], yerr=std_repnum[:, idx], fmt='none', ecolor='b')
+        plt.plot(list(range(len(path_list))), avrg_repnum[:, idx], label=(param + " prior sigma: " + str(p_set.params[idx].sigma)), color='b', marker='x')
+        plt.errorbar(list(range(len(path_list))), avrg_repnum[:, idx], yerr=std_repnum[:, idx], fmt='none', ecolor='b')
         plt.legend(loc="best")
-        for i, j, k in zip(range(len(path_list)), avrg_repnum[:, idx], std_repnum[:, idx]):
+        for i, j, k in zip(list(range(len(path_list))), avrg_repnum[:, idx], std_repnum[:, idx]):
             plt.annotate(str(int(round(j))) + "\n+/-" + str(int(round(k))), xy=(i, j), xytext=(10, 10), textcoords='offset points', color='red')
         plt.yscale('log')
         plt.autoscale(True)

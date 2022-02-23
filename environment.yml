@@ -2,7 +2,7 @@ name: param-estim
 channels:
   - conda-forge
 dependencies:
-  - python=2.7
+  - python=3.8
   - numpy
   - scipy
   - matplotlib

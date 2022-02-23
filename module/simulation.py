@@ -711,7 +711,7 @@ def real_morphology_model_soma_spatial(stim, k=0.001, gpas_soma=0.0001, Ra=100.,
 
             if gpas < 0:
                 seg.g_pas = 0
-                print "WARNING!!! 'gpas' is in negative! Corrected to zero."
+                print("WARNING!!! 'gpas' is in negative! Corrected to zero.")
             else:
                 seg.g_pas = gpas
 
@@ -772,7 +772,7 @@ def real_morphology_model_dend_spatial(stim, d=30, k=0.001, gpas_soma=0.0001, Ra
 
             if gpas < 0:
                 seg.g_pas = 0
-                print "WARNING!!! 'gpas' is in negative! Corrected to zero."
+                print("WARNING!!! 'gpas' is in negative! Corrected to zero.")
             else:
                 seg.g_pas = gpas
 
@@ -845,7 +845,7 @@ def real_morphology_model_ssoma_rdend_spatial(stim, d=30, k=0.001, gpas_soma=0.0
 
             if gpas < 0:
                 seg.g_pas = 0
-                print "WARNING!!! 'gpas' is in negative! Corrected to zero."
+                print("WARNING!!! 'gpas' is in negative! Corrected to zero.")
             else:
                 seg.g_pas = gpas
 
@@ -917,7 +917,7 @@ def real_morphology_model_srsoma_rdend_spatial(stim, d=30, k=0.001, gpas_soma=0.
 
             if gpas < 0:
                 seg.g_pas = 0
-                print "WARNING!!! 'gpas' is in negative! Corrected to zero."
+                print("WARNING!!! 'gpas' is in negative! Corrected to zero.")
             else:
                 seg.g_pas = gpas
 
@@ -1011,7 +1011,7 @@ if __name__ == "__main__":
 
     # np.savetxt("/Users/Dani/TDK/parameter_estim/stim_protocol2/steps/400/stim.txt", stim)
 
-    print len(stim)
+    print((len(stim)))
 
     # --- Load NEURON morphology
     h('load_file("/home/terbe/parameter-inference/exp/morphology_131117-C2.hoc")')
@@ -1030,5 +1030,5 @@ if __name__ == "__main__":
     # plt.savefig("/Users/Dani/TDK/parameter_estim/stim_protocol2/steps/400/resp.png")
     plt.show()
 
-    print len(t)
-    print len(v)
+    print((len(t)))
+    print((len(v)))

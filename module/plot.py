@@ -334,8 +334,8 @@ def plot_joint(result, param1, param2):
                 likelihood = np.sum(likelihood, axis=idx) * item.step
                 posterior = np.sum(posterior, axis=idx) * item.step
 
-    print "Is the JOINT posterior a probability distribution? Integrate(posterior) = " + str(
-        np.sum(posterior) * param1.step * param2.step)
+    print(("Is the JOINT posterior a probability distribution? Integrate(posterior) = " + str(
+        np.sum(posterior) * param1.step * param2.step)))
 
     # 3d plot
     fig = plt.figure(figsize=(12, 8))
@@ -402,8 +402,8 @@ def marginal_plot(param, path=''):
     check_directory(path + "/marginal")
 
     # Check posterior distribution correctness
-    print "The MARGINAL posterior is probability distributions? Integrate(posterior) = " + str(
-        np.sum(param.posterior) * param.step)
+    print(("The MARGINAL posterior is probability distributions? Integrate(posterior) = " + str(
+        np.sum(param.posterior) * param.step)))
 
     # Plot posterior
     plt.figure(figsize=(12,8))
@@ -425,7 +425,7 @@ def marginal_plot(param, path=''):
     while os.path.exists('{}({:d}).pdf'.format(filename, i)):
         i += 1
     plt.savefig('{}({:d}).pdf'.format(filename, i))
-    print "Plot done! File path: " + filename
+    print(("Plot done! File path: " + filename))
 
     # Plot likelihood
     plt.figure(figsize=(12, 8))
@@ -442,7 +442,7 @@ def marginal_plot(param, path=''):
     while os.path.exists('{}({:d}).pdf'.format(filename, i)):
         i += 1
     plt.savefig('{}({:d}).pdf'.format(filename, i))
-    print "Plot done! File path: " + filename
+    print(("Plot done! File path: " + filename))
 
 
 def plot_stat(stat, param, path='', bin=None):
@@ -559,7 +559,7 @@ def plot_stat(stat, param, path='', bin=None):
     plt.hist(stat[:, 1], bin, facecolor='#3ce1bb', normed=False)
     plt.savefig(path + "/histograms/fiterr_" + param.name + ".pdf")
 
-    print "Stat plotted to: " + path
+    print(("Stat plotted to: " + path))
 
     # plt.figure()
     # plt.title("Fitted gaussian sigma parameter | " + param.name)

@@ -45,7 +45,7 @@ if __name__ == "__main__":
     #
 
     inv_covmat = diagonal(2., 12001)
-    print inv_covmat.shape
+    print((inv_covmat.shape))
     invcovmat = pd.DataFrame(data=inv_covmat.astype(float))
     invcovmat.to_csv('inv_covmat_w.csv', header=False, float_format=None, index=False)
 

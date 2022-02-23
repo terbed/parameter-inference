@@ -46,7 +46,7 @@ A, T1, T2, phi = [ 2.79388925e-02,  3.91934291e+02, 9.54439765e+02, -9.99502661e
 target_traces = np.loadtxt(path_target_traces)
 # target_traces = target_traces.T
 target_traces = target_traces.reshape((1, noise_rep, samples_num))
-print target_traces.shape
+print((target_traces.shape))
 
 # -----------------------------
 # --- Load NEURON morphology
@@ -67,10 +67,10 @@ t_vec = np.linspace(0, (samples_num-1)*dt, samples_num)
 # ---------------------------------------
 invcovmat_path = None  # Set to None if covmat is to be computed
 if invcovmat_path is None:
-    print "Constructing covmat and invcovmat..."
+    print("Constructing covmat and invcovmat...")
     covmat, invcovmat = inv_cov_mat(aut_corr_func, t_vec)
-    print "Inverse covariance matrix is loaded to memory!"
-    print invcovmat.shape
+    print("Inverse covariance matrix is loaded to memory!")
+    print((invcovmat.shape))
     # np.savetxt("invcovmat.txt", invcovmat)
     # print("Inverse covmat is saved, next time you can load it.")
 else:
@@ -119,8 +119,8 @@ database.create_array(database.root, "fixed_params",
                       shape=fixed_p.shape, obj=fixed_p)
 
 database.flush()
-print "Parameter space initialization data saved to disk"
-print database
+print("Parameter space initialization data saved to disk")
+print(database)
 database.close()
 
 
@@ -129,7 +129,7 @@ database.close()
 # Load stimulus
 s = np.loadtxt(path_stimulus)
 s = s[:-1]
-print("stimulus len: ", s.shape)
+print(("stimulus len: ", s.shape))
 model = partial(real_morphology_model_2, stim=s)
 
 if __name__ == '__main__':
@@ -137,4 +137,4 @@ if __name__ == '__main__':
                                working_path=working_path)
 
 runningTime = (time.time()-startTime)/60
-print "\n\nThe script was running for %f minutes" % runningTime
+print(("\n\nThe script was running for %f minutes" % runningTime))

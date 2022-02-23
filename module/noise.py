@@ -228,7 +228,7 @@ def colored_vector(D, lamb, dt, vec):  # TODO not working properly!!!
     noise_generator = colored_noise_generator(D, lamb, dt)
 
     # iterate through vec and add noise then return the list
-    return [x + noise_generator.next() for x in vec]
+    return [x + next(noise_generator) for x in vec]
 
 
 # Create noise with known autocorrelation function ----------------------------------------------------------------
@@ -252,8 +252,8 @@ def near_psd(x, epsilon=0.00001):
 
     # Removing scaling factor of covariance matrix
     n = x.shape[0]
-    var_list = np.array([np.sqrt(x[i,i]) for i in xrange(n)])
-    y = np.array([[x[i, j]/(var_list[i]*var_list[j]) for i in xrange(n)] for j in xrange(n)])
+    var_list = np.array([np.sqrt(x[i,i]) for i in range(n)])
+    y = np.array([[x[i, j]/(var_list[i]*var_list[j]) for i in range(n)] for j in range(n)])
 
     # getting the nearest correlation matrix
     eigval, eigvec = np.linalg.eig(y)
@@ -265,9 +265,9 @@ def near_psd(x, epsilon=0.00001):
     near_corr = B*B.T
 
     # returning the scaling factors
-    near_cov = np.array([[near_corr[i, j]*(var_list[i]*var_list[j]) for i in xrange(n)] for j in xrange(n)])
+    near_cov = np.array([[near_corr[i, j]*(var_list[i]*var_list[j]) for i in range(n)] for j in range(n)])
 
-    print "Transformed to near positive definite matrix!"
+    print("Transformed to near positive definite matrix!")
     return near_cov
 
 
@@ -280,7 +280,7 @@ def cov_mat(f, t_vec):
     :return: The covariance matrix for the given autocorrelation function
     """
 
-    return np.array([[f(abs(t_vec[t1] - t_vec[t2])) for t2 in xrange(len(t_vec))] for t1 in xrange(len(t_vec))])
+    return np.array([[f(abs(t_vec[t1] - t_vec[t2])) for t2 in range(len(t_vec))] for t1 in range(len(t_vec))])
 
 
 def inv_cov_mat(f, t_vec):
@@ -291,7 +291,7 @@ def inv_cov_mat(f, t_vec):
     :param t_vec: time vector for the function
     :return: the covariance matrix and the inverse covariance matrix
     """
-    covmat = [[f(t_vec[t1] - t_vec[t2]) for t2 in xrange(len(t_vec))] for t1 in xrange(len(t_vec))]
+    covmat = [[f(t_vec[t1] - t_vec[t2]) for t2 in range(len(t_vec))] for t1 in range(len(t_vec))]
 
     return np.array(covmat), np.linalg.inv(covmat)
 
@@ -307,7 +307,7 @@ def inv_cov_mat_sd(f, t_vec):
     :return: the covariance matrix and the inverse covariance matrix
     """
 
-    covmat = np.array([[f(t_vec[t1] - t_vec[t2]) for t2 in xrange(len(t_vec))] for t1 in xrange(len(t_vec))])
+    covmat = np.array([[f(t_vec[t1] - t_vec[t2]) for t2 in range(len(t_vec))] for t1 in range(len(t_vec))])
 
     # creating big matrix containing soma-dendrit cross-correlation
     s = covmat.shape[0]

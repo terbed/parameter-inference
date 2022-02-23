@@ -22,7 +22,7 @@ np.random.seed(42)
 
 
 for i in range(10):
-    print "\n\n--- SIMULATION FOR %ith FIXED PARAMETER ---" % (i+1)
+    print("\n\n--- SIMULATION FOR %ith FIXED PARAMETER ---" % (i+1))
     # Set up "true" value for this cycle
     current_value = {}                                          
 
@@ -39,7 +39,7 @@ for i in range(10):
                                             sigma=p_std[idx], mean=p_mean[idx]))
 
     for item in hz:
-        print "\n\n---------------------------------------- Running %i Hz zap protocol" % item
+        print("\n\n---------------------------------------- Running %i Hz zap protocol" % item)
 
         # Stimulus path
         stim = np.loadtxt("/Users/Dani/TDK/parameter_estim/stim_protocol2/zap/%i/stim.txt" % item)
@@ -61,7 +61,7 @@ for i in range(10):
             inf.run_moretrace_inf()
 
     for item in duration:
-        print "\n\n---------------------------------------- Running %i ms impulse protocol" % item
+        print("\n\n---------------------------------------- Running %i ms impulse protocol" % item)
 
         # Stimulus path
         stim = np.loadtxt("/Users/Dani/TDK/parameter_estim/stim_protocol2/steps/%i/stim.txt" % item)

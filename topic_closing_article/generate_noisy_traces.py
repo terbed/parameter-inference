@@ -43,9 +43,9 @@ np.savetxt("stimulus_vector.txt", stim_vect, delimiter='\t')
 
 traces = more_c_trace(noise_D, noise_lamb, 0.1, exp_model, parameters, 30)
 
-print traces.shape
+print(traces.shape)
 traces = traces.reshape((30, 12001))
-print traces.shape
+print(traces.shape)
 
 plt.figure(figsize=(12, 6))
 plt.plot(t, traces.transpose())

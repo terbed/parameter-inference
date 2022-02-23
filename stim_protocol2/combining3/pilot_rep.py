@@ -39,13 +39,13 @@ prior_set = ParameterSet(*prior_params)
 fixed_params = sampling_from_prior(prior_set, fixed_param_num)
 
 for idx, current_params in enumerate(fixed_params):
-    print "\n\n---------------------------------------- %ith FIXED PARAMETER -------------------------------------" % idx
+    print("\n\n---------------------------------------- %ith FIXED PARAMETER -------------------------------------" % idx)
 
     for param in prior_set.params:
         param.value = current_params[param.name]
 
     for item in hz:
-        print "\n\n---------------------------------------- Running %i Hz zap protocol" % item
+        print("\n\n---------------------------------------- Running %i Hz zap protocol" % item)
 
         # Stimulus path
         stim = np.loadtxt("/Users/Dani/TDK/parameter_estim/stim_protocol2/zap/%i/stim.txt" % item)
@@ -63,7 +63,7 @@ for idx, current_params in enumerate(fixed_params):
                          working_path=working_path)
 
     for item in duration:
-        print "\n\n---------------------------------------- Running %i ms impulse protocol" % item
+        print("\n\n---------------------------------------- Running %i ms impulse protocol" % item)
 
         # Stimulus path
         stim = np.loadtxt("/Users/Dani/TDK/parameter_estim/stim_protocol2/steps/%i/stim.txt" % item)
@@ -81,4 +81,4 @@ for idx, current_params in enumerate(fixed_params):
                          working_path=working_path)
 
 runningTime = (time.time()-startTime)/60
-print "\n\nThe script was running for %f minutes" % runningTime
+print("\n\nThe script was running for %f minutes" % runningTime)
