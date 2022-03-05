@@ -467,7 +467,7 @@ def real_morphology_model_2(stim, gpas=0.0001, Ra=100., ffact=1., dt=0.1):
 
     # Simulation duration and RUN
     # h.tstop = 1200  # Simulation end
-    h.v_init = 0
+    h.v_init = -69.196
     h.finitialize(h.v_init)
 
     h.init()
