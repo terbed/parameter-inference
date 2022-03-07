@@ -280,7 +280,7 @@ def cov_mat(f, t_vec):
     :return: The covariance matrix for the given autocorrelation function
     """
 
-    return np.array([[f(abs(t_vec[t1] - t_vec[t2])) for t2 in xrange(len(t_vec))] for t1 in xrange(len(t_vec))])
+    return np.array([[f(t_vec[t1] - t_vec[t2]) for t2 in xrange(len(t_vec))] for t1 in xrange(len(t_vec))])
 
 
 def inv_cov_mat(f, t_vec):

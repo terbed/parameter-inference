@@ -31,11 +31,13 @@ working_path = "/Users/admin/PROJECTS/SPE/parameter-inference/exp/exp_160526"
 # ----------------------
 # Construct noise model
 # ----------------------
+# def aut_corr_func(x):
+#     return A*np.exp(-x/T1)*np.cos(2*np.pi/T2*x+phi)
 def aut_corr_func(x):
-    return A*np.exp(-x/T1)*np.cos(2*np.pi/T2*x+phi)
+    return A*np.exp(-np.abs(x)/T1)*np.cos(2*np.pi/T2*x)
 
 # fitted model parameters:
-A, T1, T2, phi = [ 2.79388925e-02,  3.91934291e+02, 9.54439765e+02, -9.99502661e+01]
+A, T1, T2 = [0.023, 350, 750]
 
 # def aut_corr_func(x):
 #     return p[0]*np.exp(-np.abs(x)/p[1])*np.cos(2*np.pi/p[2]*np.abs(x))

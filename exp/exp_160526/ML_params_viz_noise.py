@@ -4,7 +4,7 @@ import numpy as np
 from neuron import h, gui
 from module.simulation import real_morphology_model_2
 from functools import  partial
-import os
+from module.noise import noise_from_covmat, cov_mat
 
 # create output directory
 output_path = "ML_params_viz_output_2_noise"
@@ -15,6 +15,34 @@ path_stimulus = "/Users/admin/PROJECTS/SPE/parameter-inference/exp/exp_160526/ne
 dt = 0.1
 samples_num = 15000
 noise_rep = 45      # How many repetition while params are fixed
+
+
+# ----------------------
+# Construct noise model
+# ----------------------
+def aut_corr_func(x):
+    return A*np.exp(-np.abs(x)/T1)*np.cos(2*np.pi/T2*x)
+
+
+# fitted model parameters:
+A, T1, T2, phi = [ 2.79388925e-02, 3.91934291e+02, 9.54439765e+02, -9.99502661e+01]
+
+t_vec = np.linspace(0, (samples_num-1)*dt, samples_num)
+
+# visualize autocorr functions
+full_t_vec = np.linspace(-samples_num*dt, +samples_num*dt, samples_num)
+y = map(aut_corr_func, list(full_t_vec))
+plt.plot(full_t_vec, y)
+plt.show()
+
+print "Constructing covmat and invcovmat..."
+covmat = cov_mat(aut_corr_func, t_vec)
+print "Inverse covariance matrix is loaded to memory!"
+print covmat.shape
+print("Symmetric: ")
+print(np.allclose(covmat, covmat.T))
+print("Positive semidefinit: ")
+print(np.all(np.linalg.eigvals(covmat) >= -1.e-8))
 
 # -----------------------------
 # --- Load NEURON morphology
@@ -58,9 +86,11 @@ model = partial(real_morphology_model_2, stim=s)
 
 for i, trace in enumerate(target_traces):
     t, v = model(**model_parameters[i])
+    v_ = noise_from_covmat(covmat, v)
     plt.figure(figsize=(12, 6))
     plt.plot(t, trace, label="Recorded trace")
     plt.plot(t, v, label="Simulated trace")
+    plt.plot(t, v_, label="Simulated trace with noise")
     plt.legend()
     plt.title("Target trace and corresponding simulation with ML parameters | rep " + str(i))
     plt.savefig(output_path + "/rep_" + str(i) + ".pdf")
