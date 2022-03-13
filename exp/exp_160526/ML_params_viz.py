@@ -7,10 +7,11 @@ from functools import  partial
 import os
 
 # create output directory
-output_path = "ML_params_viz_output_2_noise"
+output_path = "ML_params_viz_output_3"
 path_target_traces = "/Users/admin/GD/PROJECTS/SPE/data/160526-C2-row-dt0.1-1.5s-corrected.txt"
 path_neuron_model = 'load_file("/Users/admin/PROJECTS/SPE/parameter-inference/exp/exp_160526/load_new_passive.hoc")'
 path_stimulus = "/Users/admin/PROJECTS/SPE/parameter-inference/exp/exp_160526/new_stim-dt0.1-1.5sec.txt"
+path_ml_csv = "single_plots_3/ML.csv"
 
 dt = 0.1
 samples_num = 15000
@@ -27,7 +28,7 @@ h('forall {nseg = int((L/(0.1*lambda_f(100))+.9)/2)*2 + 1}')  # If Ra_max = 105 
 
 # read ML params
 #v p_names = ['Ra', 'gpas', 'ffact']
-inferred_params = pd.read_csv("single_plots_2/ML.csv", header=None)
+inferred_params = pd.read_csv(path_ml_csv, header=None)
 print(inferred_params.head())
 
 # Create lis of function input dict
@@ -65,3 +66,4 @@ for i, trace in enumerate(target_traces):
     plt.title("Target trace and corresponding simulation with ML parameters | rep " + str(i))
     plt.savefig(output_path + "/rep_" + str(i) + ".pdf")
     plt.cla()
+    plt.close()
