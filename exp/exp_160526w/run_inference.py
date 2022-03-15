@@ -5,7 +5,6 @@ import numpy as np
 from neuron import h, gui
 from module.simulation import real_morphology_model_2
 from module.probability import ParameterSet, RandomVariable
-from module.noise import inv_cov_mat
 from module.protocol_test import run_protocol_simulations
 import tables as tb
 from functools import  partial
