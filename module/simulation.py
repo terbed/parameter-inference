@@ -419,18 +419,18 @@ def real_morphology_model(stim, gpas=0.0001, Ra=100., cm=1., dt=0.1):
     return t, v
 
 
-def real_morphology_model_2(stim, stim_sec=93, stim_pos=0.5, gpas=0.0001, Ra=100., ffact=1., dt=0.1):
+def real_morphology_model_2(stim, v_init=-69.196, stim_sec=93, stim_pos=0.5, gpas=0.0001, Ra=100., ffact=1., dt=0.1):
     # -- Biophysics --
     # Sec parameters and conductance
     for sec in h.allsec():
         sec.Ra = Ra  # Ra is a parameter to infer
         sec.cm = 1   # parameter optimisation algorithm found this
-        sec.v = -69.196
+        sec.v = v_init
 
         sec.insert('pas')
         for seg in sec:
             seg.g_pas = gpas  # gpas is a parameter to infer
-            seg.e_pas = -69.196
+            seg.e_pas = v_init
 
     for sec in h.basal:
         sec.cm *= ffact
@@ -467,7 +467,7 @@ def real_morphology_model_2(stim, stim_sec=93, stim_pos=0.5, gpas=0.0001, Ra=100
 
     # Simulation duration and RUN
     # h.tstop = 1200  # Simulation end
-    h.v_init = -69.196
+    h.v_init = v_init
     h.finitialize(h.v_init)
 
     h.init()
@@ -479,13 +479,13 @@ def real_morphology_model_2(stim, stim_sec=93, stim_pos=0.5, gpas=0.0001, Ra=100
     return t, v
 
 
-def real_morphology_model_2_spatial(stim, stim_sec=93, stim_pos=0.5, gpas_soma=2.05e-05, k=0.001, Ra=34., ffact=1.55, dt=0.1):
+def real_morphology_model_2_spatial(stim, v_init=-69.196, stim_sec=93, stim_pos=0.5, gpas_soma=2.05e-05, k=0.001, Ra=34., ffact=1.55, dt=0.1):
     # -- Biophysics --
     # Sec parameters and conductance
     for sec in h.allsec():
         sec.Ra = Ra  # Ra is a parameter to infer
         sec.cm = 1   # parameter optimisation algorithm found this
-        sec.v = -69.196
+        sec.v = v_init
 
         sec.insert('pas')
         for seg in sec:
@@ -499,7 +499,7 @@ def real_morphology_model_2_spatial(stim, stim_sec=93, stim_pos=0.5, gpas_soma=2
             else:
                 seg.g_pas = gpas
 
-            seg.e_pas = -69.196
+            seg.e_pas = v_init
 
     for sec in h.basal:
         sec.cm *= ffact
@@ -536,7 +536,7 @@ def real_morphology_model_2_spatial(stim, stim_sec=93, stim_pos=0.5, gpas_soma=2
 
     # Simulation duration and RUN
     # h.tstop = 1200  # Simulation end
-    h.v_init = -69.196
+    h.v_init = v_init
     h.finitialize(h.v_init)
 
     h.init()
