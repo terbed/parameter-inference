@@ -419,7 +419,7 @@ def real_morphology_model(stim, gpas=0.0001, Ra=100., cm=1., dt=0.1):
     return t, v
 
 
-def real_morphology_model_2(stim, gpas=0.0001, Ra=100., ffact=1., dt=0.1):
+def real_morphology_model_2(stim, stim_sec=93, stim_pos=0.5, gpas=0.0001, Ra=100., ffact=1., dt=0.1):
     # -- Biophysics --
     # Sec parameters and conductance
     for sec in h.allsec():
@@ -452,7 +452,7 @@ def real_morphology_model_2(stim, gpas=0.0001, Ra=100., ffact=1., dt=0.1):
     h.tstop = len(stim) * dt
     h.load_file("vplay.hoc")
     vec = h.Vector(stim)
-    istim = h.IClamp(h.apic[93](0.5))
+    istim = h.IClamp(h.apic[stim_sec](stim_pos))
     vec.play(istim._ref_amp, h.dt)
     istim.delay = 0  # Just for Neuron
     istim.dur = 1e9  # Just for Neuron
@@ -462,7 +462,7 @@ def real_morphology_model_2(stim, gpas=0.0001, Ra=100., ffact=1., dt=0.1):
     # Set up recording Vectors
     v_vec = h.Vector()  # Membrane potential vector
     t_vec = h.Vector()  # Time stamp vector
-    v_vec.record(h.apic[93](0.5)._ref_v)
+    v_vec.record(h.apic[stim_sec](stim_pos)._ref_v)
     t_vec.record(h._ref_t)
 
     # Simulation duration and RUN
@@ -479,7 +479,7 @@ def real_morphology_model_2(stim, gpas=0.0001, Ra=100., ffact=1., dt=0.1):
     return t, v
 
 
-def real_morphology_model_2_spatial(stim, gpas_soma=2.05e-05, k=0.001, Ra=34., ffact=1.55, dt=0.1):
+def real_morphology_model_2_spatial(stim, stim_sec=93, stim_pos=0.5, gpas_soma=2.05e-05, k=0.001, Ra=34., ffact=1.55, dt=0.1):
     # -- Biophysics --
     # Sec parameters and conductance
     for sec in h.allsec():
@@ -521,7 +521,7 @@ def real_morphology_model_2_spatial(stim, gpas_soma=2.05e-05, k=0.001, Ra=34., f
     h.tstop = len(stim) * dt
     h.load_file("vplay.hoc")
     vec = h.Vector(stim)
-    istim = h.IClamp(h.apic[93](0.5))
+    istim = h.IClamp(h.apic[stim_sec](stim_pos))
     vec.play(istim._ref_amp, h.dt)
     istim.delay = 0  # Just for Neuron
     istim.dur = 1e9  # Just for Neuron
@@ -531,7 +531,7 @@ def real_morphology_model_2_spatial(stim, gpas_soma=2.05e-05, k=0.001, Ra=34., f
     # Set up recording Vectors
     v_vec = h.Vector()  # Membrane potential vector
     t_vec = h.Vector()  # Time stamp vector
-    v_vec.record(h.apic[93](0.5)._ref_v)
+    v_vec.record(h.apic[stim_sec](stim_pos)._ref_v)
     t_vec.record(h._ref_t)
 
     # Simulation duration and RUN
