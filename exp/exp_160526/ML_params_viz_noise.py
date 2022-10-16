@@ -20,26 +20,52 @@ noise_rep = 45      # How many repetition while params are fixed
 # ----------------------
 # Construct noise model
 # ----------------------
-def aut_corr_func(x):
-    y = A*np.exp(-np.abs(x)/T1)*np.cos(np.abs(2*np.pi/T2*x)+phi)
+def aut_corr_func2(x):
+    y = A2*np.exp(-np.abs(x)/T12)*np.cos(np.abs(2*np.pi/T22*x)+phi2)
     if x == 0:
         y += 0.0035
     return y
 
 
 # fitted model parameters:
-A, T1, T2, phi = [ 2.79388925e-02,  3.91934291e+02,  9.54439765e+02, -9.99502661e+01]
+A2, T12, T22, phi2 = [ 2.79388925e-02,  3.91934291e+02,  9.54439765e+02, -9.99502661e+01]
 
 t_vec = np.linspace(0, (samples_num-1)*dt, samples_num)
-y = map(aut_corr_func, t_vec)
-print("y[0] = {}  | sum(y[1:]) = {}".format(y[0], sum(y[1:])))
+y2 = map(aut_corr_func2, t_vec)
+y2_sum = np.sum(y2)
+print("expcos2 sum(y) = {}".format(sum(y2)))
+
+def aut_corr_func1(x):
+    y = A1*np.exp(-np.abs(x)/T11)*np.cos(np.abs(2*np.pi/T21*x))
+    if x == 0:
+        y += 0.0035
+    return y
+
+
+# fitted model parameters:
+A1, T11, T21 = [0.023, 400, 750]
+
+t_vec = np.linspace(0, (samples_num-1)*dt, samples_num)
+y1 = map(aut_corr_func1, t_vec)
+y1_sum = np.sum(y1)
+print("expcos sum(y) = {}".format(sum(y1)))
 
 
 # visualize autocorr functions
 full_t_vec = np.linspace(-samples_num*dt, +samples_num*dt, samples_num*2+1)
-y = map(aut_corr_func, list(full_t_vec))
-plt.plot(full_t_vec, y)
+y1 = map(aut_corr_func1, list(full_t_vec))
+y2 = map(aut_corr_func2, list(full_t_vec))
+
+plt.figure(figsize=(10,5))
+plt.plot(full_t_vec, y1, label="expcos | sum: {}".format(y1_sum))
+plt.plot(full_t_vec, y2, label="expcos2 | sum: {}".format(y2_sum))
+plt.xlabel("time (ms)")
+plt.legend()
+plt.grid()
 plt.show()
+
+
+assert False, "EOP"
 
 print "Constructing covmat and invcovmat..."
 covmat = cov_mat(aut_corr_func, t_vec)
