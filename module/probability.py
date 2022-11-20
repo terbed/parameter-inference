@@ -24,7 +24,7 @@ class RandomVariable:
         :param resolution: resolution of simulation
         :param mean: the mean of the prior distribution
         :param sigma: standard deviation of the prior distribution
-        :param value: the true value (optional) if not given, than value=mean
+        :param value: the true value (optional) if not given, then value=mean
         :param p_sampling: parameter sampling method: uniform: 'u' or prior: 'p' (sampled from prior distribution)
         """
 

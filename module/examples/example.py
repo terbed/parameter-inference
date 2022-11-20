@@ -1,3 +1,9 @@
+# add project root directory to search path
+import sys
+
+import matplotlib.pyplot as plt
+
+sys.path.append('../..')
 from module.noise import white
 from module.probability import RandomVariable, ParameterSet, IndependentInference
 from module.simulation import stick_and_ball
@@ -17,9 +23,16 @@ cm_gpas = ParameterSet(cm, gpas)
 t, v = stick_and_ball()
 exp_v = white(noise, v)
 
+# # plot v and exp_v in t
+# plt.figure()
+# plt.plot(t, exp_v, label='exp_v')
+# plt.plot(t, v, label='v')
+# plt.legend()
+# plt.show()
+
 # 4.) Set up inference
 inf = IndependentInference(model=stick_and_ball, noise_std=noise, target_trace=exp_v, parameter_set=cm_gpas,
-                           working_path="/home/terbed/PROJECTS/SPE/parameter-inference/module/examples/output", speed='max', save=False)
+                           working_path="/Users/admin/PROJECTS/SPE/parameter-inference/module/examples/output", speed='max', save=False)
 
 # 5.) Run inference
 if __name__ == "__main__":
