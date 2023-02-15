@@ -267,7 +267,9 @@ def plot_single_results(path, numfp, which, dbs):
         lldbs = tb.open_file(path + "/ll%i.hdf5" % i, mode="r")
 
         for idx, param in enumerate(p_set.params):
-            param.value = dbs.root.fixed_params[i, idx]
+            val = dbs.root.fixed_params[i, idx]
+            if val == val: # if not nan
+                param.value = dbs.root.fixed_params[i, idx]
 
         res = Analyse(lldbs.root.ll[:, which], p_set, path + "/single_plots")
         print res
@@ -295,7 +297,10 @@ def plot_single_results_reps(path, numrep, which, dbs):
         print "\n\n%i th repetition: --------------------------" % i
 
         for idx, param in enumerate(p_set.params):
-            param.value = dbs.root.fixed_params[which, idx]
+            val = dbs.root.fixed_params[which, idx]
+            # if val is not nan assign it to param.value
+            if val == val:
+                param.value = val
 
         res = Analyse(lldbs.root.ll[:, i], p_set, path + "/single_plots")
         print res
