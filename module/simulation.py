@@ -478,6 +478,67 @@ def real_morphology_model_2(stim, gpas=0.0001, Ra=100., ffact=1., dt=0.1):
 
     return t, v
 
+
+def real_morphology_model_3(stim, gpas=0.0001, Ra=100., ffact=1., dt=0.1):
+    # -- Biophysics --
+    # Sec parameters and conductance
+    for sec in h.allsec():
+        sec.Ra = Ra  # Ra is a parameter to infer
+        sec.cm = 1   # parameter optimisation algorithm found this
+        sec.v = -69.196
+
+        sec.insert('pas')
+        for seg in sec:
+            seg.g_pas = gpas  # gpas is a parameter to infer
+            seg.e_pas = -69.196
+
+    for sec in h.basal:
+        sec.cm *= ffact
+        for seg in sec:
+            seg.g_pas *= ffact
+
+    for sec in h.apical:
+        sec.cm *= ffact
+        for seg in sec:
+            seg.g_pas *= ffact
+
+    # Print information
+    # h.psection()
+
+    h.dt = dt  # Time step (iteration)
+    h.steps_per_ms = 1 / dt
+
+    # Stimulus
+    h.tstop = len(stim) * dt
+    h.load_file("vplay.hoc")
+    vec = h.Vector(stim)
+    istim = h.IClamp(h.soma(0.5))
+    vec.play(istim._ref_amp, h.dt)
+    istim.delay = 0  # Just for Neuron
+    istim.dur = 1e9  # Just for Neuron
+
+
+    # Run simulation ->
+    # Set up recording Vectors
+    v_vec = h.Vector()  # Membrane potential vector
+    t_vec = h.Vector()  # Time stamp vector
+    v_vec.record(h.soma(0.5)._ref_v)
+    t_vec.record(h._ref_t)
+
+    # Simulation duration and RUN
+    # h.tstop = 1200  # Simulation end
+    h.v_init = 0
+    h.finitialize(h.v_init)
+
+    h.init()
+    h.run()
+
+    t = t_vec.to_python()
+    v = v_vec.to_python()
+
+    return t, v
+
+
 def real_morphology_model_dend(stim, gpas=0.0001, Ra=100., cm=1., dt=0.1):
     # -- Biophysics --
     # Sec parameters and conductance

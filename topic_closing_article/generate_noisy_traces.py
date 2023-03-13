@@ -1,9 +1,10 @@
-from simulation import exp_model
+from simulation import exp_model, real_morphology_model_3
 from noise import more_c_trace
 from neuron import h, gui
 from matplotlib import pyplot as plt
 import numpy as np
 from sys import exit
+from functools import partial
 
 parameters = [{"Ra": 100., "gpas": 0.0001, "cm": 1.}]
 noise_D = 21.6767
@@ -41,7 +42,10 @@ for time in t:
 stim_vect = np.reshape(stim_vect, (len(stim_vect), 1))
 np.savetxt("stimulus_vector.txt", stim_vect, delimiter='\t')
 
-traces = more_c_trace(noise_D, noise_lamb, 0.1, exp_model, parameters, 30)
+model = real_morphology_model_3
+model = partial(model, stim=stim_vect)
+
+traces = more_c_trace(noise_D, noise_lamb, 0.1, model, parameters, 30)
 
 print(traces.shape)
 traces = traces.reshape((30, 12001))
