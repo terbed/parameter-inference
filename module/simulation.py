@@ -479,12 +479,12 @@ def real_morphology_model_2(stim, gpas=0.0001, Ra=100., ffact=1., dt=0.1):
     return t, v
 
 
-def real_morphology_model_3(stim, gpas=0.0001, Ra=100., ffact=1., dt=0.1):
+def real_morphology_model_3(stim, gpas=0.0001, Ra=100., cm=1., ffact=1., dt=0.1):
     # -- Biophysics --
     # Sec parameters and conductance
     for sec in h.allsec():
-        sec.Ra = Ra  # Ra is a parameter to infer
-        sec.cm = 1   # parameter optimisation algorithm found this
+        sec.Ra = Ra   # Ra is a parameter to infer
+        sec.cm = cm   # cm parameter to infer
         sec.v = -69.196
 
         sec.insert('pas')
