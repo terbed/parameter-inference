@@ -42,8 +42,11 @@ def load_parameter_set(params_data):
 
     p = []
     for item in params_data:
+        name = str(item[0])
+        # Select name in between xxx'name'yyy and remove the ' ' if there is any
+        name = name[name.find("'") + 1:name.rfind("'")]
         p.append(
-            RandomVariable(name=item[0], range_min=float(item[1]), range_max=float(item[2]), resolution=float(item[3]),
+            RandomVariable(name=name, range_min=float(item[1]), range_max=float(item[2]), resolution=int(item[3]),
                            mean=float(item[4]), sigma=float(item[5]), value=float(item[6])))
     p_set = ParameterSet(*p)
 
