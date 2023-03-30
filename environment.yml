@@ -7,7 +7,6 @@ dependencies:
   - scipy
   - matplotlib
   - pytables
-  - neuron
   - pandas
   - seaborn
   - tqdm

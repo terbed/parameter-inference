@@ -140,7 +140,7 @@ class ParameterSet:
     def create_batch(self):
         """Create batches with self.batch_len elements for flawless multiprocessing"""
         print("Creating batches for flawless simulations...")
-        batch_num = len(self.parameter_set_seq)/self.batch_len  # This stores an int
+        batch_num = len(self.parameter_set_seq)//self.batch_len  # This stores an int
         for times in range(batch_num):
             self.parameter_set_batch_list.append(self.parameter_set_seq[times*self.batch_len: (times+1)*self.batch_len])
 

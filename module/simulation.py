@@ -509,7 +509,7 @@ def real_morphology_model_3(stim, v_init=-65, gpas=0.0001, Ra=100., cm=1., ffact
     h.steps_per_ms = 1 / dt
 
     # Stimulus
-    h.tstop = len(stim) * dt
+    h.tstop = (len(stim)-1) * dt
     h.load_file("vplay.hoc")
     vec = h.Vector(stim)
     istim = h.IClamp(h.soma(0.5))
