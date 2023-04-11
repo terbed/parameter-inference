@@ -297,9 +297,9 @@ def plot_single_results_reps(path, numrep, which, dbs):
         print(("\n\n%i th repetition: --------------------------" % i))
 
         for idx, param in enumerate(p_set.params):
-            val = dbs.root.fixed_params[i, idx]
+            val = dbs.root.fixed_params[which, idx]
             if val == val:  # if not nan
-                param.value = dbs.root.fixed_params[i, idx]
+                param.value = val
 
         res = Analyse(lldbs.root.ll[:, i], p_set, path + "/single_plots")
         print(res)
