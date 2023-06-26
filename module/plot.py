@@ -12,6 +12,8 @@ from matplotlib import pyplot as plt
 from module.prior import normal
 import csv
 
+plt.rcParams["text.usetex"] = False
+
 
 def check_directory(working_path):
     if not os.path.exists(working_path):

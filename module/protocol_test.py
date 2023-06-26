@@ -11,6 +11,7 @@ import os
 import tables as tb
 import pandas as pd
 from tqdm import tqdm
+from matplotlib import pyplot as plt
 
 
 def check_directory(working_path):
@@ -410,7 +411,6 @@ def protocol_comparison(path_list, numfp, repnum_k, inferred_params, out_path, d
     :param protocol_xticks: Protocol names on x axes
     :return: .txt file each contains sharpness, broadness and KL statistics for each protocol
     """
-    from matplotlib import pyplot as plt
     m = 0
     setup_name = path_list[0].split('/')[-3]
     setup_name = setup_name.replace('_', '-', 100)
@@ -531,7 +531,7 @@ def protocol_comparison(path_list, numfp, repnum_k, inferred_params, out_path, d
             #y_max = f(x_max)
 
             plt.figure(figsize=(12, 7))
-            plt.rc('text', usetex=True)
+            plt.rc('text', usetex=False)
             plt.title(
                 "Posterior dist. std parameter" + "  | Protocol: " + full_identification + "  | param.: " + inferred_params[param_idx] + r" | $\sigma_{prior}$: " + str(
                     p_set.params[param_idx].sigma))
@@ -712,9 +712,13 @@ def est_rep_num(k, sigma_0, mean_sigma_k, d):
     try:
         alpha = (sn**2/(1-sn**2))
     except ZeroDivisionError:
-        return 0.
+        return 1e6
 
     n = k*(sk**2/(1-sk**2))/alpha
+
+    # n should be positive
+    if n < 0:
+        return 1e6
 
     return n
 
